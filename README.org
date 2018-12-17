@@ -1,0 +1,76 @@
+#+TITLE: AngularMomentumAlgebra.jl
+#+AUTHOR: Stefanos Carlström
+#+EMAIL: stefanos.carlstrom@gmail.com
+
+
+#+PROPERTY: header-args:julia :session *julia-README*
+* Usage
+  #+BEGIN_SRC julia :exports none
+    using Revise
+    using Pkg
+    Pkg.activate(".")
+  #+END_SRC
+
+  #+BEGIN_SRC julia :exports code
+    using AngularMomentumAlgebra
+  #+END_SRC
+
+  #+RESULTS:
+  : nothing
+
+  A 3j symbol can be constructed simply as
+  #+BEGIN_SRC julia :exports both :results verbatim
+    iiij = IIIJ(0, 1, 1,
+                0, 1, -1)
+  #+END_SRC
+
+  #+RESULTS:
+  : ⎛0  1  1 ⎞
+  : ⎝0  1  -1⎠
+
+  To evaluate it (via [[https://github.com/Jutho/WignerSymbols.jl][WignerSymbols.jl]]), convert it to a numeric type:
+  #+BEGIN_SRC julia :exports both :results verbatim
+    convert(Float64, iiij)
+  #+END_SRC
+
+  #+RESULTS:
+  : 0.5773502691896257
+
+  The 3j symbols can also hold =Symbolic= values, but can of course
+  not be evaluated:
+  #+BEGIN_SRC julia :exports both :results verbatim
+    IIIJ(:l, :k, :j,
+         :m, :q, :n)
+  #+END_SRC
+
+  #+RESULTS:
+  : ⎛l k j⎞
+  : ⎝m q n⎠
+
+  6j and 9j symbols are also available, although the latter cannot yet
+  be numerically evaluated due to not being implemented in
+  WignerSymbols.jl yet.
+
+  Another object of interest is the Clebsch–Gordan coefficient:
+  #+BEGIN_SRC julia :exports both :results verbatim
+    cg = ClebschGordan(1,0,3//2,3//2,5//2,3//2)
+  #+END_SRC
+
+  #+RESULTS:
+  : ⟨1,3/2;0,3/2|5/2,3/2⟩
+
+  which can be likewise converted to a number:
+  #+BEGIN_SRC julia :exports both :results verbatim
+    convert(Float64, cg)
+  #+END_SRC
+
+  #+RESULTS:
+  : 0.6324555320336758
+
+  For the case of LS coupling, a specialized type exists:
+  #+BEGIN_SRC julia :exports both :results verbatim
+    cg = ClebschGordanℓs(1,0,1//2,1//2,3//2,3//2)
+  #+END_SRC
+
+  #+RESULTS:
+  : ⟨p;0,↑|3/2,3/2⟩
