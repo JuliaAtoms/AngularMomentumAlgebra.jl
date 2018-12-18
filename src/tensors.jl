@@ -113,6 +113,24 @@ function Base.show(io::IO, rme::ReducedMatrixElement{T,B,K}) where {T,B,K}
     show(io, rme.ket)
 end
 
+function Base.show(io::IO, rme::ReducedMatrixElement{SphericalTensor{k},A,A}) where {k,A<:AngularMomentum}
+    show(io, rme.bra)
+    write(io, "|")
+    show(io, SphericalTensor{k})
+    write(io, "|")
+    show(io, rme.ket)
+
+    ℓ = convert(Rational, rme.bra.v.j)
+    denominator(ℓ) == 1 && (ℓ = ℓ |> Int)
+    ℓ′ = convert(Rational, rme.ket.v.j)
+    denominator(ℓ′) == 1 && (ℓ′ = ℓ′ |> Int)
+
+    p = (-1)^ℓ
+    write(io, " = $(p > 0 ? "" : "-")")
+    write(io, to_root((2ℓ+1)*(2ℓ′+1) |> Int))
+    show(io, IIIJ(ℓ, k, ℓ′, 0, 0, 0))
+end
+
 Base.:(|)(bra::Bra{B}, ::Type{T}) where {B,T<:AbstractTensor} =
     TensorProduct(bra, T)
 

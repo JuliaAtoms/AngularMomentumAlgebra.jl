@@ -94,7 +94,7 @@
   #+END_SRC
 
   #+RESULTS:
-  : ⟨1||𝐂⁽¹⁾||0⟩
+  : ⟨1||𝐂⁽¹⁾||0⟩ = -√3̅( 1 1 0 ; 0 0 0 )
   
   #+BEGIN_SRC julia :exports both :results verbatim
     convert(Float64,rme)
