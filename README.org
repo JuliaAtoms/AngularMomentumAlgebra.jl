@@ -103,3 +103,16 @@
   #+RESULTS:
   : 0.9999999999999999
 
+  #+BEGIN_SRC julia :exports both :results verbatim
+    bk=Bra(AngularMomentum(1))*Ket(AngularMomentum(1))
+  #+END_SRC
+
+  #+RESULTS:
+  : δ(1,1)
+
+  #+BEGIN_SRC julia :exports both :results verbatim
+    convert(Float64, bk)
+  #+END_SRC
+
+  #+RESULTS:
+  : 1.0

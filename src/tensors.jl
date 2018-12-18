@@ -86,6 +86,9 @@ struct AngularMomentum
     j::HalfInteger
 end
 
+Base.:(*)(bra::Bra{AngularMomentum}, ket::Ket{AngularMomentum}) =
+    Kronecker(bra.v, ket.v)
+
 function Base.show(io::IO, a::AngularMomentum)
     r = convert(Rational, a.j)
     write(io, "$(numerator(r))")
