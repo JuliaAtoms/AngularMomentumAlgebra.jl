@@ -74,3 +74,32 @@
 
   #+RESULTS:
   : ⟨p;0,↑|3/2,3/2⟩
+* Spherical tensors
+  #+BEGIN_SRC julia :exports both
+    C1 = SphericalTensor{1}
+  #+END_SRC
+
+  #+RESULTS:
+  : 𝐂⁽¹⁾
+  
+  #+BEGIN_SRC julia :exports both
+    t = C1⋅C1
+  #+END_SRC
+
+  #+RESULTS:
+  : 𝐂⁽¹⁾⋅𝐂⁽¹⁾
+  
+  #+BEGIN_SRC julia :exports both :results verbatim
+    rme=Bra(AngularMomentum(1))|C1|Ket(AngularMomentum(0))
+  #+END_SRC
+
+  #+RESULTS:
+  : ⟨1||𝐂⁽¹⁾||0⟩
+  
+  #+BEGIN_SRC julia :exports both :results verbatim
+    convert(Float64,rme)
+  #+END_SRC
+
+  #+RESULTS:
+  : 0.9999999999999999
+
