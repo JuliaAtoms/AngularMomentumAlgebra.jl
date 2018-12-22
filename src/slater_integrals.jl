@@ -1,22 +1,32 @@
-abstract type AbstractRadialIntegral{T,O<:Orbital} end
-abstract type AbstractSlaterIntegral{k,T,O} <: AbstractRadialIntegral{T,O} end
+abstract type AbstractRadialIntegral{O<:Orbital} end
+abstract type AbstractSlaterIntegral{k,T,O} <: AbstractRadialIntegral{O} end
 
-struct DiagonalIntegral{T,O} <: AbstractRadialIntegral{T,O}
+struct OverlapIntegral{O} <: AbstractRadialIntegral{O}
+    p::Int
+    a::O
+    b::O
+end
+OverlapIntegral(p::Integer, a::O, b::O) where {O} =
+    OverlapIntegral{O}(p, a, b)
+
+struct DiagonalIntegral{T,O,N} <: AbstractRadialIntegral{O}
     w::T
     o::O
+    overlaps::NTuple{N,OverlapIntegral{O}}
 end
-DiagonalIntegral(w::T,o::O) where {T,O} =
-    DiagonalIntegral{T,O}(w,o)
+DiagonalIntegral(w::T, o::O, overlaps::OverlapIntegral{O}...) where {T,O} =
+    DiagonalIntegral{T,O,length(overlaps)}(w, o, overlaps)
 
-struct GeneralSlaterIntegral{k,T,O} <: AbstractSlaterIntegral{k,T,O}
+struct GeneralSlaterIntegral{k,T,O,N} <: AbstractSlaterIntegral{k,T,O}
     w::T
     a::O
     b::O
     c::O
     d::O
+    overlaps::NTuple{N,OverlapIntegral{O}}
 end
-GeneralSlaterIntegral(k::Integer, w::T, a::O, b::O, c::O, d::O) where {T,O} =
-    GeneralSlaterIntegral{k,T,O}(w, a, b, c, d)
+GeneralSlaterIntegral(k::Integer, w::T, a::O, b::O, c::O, d::O, overlaps::OverlapIntegral{O}...) where {T,O} =
+    GeneralSlaterIntegral{k,T,O,length(overlaps)}(w, a, b, c, d, overlaps)
 
 struct DirectSlaterIntegral{k,T,O} <: AbstractSlaterIntegral{k,T,O}
     w::T
@@ -34,6 +44,17 @@ end
 ExchangeSlaterIntegral(w::T, a::O, b::O) where {T,O} =
     ExchangeSlaterIntegral{T,O}(w, a, b)
 
+
+
+function Base.show(io::IO, o::OverlapIntegral{O}) where O
+    write(io, "⟨")
+    show(io, o.a)
+    write(io, "|")
+    show(io, o.b)
+    write(io, "⟩")
+    o.p != 1 && write(io, to_superscript(o.p))
+end
+
 function Base.show(io::IO, I::DiagonalIntegral{T,O}) where {T,O}
     show(io, I.w)
     write(io, " × I(")
@@ -41,6 +62,10 @@ function Base.show(io::IO, I::DiagonalIntegral{T,O}) where {T,O}
     write(io, ", ")
     show(io, I.o)
     write(io, ")")
+    for ov in I.overlaps
+        write(io, " × ")
+        show(io, ov)
+    end
 end
 
 function Base.show(io::IO, R::GeneralSlaterIntegral{k,T,O}) where {k,T,O}
@@ -54,6 +79,10 @@ function Base.show(io::IO, R::GeneralSlaterIntegral{k,T,O}) where {k,T,O}
     write(io, ", ")
     show(io, R.d)
     write(io, ")")
+    for ov in R.overlaps
+        write(io, " × ")
+        show(io, ov)
+    end
 end
 
 function Base.show(io::IO, F::DirectSlaterIntegral{k,T,O}) where {k,T,O}
@@ -74,4 +103,4 @@ function Base.show(io::IO, G::ExchangeSlaterIntegral{k,T,O}) where {k,T,O}
     write(io, ")")
 end
 
-export DiagonalIntegral, GeneralSlaterIntegral, DirectSlaterIntegral, ExchangeSlaterIntegral
+export OverlapIntegral, DiagonalIntegral, GeneralSlaterIntegral, DirectSlaterIntegral, ExchangeSlaterIntegral
