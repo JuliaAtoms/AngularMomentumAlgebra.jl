@@ -1,8 +1,3 @@
-using UnicodeFun
-using LinearAlgebra
-import WignerSymbols: HalfInteger
-using Parameters
-
 # * Tensors
 
 abstract type AbstractTensor end

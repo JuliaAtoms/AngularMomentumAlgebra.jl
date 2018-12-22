@@ -1,4 +1,10 @@
-# This file is machine-generated - editing it directly is not advised
+[[AtomicLevels]]
+deps = ["Printf", "Test", "UnicodeFun"]
+git-tree-sha1 = "89932d999982287e8483a8cdb03e82c3d398afae"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaAtoms/AtomicLevels.jl.git"
+uuid = "10933b4c-d60f-11e8-1fc6-bd9035a249a1"
+version = "0.1.0"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -18,7 +24,7 @@ deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[Distributed]]
-deps = ["Random", "Serialization", "Sockets"]
+deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Formatting]]
@@ -28,7 +34,7 @@ uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.3.5"
 
 [[InteractiveUtils]]
-deps = ["Markdown"]
+deps = ["LinearAlgebra", "Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[LibGit2]]
@@ -111,7 +117,7 @@ deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[UUIDs]]
-deps = ["Random", "SHA"]
+deps = ["Random"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
