@@ -6,6 +6,7 @@ using LinearAlgebra
 import WignerSymbols: HalfInteger
 using Parameters
 
+include("symbolics.jl")
 include("j.jl")
 include("common.jl")
 include("clebsch_gordan.jl")

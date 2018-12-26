@@ -1,6 +1,8 @@
 using WignerSymbols
 using Formatting
 
+abstract type WignerJ <: Symbolic end
+
 # * Pretty-printing
 
 function show_singleline(io::IO, s::String,e::String,
@@ -39,7 +41,7 @@ end
 
 # * 3j
 
-struct IIIJ{A,B,C,D,E,F}
+struct IIIJ{A,B,C,D,E,F} <: WignerJ
     j₁::A
     j₂::B
     j₃::C
@@ -48,7 +50,7 @@ struct IIIJ{A,B,C,D,E,F}
     m₃::F
 end
 
-Base.convert(::Type{T}, iiij::IIIJ{R,R,R,R,R,R}) where {T<:Number,R<:Real} =
+Base.convert(::Type{T}, iiij::IIIJ{R,R,R,R,R,R}) where {T<:Union{Real,Complex},R<:Real} =
     wigner3j(T,
              iiij.j₁, iiij.j₂, iiij.j₃,
              iiij.m₁, iiij.m₂, iiij.m₃)
@@ -67,9 +69,18 @@ function triangle_inequality(iiij::IIIJ)
     println("|$(iiij.j₁)-$(iiij.j₂)| ≤ $(iiij.j₃) ≤ $(iiij.j₁)+$(iiij.j₂)")
 end
 
+@new_number IIIJ
+Base.:(==)(x::IIIJ, y::IIIJ) =
+    x.j₁ == y.j₁ &&
+    x.j₂ == y.j₂ &&
+    x.j₃ == y.j₃ &&
+    x.m₁ == y.m₁ &&
+    x.m₂ == y.m₂ &&
+    x.m₃ == y.m₃
+
 # * 6j
 
-struct VIJ{A,B,C,D,E,F}
+struct VIJ{A,B,C,D,E,F} <: WignerJ
     j₁::A
     j₂::B
     j₃::C
@@ -78,7 +89,7 @@ struct VIJ{A,B,C,D,E,F}
     j₆::F
 end
 
-Base.convert(::Type{T}, vij::VIJ{R,R,R,R,R,R}) where {T<:Number,R<:Real} =
+Base.convert(::Type{T}, vij::VIJ{R,R,R,R,R,R}) where {T<:Union{Real,Complex},R<:Real} =
     wigner6j(T,
              vij.j₁, vij.j₂, vij.j₃,
              vij.j₄, vij.j₅, vij.j₆)
@@ -93,9 +104,18 @@ Base.show(io::IO, ::MIME"text/plain", vij::VIJ) =
                    ("⎰","⎱")=>(vij.j₁, vij.j₂, vij.j₃),
                    ("⎱","⎰")=>(vij.j₄, vij.j₅, vij.j₆))
 
+@new_number VIJ
+Base.:(==)(x::VIJ, y::VIJ) =
+    x.j₁ == y.j₁ &&
+    x.j₂ == y.j₂ &&
+    x.j₃ == y.j₃ &&
+    x.j₄ == y.j₄ &&
+    x.j₅ == y.j₅ &&
+    x.j₆ == y.j₆
+
 # * 9j
 
-struct IXJ{A,B,C,D,E,F,G,H,I}
+struct IXJ{A,B,C,D,E,F,G,H,I} <: WignerJ
     j₁::A
     j₂::B
     j₃::C
@@ -125,5 +145,17 @@ Base.show(io::IO, ::MIME"text/plain", ixj::IXJ) =
                    ("⎧","⎫")=>(ixj.j₁, ixj.j₂, ixj.j₃),
                    ("⎨","⎬")=>(ixj.j₄, ixj.j₅, ixj.j₆),
                    ("⎩","⎭")=>(ixj.j₇, ixj.j₈, ixj.j₉))
+
+@new_number IXJ
+Base.:(==)(x::IXJ, y::IXJ) =
+    x.j₁ == y.j₁ &&
+    x.j₂ == y.j₂ &&
+    x.j₃ == y.j₃ &&
+    x.j₄ == y.j₄ &&
+    x.j₅ == y.j₅ &&
+    x.j₆ == y.j₆ &&
+    x.j₇ == y.j₇ &&
+    x.j₈ == y.j₈ &&
+    x.j₉ == y.j₉
 
 export IIIJ, VIJ, IXJ
