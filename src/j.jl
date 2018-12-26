@@ -39,6 +39,16 @@ function show_multiline(io::IO, lines::Pair{<:NTuple{2,String},<:Tuple}...)
     end
 end
 
+function latex_matrix(matrix_type::String, lines::Tuple...)
+    S = "\\begin{$(matrix_type)}"
+    lines = map(lines) do line
+        join(latex.(line),"&")
+    end
+    S *= join(lines, "\\\\")
+    S *= "\\end{$(matrix_type)}"
+    S
+end
+
 # * 3j
 
 struct IIIJ{A,B,C,D,E,F} <: WignerJ
@@ -64,6 +74,11 @@ Base.show(io::IO, ::MIME"text/plain", iiij::IIIJ) =
     show_multiline(io,
                    ("⎛","⎞")=>(iiij.j₁, iiij.j₂, iiij.j₃),
                    ("⎝","⎠")=>(iiij.m₁, iiij.m₂, iiij.m₃))
+
+latex(iiij::IIIJ) =
+    latex_matrix("pmatrix",
+                 (iiij.j₁, iiij.j₂, iiij.j₃),
+                 (iiij.m₁, iiij.m₂, iiij.m₃))
 
 function triangle_inequality(iiij::IIIJ)
     println("|$(iiij.j₁)-$(iiij.j₂)| ≤ $(iiij.j₃) ≤ $(iiij.j₁)+$(iiij.j₂)")
@@ -103,6 +118,11 @@ Base.show(io::IO, ::MIME"text/plain", vij::VIJ) =
     show_multiline(io,
                    ("⎰","⎱")=>(vij.j₁, vij.j₂, vij.j₃),
                    ("⎱","⎰")=>(vij.j₄, vij.j₅, vij.j₆))
+
+latex(vij::VIJ) =
+    latex_matrix("Bmatrix",
+                 (vij.j₁, vij.j₂, vij.j₃),
+                 (vij.j₄, vij.j₅, vij.j₆))
 
 @new_number VIJ
 Base.:(==)(x::VIJ, y::VIJ) =
@@ -145,6 +165,12 @@ Base.show(io::IO, ::MIME"text/plain", ixj::IXJ) =
                    ("⎧","⎫")=>(ixj.j₁, ixj.j₂, ixj.j₃),
                    ("⎨","⎬")=>(ixj.j₄, ixj.j₅, ixj.j₆),
                    ("⎩","⎭")=>(ixj.j₇, ixj.j₈, ixj.j₉))
+
+latex(ixj::IXJ) =
+    latex_matrix("Bmatrix",
+                 (ixj.j₁, ixj.j₂, ixj.j₃),
+                 (ixj.j₄, ixj.j₅, ixj.j₆),
+                 (ixj.j₇, ixj.j₈, ixj.j₉))
 
 @new_number IXJ
 Base.:(==)(x::IXJ, y::IXJ) =
