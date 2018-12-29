@@ -61,8 +61,6 @@ end
 function Base.show(io::IO, I::DiagonalIntegral{O}) where {O}
     write(io, "I(")
     show(io, I.o)
-    write(io, ", ")
-    show(io, I.o)
     write(io, ")")
 end
 
@@ -81,8 +79,10 @@ end
 function Base.show(io::IO, F::DirectSlaterIntegral{k,O}) where {k,O}
     write(io, "F", to_superscript(k), "(")
     show(io, F.a)
-    write(io, ", ")
-    show(io, F.b)
+    if F.a != F.b
+        write(io, ", ")
+        show(io, F.b)
+    end
     write(io, ")")
 end
 
