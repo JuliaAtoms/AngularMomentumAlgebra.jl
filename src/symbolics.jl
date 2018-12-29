@@ -31,10 +31,14 @@ end
 macro gen_compare_false(types...)
     for (i,A) in enumerate(types)
         for (j,B) in enumerate(types)
-            j ≤ i && continue
+            j < i && continue
 
             @eval Base.promote(x::$A, y::$B) =
                 (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
+
+            j == i && continue
+
+            @eval Base.promote(x::$B, y::$A) = promote(y, x)
 
             @eval Base.:(==)(x::$A, y::$B) = false
             @eval Base.:(==)(x::$B, y::$A) = false
