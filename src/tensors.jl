@@ -1,6 +1,6 @@
 # * Tensors
 
-abstract type AbstractTensor end
+abstract type AbstractTensor <: Symbolic end
 
 struct BasisTensor{T<:AbstractTensor,q} <: AbstractTensor end
 
@@ -39,10 +39,14 @@ end
 struct Bra{B} <: AbstractTensor
     v::B
 end
+Base.:(==)(a::Bra{B}, b::Bra{B}) where B =
+    a.v == b.v
 
 struct Ket{K} <: AbstractTensor
     v::K
 end
+Base.:(==)(a::Ket{K}, b::Ket{K}) where K =
+    a.v == b.v
 
 struct Braket{B,K} <: AbstractTensor
     b::B
@@ -50,6 +54,21 @@ struct Braket{B,K} <: AbstractTensor
 end
 Braket(bra::Bra{B}, ket::Ket{K}) where {B,K} =
     Braket{B,K}(bra.v, ket.v)
+Base.:(==)(a::Braket{B,K}, b::Braket{B,K}) where {B,K} =
+    a.b == b.b && a.k == b.k
+
+# The brakets are assumed to be real, hence no conjugates
+function Base.diff(bk::Braket{B,K}, orb::O, occ::I) where {B,K,O,I}
+    if orb == bk.b == bk.k
+        2Ket(orb)
+    elseif orb == bk.b
+        Ket(bk.k)
+    elseif orb == bk.k
+        Ket(bk.b)
+    else
+        0
+    end
+end
 
 Base.adjoint(bra::Bra) = Ket(bra.v)
 Base.adjoint(ket::Ket) = Bra(ket.v)
@@ -140,6 +159,42 @@ function Base.convert(::Type{T}, rme::ReducedMatrixElement{SphericalTensor{k},An
     (-one(T))^j*√((2j+1)*(2j′+1))*wigner3j(j,k,j′,0,0,0)
 end
 
+# * Lagrange multipliers
+struct LagrangeMultiplier{O} <: Symbolic
+    a::O
+    b::O
+end
+LagrangeMultiplier(o::O) where O = LagrangeMultiplier(o, o)
+
+isdiagonal(λ::LagrangeMultiplier{O}) where O =  λ.a == λ.b
+
+Base.:(==)(a::LagrangeMultiplier{O}, b::LagrangeMultiplier{O}) where O =
+    a.a == b.a && a.b == b.b
+
+Base.show(io::IO, λ::LagrangeMultiplier{O}) where O =
+    write(io, "λ[$(λ.a)"*(!isdiagonal(λ) ? "|$(λ.b)" : "")*"]")
+
+Base.diff(λ::LagrangeMultiplier{O}, orb::O, occ::I) where {O,I} = 0
+
+function lagrange_multipliers(orbitals::Vector{O}) where O
+    λ = [LagrangeMultiplier(o)*Braket(o,o) for o in orbitals]
+    for (i,o) in enumerate(orbitals)
+        for (j,o′) in enumerate(orbitals)
+            (j == i || o.ℓ != o′.ℓ) && continue
+            push!(λ, LagrangeMultiplier(o, o′)*Braket(o, o′))
+        end
+    end
+    sum(λ)
+end
+
+# * Symbolics registration
+
+@new_number Bra
+@new_number Ket
+@new_number Braket
+@new_number LagrangeMultiplier
+
 # * Exports
 
-export SphericalTensor, order, dot, ⋅, Bra, Ket, Braket, AngularMomentum
+export SphericalTensor, order, dot, ⋅, Bra, Ket, Braket, AngularMomentum,
+    LagrangeMultiplier, lagrange_multipliers

@@ -2,28 +2,28 @@ using Symbolics
 
 macro new_number(T)
     quote
-        Base.:(==)(x::$T, y) = false
-        Base.:(==)(x, y::$T) = false
-        Base.:(==)(x::$T, y::Number) = false
-        Base.:(==)(x::Number, y::$T) = false
-        Base.:(==)(x::$T, y::Sym) = false
-        Base.:(==)(x::Sym, y::$T) = false
-        Base.:(==)(x::$T, y::SymExpr) = false
-        Base.:(==)(x::SymExpr, y::$T) = false
+        Base.:(==)(x::$(esc(T)), y) = false
+        Base.:(==)(x, y::$(esc(T))) = false
+        Base.:(==)(x::$(esc(T)), y::Number) = false
+        Base.:(==)(x::Number, y::$(esc(T))) = false
+        Base.:(==)(x::$(esc(T)), y::Sym) = false
+        Base.:(==)(x::Sym, y::$(esc(T))) = false
+        Base.:(==)(x::$(esc(T)), y::SymExpr) = false
+        Base.:(==)(x::SymExpr, y::$(esc(T))) = false
 
-        Base.promote(::Type{<:$T}) = SymExpr
+        Base.promote(::Type{<:$(esc(T))}) = SymExpr
 
-        Base.promote(x::TT, y::SymExpr) where {TT<:$T} =
+        Base.promote(x::TT, y::SymExpr) where {TT<:$(esc(T))} =
             (SymExpr(:identity, [x]), y)
-        Base.promote(x::SymExpr, y::TT) where {TT<:$T} =
+        Base.promote(x::SymExpr, y::TT) where {TT<:$(esc(T))} =
             (x, SymExpr(:identity, [y]))
 
         # Base.promote(x::A, y::B) where {A<:Symbolic,B<:Symbolic} =
         #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
 
-        # Base.promote(x::TT, y::S) where {TT<:$T,S<:Symbolic} =
+        # Base.promote(x::TT, y::S) where {TT<:$(esc(T)),S<:Symbolic} =
         #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
-        # Base.promote(x::S, y::TT) where {TT<:$T,S<:Symbolic} =
+        # Base.promote(x::S, y::TT) where {TT<:$(esc(T)),S<:Symbolic} =
         #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
     end
 end
@@ -46,6 +46,21 @@ macro gen_compare_false(types...)
     end
 end
 
+Base.diff(::Union{Real,Complex}, orb::O, occ::I) where {O,I} = 0
+
+function Base.diff(s::SymExpr, orb::O, occ::I) where {O,I}
+    va = [diff(a, orb, occ) for a in s.args]
+
+    if s.op == :(+)
+        sum(va)
+    elseif s.op == :(-)
+        error("Not implemented")
+    elseif s.op == :(*)
+        sum([prod(vcat(s.args[1:i-1], va[i], s.args[i+1:end]))
+             for i in eachindex(s.args)])
+    end
+end
+
 # macro new_numbers(types...)
 #     for T in types
 #         eval(@new_number(T))
@@ -54,6 +69,8 @@ end
 # end
 
 latex(s::Number) = "$(s)"
+latex(s::AbstractFloat) = @sprintf("%0.10g", s)
+
 function latex(z::Complex{T}) where T
     a,b = real(z),imag(z)
     if a == zero(T)
@@ -68,21 +85,25 @@ latex(s::Sym) = "$(s)"
 latex_op(op::Sym) = op.name == :(*) ? "" : latex(op)
 latex_op(op) = latex(op)
 
+latex(o::Orbital) =
+    "$(o.n)\\mathrm{$(spectroscopic_label(o.ℓ))}"
+
 function latex(expr::SymExpr)
     op = expr.op
-    args = map(expr.args) do arg
-        if op.name != :(+) && arg isa Number && !(arg isa SymExpr) &&
-            arg isa Real && arg < 0 || arg isa Complex
-            "{($(latex(arg)))}"
+    args = map(enumerate(expr.args)) do (i,arg)
+        arg_negative = (arg isa Number && !(arg isa SymExpr) &&
+                        arg isa Real && arg < 0)
+        if op.name != :(+) && arg_negative && i > 1 || arg isa Complex
+            "($(latex(arg)))"
         else
-            "{$(latex(arg))}"
+            "$(latex(arg))"
         end
     end
     lop = latex_op(op)
     if op.name == :(+)
         S = args[1]
         for a in args[2:end]
-            S *= a[2] == '-' ? "" : "+"
+            S *= first(lstrip(a, ['{'])) == '-' ? "" : "+"
             S *= a
         end
         S

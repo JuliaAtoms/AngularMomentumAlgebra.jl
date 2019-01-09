@@ -49,10 +49,6 @@ function get_sum_variables(n::Int, i=0)
     end
 end
 
-# * Comparators
-@gen_compare_false AngularRoot SumVariable IIIJ VIJ IXJ
-# @new_numbers AngularRoot IIIJ VIJ IXJ
-
 # * Couplings
 
 mutable struct Coupling{T<:Union{HalfInteger,Symbolic}, A<:Number}
