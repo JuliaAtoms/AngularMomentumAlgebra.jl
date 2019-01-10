@@ -80,6 +80,12 @@ Base.:(==)(a::SlaterPotential{k}, b::SlaterPotential{k′}) where {k,k′} =
     k == k′ && a.a == b.a && a.b == b.b
 
 isdiagonal(Y::SlaterPotential) = Y.a == Y.b
+isdirect(Y::SlaterPotential{k,O}, o::O) where {k,O} =
+    Y.a != o && Y.b != o
+isexchange(Y::SlaterPotential{k,O}, o::O) where {k,O} =
+    Y.a == o || Y.b == o
+
+Base.log(::SlaterPotential{k}) where k = k
 
 # * Pretty-printing
 
