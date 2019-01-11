@@ -22,7 +22,7 @@ end
 Base.:(==)(a::DiagonalIntegral, b::DiagonalIntegral) = a.o == b.o
 
 Base.diff(I::DiagonalIntegral{O}, orb::O, occ::II) where {O,II} =
-    I.o == orb ? -Sym(:𝓛)*Ket(orb) : 0
+    I.o == orb ? -Sym(:𝓛)*Ket(orb)/occ : 0
 
 struct GeneralSlaterIntegral{k,O} <: AbstractSlaterIntegral{k,O}
     a::O
