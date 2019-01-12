@@ -1,11 +1,13 @@
 using Symbolics
 
+Base.:(==)(x::A, y::B) where {A<:Symbolic,B<:Symbolic} = false
+Base.promote(x::A, y::B) where {A<:Symbolic,B<:Symbolic} =
+    (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
+
 macro new_number(T)
     quote
-        Base.:(==)(x::$(esc(T)), y) = false
-        Base.:(==)(x, y::$(esc(T))) = false
-        Base.:(==)(x::$(esc(T)), y::Number) = false
-        Base.:(==)(x::Number, y::$(esc(T))) = false
+        Base.:(==)(x::$(esc(T)), y::N) where {N<:Union{Real,Complex}} = false
+        Base.:(==)(x::N, y::$(esc(T))) where {N<:Union{Real,Complex}} = false
         Base.:(==)(x::$(esc(T)), y::Sym) = false
         Base.:(==)(x::Sym, y::$(esc(T))) = false
         Base.:(==)(x::$(esc(T)), y::SymExpr) = false
@@ -17,32 +19,6 @@ macro new_number(T)
             (SymExpr(:identity, [x]), y)
         Base.promote(x::SymExpr, y::TT) where {TT<:$(esc(T))} =
             (x, SymExpr(:identity, [y]))
-
-        # Base.promote(x::A, y::B) where {A<:Symbolic,B<:Symbolic} =
-        #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
-
-        # Base.promote(x::TT, y::S) where {TT<:$(esc(T)),S<:Symbolic} =
-        #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
-        # Base.promote(x::S, y::TT) where {TT<:$(esc(T)),S<:Symbolic} =
-        #     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
-    end
-end
-
-macro gen_compare_false(types...)
-    for (i,A) in enumerate(types)
-        for (j,B) in enumerate(types)
-            j < i && continue
-
-            @eval Base.promote(x::$A, y::$B) =
-                (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
-
-            j == i && continue
-
-            @eval Base.promote(x::$B, y::$A) = promote(y, x)
-
-            @eval Base.:(==)(x::$A, y::$B) = false
-            @eval Base.:(==)(x::$B, y::$A) = false
-        end
     end
 end
 
@@ -60,13 +36,6 @@ function Base.diff(s::SymExpr, orb::O, occ::I) where {O,I}
              for i in eachindex(s.args)])
     end
 end
-
-# macro new_numbers(types...)
-#     for T in types
-#         eval(@new_number(T))
-#     end
-#     @gen_compare_false(types...)
-# end
 
 latex(s::Number) = "$(s)"
 latex(s::AbstractFloat) = @sprintf("%0.10g", s)
