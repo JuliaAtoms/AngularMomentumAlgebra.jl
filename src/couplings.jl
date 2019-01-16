@@ -22,7 +22,10 @@ Base.convert(::Type{Sym}, root::AngularRoot{Sym}) =
 
 Base.show(io::IO, r::AngularRoot) =
     write(io, Unicode.normalize("$(r.v)̂"))
-latex(r::AngularRoot) = "\\hat{$(latex(r.v))}"
+function Symbolics.latex(r::AngularRoot)
+    lv,d = Symbolics.latex(r.v)
+    "\\hat{$(lv)}",d
+end
 
 # * Sum variables
 struct SumVariable <: Symbolic
@@ -33,7 +36,7 @@ end
 Base.:(==)(a::SumVariable, b::SumVariable) = a.v == b.v
 
 Base.show(io::IO, s::SumVariable) = write(io, "Σ$(s.v)")
-latex(s::SumVariable) = "$(s.v)_\\Sigma"
+Symbolics.latex(s::SumVariable) = "$(s.v)_\\Sigma",0
 
 const sum_variables = "αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
 
@@ -64,14 +67,14 @@ Coupling(J::S,a::A) where {S<:Symbolic,A<:Number} = Coupling{Symbolic,Number}(J,
 
 Base.show(io::IO, coupling::Coupling) = show(io, coupling.J)
 
-latex(coupling::Coupling{HalfInteger,Int}) = latexstring("$(coupling.J)")
+Symbolics.latex(coupling::Coupling{HalfInteger,Int}) = latexstring("$(coupling.J)"),0
 
-function latex(coupling::Coupling{Symbolic,Number})
+function Symbolics.latex(coupling::Coupling{Symbolic,Number})
     S = "\$$(latex(coupling.J))\$"
     if coupling.amplitude != 1
         S *= "\\\\\\\\\$$(latex(coupling.amplitude))\$"
     end
-    latexstring(S)
+    latexstring(S),0
 end
 
 # function Base.show(io::IO, coupling::Coupling)
@@ -194,7 +197,7 @@ function switch_9j!(tree::CouplingTree, z::Int)
 end
 
 TikzGraphs.plot(tree::CouplingTree; kwargs...) =
-    plot(tree.tree, latex.(tree.couplings);
+    plot(tree.tree, Symbolics.latex.(tree.couplings);
          node_style="draw, rounded corners, align=center",
          prepend_preamble=preamble,
          kwargs...)

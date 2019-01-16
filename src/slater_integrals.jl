@@ -144,23 +144,51 @@ end
 
 # ** LaTeX
 
-latex(o::OverlapIntegral{O}) where O =
-    "\\langle$(latex(o.a))|$(latex(o.b))\\rangle" * (o.p != 1 ? "^{$(latex(o.p))}" : "")
+function Symbolics.latex(o::Orbital)
+    "$(o.n)\\mathrm{$(spectroscopic_label(o.ℓ))}",0
+end
 
-latex(I::DiagonalIntegral{O}) where {O} = "I($(latex(I.o)))"
+function Symbolics.latex(o::OverlapIntegral{O}) where O
+    la,mda = Symbolics.latex(o.a)
+    lb,mdb = Symbolics.latex(o.b)
+    lp,mdp = Symbolics.latex(o.p)
+    "\\langle$(la)|$(lb)\\rangle" * (o.p != 1 ? "^{$(lp)}" : ""),max(mda,mdb,mdp)
+end
 
-latex(R::GeneralSlaterIntegral{k,O}) where {k,O} =
-    "R^{$(k)}($(latex(R.a)),$(latex(R.b));$(latex(R.c)),$(latex(R.d)))"
+function Symbolics.latex(I::DiagonalIntegral{O}) where {O}
+    lo,mdo = Symbolics.latex(I.o)
+    "I($(lo))",mdo
+end
 
-latex(F::DirectSlaterIntegral{k,O}) where {k,O} =
-    "F^{$(k)}($(latex(F.a))"*(!isdiagonal(F) ? ", $(latex(F.b))" : "")*")"
+function Symbolics.latex(R::GeneralSlaterIntegral{k,O}) where {k,O}
+    la,mda = Symbolics.latex(R.a)
+    lb,mdb = Symbolics.latex(R.b)
+    lc,mdc = Symbolics.latex(R.c)
+    ld,mdd = Symbolics.latex(R.d)
+    args,md = Symbolics.delimit("$(la),$(lb);$(lc),$(ld)", max(mda,mdb,mdc,mdd))
+    "R^{$(k)}$(args)",md
+end
 
-latex(G::ExchangeSlaterIntegral{k, O}) where {k,O} =
-    "G^{$(k)}($(latex(G.a)),$(latex(G.b)))"
+function Symbolics.latex(F::DirectSlaterIntegral{k,O}) where {k,O}
+    la,mda = Symbolics.latex(F.a)
+    lb,mdb = Symbolics.latex(F.b)
+    args,md = Symbolics.delimit("$(la)"*(!isdiagonal(F) ? ", $(lb)" : ""),max(mda,mdb))
+    "F^{$(k)}$(args)",md
+end
 
-latex(Y::SlaterPotential{k,O}) where {k,O} =
-    "Y^{$(k)}($(latex(Y.a))"*(!isdiagonal(Y) ? ", $(latex(Y.b))" : "")*")"
+function Symbolics.latex(G::ExchangeSlaterIntegral{k, O}) where {k,O}
+    la,mda = Symbolics.latex(G.a)
+    lb,mdb = Symbolics.latex(G.b)
+    args,md = Symbolics.delimit("$(la),$(lb)", max(mda,mdb))
+    "G^{$(k)}$args",md
+end
 
+function Symbolics.latex(Y::SlaterPotential{k,O}) where {k,O}
+    la,mda = Symbolics.latex(Y.a)
+    lb,mdb = Symbolics.latex(Y.b)
+    args,md = Symbolics.delimit("$(la)"*(!isdiagonal(Y) ? ", $(lb)" : ""),max(mda,mdb))
+    "Y^{$(k)}$args",md
+end
 # * Symbolics registration
 
 @new_number OverlapIntegral

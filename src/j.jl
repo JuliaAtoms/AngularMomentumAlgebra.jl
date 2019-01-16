@@ -1,6 +1,3 @@
-using WignerSymbols
-using Formatting
-
 abstract type WignerJ <: Symbolic end
 
 # * Pretty-printing
@@ -42,7 +39,7 @@ end
 function latex_matrix(matrix_type::String, lines::Tuple...)
     S = "\\begin{$(matrix_type)}"
     lines = map(lines) do line
-        join(latex.(line),"&")
+        join(first.(Symbolics.latex.(line)),"&")
     end
     S *= join(lines, "\\\\")
     S *= "\\end{$(matrix_type)}"
@@ -75,10 +72,10 @@ Base.show(io::IO, ::MIME"text/plain", iiij::IIIJ) =
                    ("⎛","⎞")=>(iiij.j₁, iiij.j₂, iiij.j₃),
                    ("⎝","⎠")=>(iiij.m₁, iiij.m₂, iiij.m₃))
 
-latex(iiij::IIIJ) =
+Symbolics.latex(iiij::IIIJ) =
     latex_matrix("pmatrix",
                  (iiij.j₁, iiij.j₂, iiij.j₃),
-                 (iiij.m₁, iiij.m₂, iiij.m₃))
+                 (iiij.m₁, iiij.m₂, iiij.m₃)),0
 
 function triangle_inequality(iiij::IIIJ)
     println("|$(iiij.j₁)-$(iiij.j₂)| ≤ $(iiij.j₃) ≤ $(iiij.j₁)+$(iiij.j₂)")
@@ -119,10 +116,10 @@ Base.show(io::IO, ::MIME"text/plain", vij::VIJ) =
                    ("⎰","⎱")=>(vij.j₁, vij.j₂, vij.j₃),
                    ("⎱","⎰")=>(vij.j₄, vij.j₅, vij.j₆))
 
-latex(vij::VIJ) =
+Symbolics.latex(vij::VIJ) =
     latex_matrix("Bmatrix",
                  (vij.j₁, vij.j₂, vij.j₃),
-                 (vij.j₄, vij.j₅, vij.j₆))
+                 (vij.j₄, vij.j₅, vij.j₆)),0
 
 @new_number VIJ
 Base.:(==)(x::VIJ, y::VIJ) =
@@ -166,11 +163,11 @@ Base.show(io::IO, ::MIME"text/plain", ixj::IXJ) =
                    ("⎨","⎬")=>(ixj.j₄, ixj.j₅, ixj.j₆),
                    ("⎩","⎭")=>(ixj.j₇, ixj.j₈, ixj.j₉))
 
-latex(ixj::IXJ) =
+Symbolics.latex(ixj::IXJ) =
     latex_matrix("Bmatrix",
                  (ixj.j₁, ixj.j₂, ixj.j₃),
                  (ixj.j₄, ixj.j₅, ixj.j₆),
-                 (ixj.j₇, ixj.j₈, ixj.j₉))
+                 (ixj.j₇, ixj.j₈, ixj.j₉)),0
 
 @new_number IXJ
 Base.:(==)(x::IXJ, y::IXJ) =

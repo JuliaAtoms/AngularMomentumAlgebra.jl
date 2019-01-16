@@ -1,9 +1,10 @@
 module AngularMomentumAlgebra
 
 using AtomicLevels
+using WignerSymbols
+using Formatting
 using UnicodeFun
 using LinearAlgebra
-import AtomicLevels: HalfInteger
 using Parameters
 using Printf
 
