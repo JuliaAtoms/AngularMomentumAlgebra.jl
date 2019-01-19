@@ -82,13 +82,6 @@ function triangle_inequality(iiij::IIIJ)
 end
 
 @new_number IIIJ
-Base.:(==)(x::IIIJ, y::IIIJ) =
-    x.j₁ == y.j₁ &&
-    x.j₂ == y.j₂ &&
-    x.j₃ == y.j₃ &&
-    x.m₁ == y.m₁ &&
-    x.m₂ == y.m₂ &&
-    x.m₃ == y.m₃
 
 # * 6j
 
@@ -122,13 +115,6 @@ Symbolics.latex(vij::VIJ) =
                  (vij.j₄, vij.j₅, vij.j₆)),0
 
 @new_number VIJ
-Base.:(==)(x::VIJ, y::VIJ) =
-    x.j₁ == y.j₁ &&
-    x.j₂ == y.j₂ &&
-    x.j₃ == y.j₃ &&
-    x.j₄ == y.j₄ &&
-    x.j₅ == y.j₅ &&
-    x.j₆ == y.j₆
 
 # * 9j
 
@@ -170,15 +156,5 @@ Symbolics.latex(ixj::IXJ) =
                  (ixj.j₇, ixj.j₈, ixj.j₉)),0
 
 @new_number IXJ
-Base.:(==)(x::IXJ, y::IXJ) =
-    x.j₁ == y.j₁ &&
-    x.j₂ == y.j₂ &&
-    x.j₃ == y.j₃ &&
-    x.j₄ == y.j₄ &&
-    x.j₅ == y.j₅ &&
-    x.j₆ == y.j₆ &&
-    x.j₇ == y.j₇ &&
-    x.j₈ == y.j₈ &&
-    x.j₉ == y.j₉
 
 export IIIJ, VIJ, IXJ

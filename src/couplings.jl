@@ -12,7 +12,6 @@ struct AngularRoot{T<:Number} <: Symbolic
 end
 
 @new_number AngularRoot
-Base.:(==)(x::AngularRoot, y::AngularRoot) = x.v == y.v
 
 Base.convert(::Type{T}, root::AngularRoot) where {T<:Union{Real,Complex}} =
     √(2convert(T, root.v) + 1)
@@ -33,7 +32,6 @@ struct SumVariable <: Symbolic
 end
 
 @new_number SumVariable
-Base.:(==)(a::SumVariable, b::SumVariable) = a.v == b.v
 
 Base.show(io::IO, s::SumVariable) = write(io, "Σ$(s.v)")
 Symbolics.latex(s::SumVariable) = "$(s.v)_\\Sigma",0
@@ -61,11 +59,22 @@ end
 
 Coupling{S,A}(J::S) where {S,A} = Coupling{S,A}(J, one(A))
 Coupling(J::HalfInteger) = Coupling{HalfInteger,Float64}(J)
+Coupling(J::Integer) = Coupling(HalfInteger(J))
 Coupling(J::Symbolic) = Coupling{Symbolic,Number}(J)
 Coupling(J::Symbol) = Coupling{Symbolic,Number}(Sym(J))
 Coupling(J::S,a::A) where {S<:Symbolic,A<:Number} = Coupling{Symbolic,Number}(J,a)
 
-Base.show(io::IO, coupling::Coupling) = show(io, coupling.J)
+Base.zero(::Type{Coupling{S,A}}) where {S,A} = Coupling{S,A}(zero(S))
+
+Base.:(==)(a::Coupling{S,A},b::Coupling{S,A}) where {S,A} =
+    a.J == b.J && a.amplitude == b.amplitude
+
+function Base.show(io::IO, coupling::Coupling)
+    if coupling.amplitude != 1
+        show(io, coupling.amplitude)
+    end
+    show(io, coupling.J)
+end
 
 Symbolics.latex(coupling::Coupling{HalfInteger,Int}) = latexstring("$(coupling.J)"),0
 
@@ -98,12 +107,52 @@ end
 CouplingTree{C}(couplings, tree) where C =
     CouplingTree{C}(couplings, tree, Vector{SumVariable}())
 
+function directed_binary_tree(k::I) where {I<:Integer}
+    g = BinaryTree(k)
+    g′ = SimpleDiGraph{I}(length(vertices(g)))
+    for v in vertices(g)
+        for n in neighbors(g,v)
+            n > v && add_edge!(g′, v, n)
+        end
+    end
+    g′
+end
+
+function CouplingTree{C}(k::I) where {C<:Coupling,I<:Integer}
+    tree = directed_binary_tree(k)
+    couplings = zeros(C, length(vertices(tree)))
+    CouplingTree{C}(couplings, tree)
+end
+
+function CouplingTree(couplings::Vector{C}) where {C<:Coupling}
+    # S = 2ⁿ - 1 => n = log2(S+1)
+    n = log2(length(couplings)+1)
+    isinteger(n) || throw(ArgumentError("Not a balanced binary tree"))
+    n = Int(n)
+    tree = directed_binary_tree(n)
+    CouplingTree{C}(couplings, tree)
+end
+
+CouplingTree(couplings::Vector{N}) where {N<:Number} =
+    CouplingTree(Coupling.(couplings))
+
 function Base.replace!(tree::CouplingTree, p::Pair{Int,<:Coupling})
     tree.couplings[p[1]] = p[2]
     tree
 end
 
 layers(tree::CouplingTree) = Int(log2(length(tree.couplings)+1))
+layer(tree::CouplingTree, n::Int) = ceil(Int, log2(n+1))
+
+final_momentum(tree::CouplingTree) = tree.couplings[1].J
+
+function view_layer(tree::CouplingTree, i::Int)
+    (i < 1 || i > layers(tree)) &&
+        throw(BoundsError("Trying to access layer $(i) outside valid range"))
+    a = 2^(i-1)
+    b = 2^i - 1
+    view(tree.couplings, a:b)
+end
 
 momenta(tree::CouplingTree, nodes::Int...) =
     map(nodes) do node
@@ -115,24 +164,93 @@ amplitudes(tree::CouplingTree, nodes::Int...) =
         tree.couplings[node].amplitude
     end
 
-function directed_binary_tree(k::I) where I
-    g = BinaryTree(k)
-    g′ = SimpleDiGraph{I}(length(vertices(g)))
-    for v in vertices(g)
-        for n in neighbors(g,v)
-            n > v && add_edge!(g′, v, n)
-        end
+function propagate_layer!(tree::CouplingTree{C}, i::Int) where C
+    v = view_layer(tree, i)
+    v′ = view_layer(tree, i+1)
+    for i in eachindex(v)
+        v′[2i-1] = v[i]
     end
-    g′
 end
 
-function CouplingTree(couplings::Vector{C}) where C
-    # S = 2ⁿ - 1 => n = log2(S+1)
-    n = log2(length(couplings)+1)
-    isinteger(n) || throw(ArgumentError("Not a balanced binary tree"))
-    n = Int(n)
-    tree = directed_binary_tree(n)
-    CouplingTree{C}(couplings, tree)
+function expand_layers!(tree::CouplingTree{C}, req_layers::Int) where C
+    new_layers = layers(tree) - req_layers
+    new_layers ≥ 0 && return tree
+    tree.tree = directed_binary_tree(req_layers)
+    append!(tree.couplings, zeros(C, length(vertices(tree.tree)) - length(tree.couplings)))
+    num_layers = layers(tree)
+    for i = (num_layers+new_layers):(num_layers-1)
+        propagate_layer!(tree, i)
+    end
+    tree
+end
+
+function expand_tree_upwards(tree::CouplingTree{C}, req_layers::Int) where C
+    new_layers = req_layers - layers(tree)
+    new_layers ≤ 0 && return tree
+    new_tree = CouplingTree{C}(req_layers)
+    insert!(new_tree, 2^new_layers, tree)
+    new_tree
+end
+
+function traverse(op::Function, tree::CouplingTree{C}, n::Int = 1) where C
+    stack = Int[n]
+    while !isempty(stack)
+        n = pop!(stack)
+        op(n) || break
+        append!(stack, neighbors(tree.tree,n))
+    end
+end
+
+valid_coupling(j₁::HalfInteger, j₂::HalfInteger, J::HalfInteger) =
+    abs(j₁-j₂) ≤ J && J ≤ (j₁ + j₂)
+
+function Base.isvalid(tree::CouplingTree{C}) where {C<:Coupling{HalfInteger,<:Number}}
+    valid = true
+    traverse(tree) do n
+        nn = neighbors(tree.tree, n)
+        if !isempty(nn)
+            a,b = nn
+            valid = valid_coupling(momenta(tree, a, b, n)...)
+        else
+            true
+        end
+    end
+    valid
+end
+
+function modify_subtrees!(op::Function,
+                          A::CouplingTree{C}, a::Integer,
+                          B::CouplingTree{C}, b::Integer) where C
+    Astack = Int[a]
+    Bstack = Int[b]
+    while !isempty(Astack) && !isempty(Bstack)
+        a,b = pop!(Astack),pop!(Bstack)
+        op((a,b))
+        append!(Astack, neighbors(A.tree,a))
+        append!(Bstack, neighbors(B.tree,b))
+    end
+end
+
+function Base.insert!(tree::CouplingTree{C}, n::Integer, sub_tree::CouplingTree{C}) where C
+    apex = sub_tree.couplings[1]
+    insertion_point = tree.couplings[n]
+
+    apex == insertion_point ||
+        throw(ArgumentError("Apex node [$(apex)] does not match with insertion point [$(insertion_point)]"))
+
+    # If trying to insert a too small subtree, i.e. at a node that is
+    # high enough such that the sub-tree does not reach the root row
+    # or beyond, it is an ill-defined operation, since we do not know
+    # what the rows below should be filled with.
+    layers(sub_tree) + layer(tree,n) ≤ layers(tree) &&
+        throw(ArgumentError("Cannot insert subtree with $(layers(sub_tree)) layer(s) at node $(n) at layer $(layer(tree,n)) of $(layers(tree)); ill-defined operation"))
+
+    expand_layers!(tree, layer(tree,n) + layers(sub_tree) - 1)
+
+    modify_subtrees!(tree, n, sub_tree, 1) do (a,b)
+        tree.couplings[a] = sub_tree.couplings[b]
+    end
+    tree
 end
 
 function swap_couplings!(tree::CouplingTree, a::Int, b::Int)
@@ -142,16 +260,12 @@ function swap_couplings!(tree::CouplingTree, a::Int, b::Int)
 end
 
 function swap_subtrees!(tree::CouplingTree, a::Int, b::Int)
-    A = dfs_tree(tree.tree, a)
-    B = dfs_tree(tree.tree, b)
+    A = dfs_tree(A.tree, a)
+    B = dfs_tree(A.tree, b)
     @assert length(edges(A)) == length(edges(B))
-    Astack = Int[a]
-    Bstack = Int[b]
-    while !isempty(Astack)
-        a,b = pop!(Astack),pop!(Bstack)
+    modify_subtrees!(tree, a, tree, b) do ab
+        a,b = ab
         swap_couplings!(tree, a, b)
-        append!(Astack, neighbors(tree.tree,a))
-        append!(Bstack, neighbors(tree.tree,b))
     end
 end
 
@@ -159,8 +273,10 @@ end
 function switch!(tree::CouplingTree, c::Int)
     nn = neighbors(tree.tree, c)
     isempty(nn) && return tree
+
     a,b = nn
     swap_subtrees!(tree, a, b)
+
     tree.couplings[c].amplitude *= (-1)^(tree.couplings[a].J
                                          + tree.couplings[b].J
                                          - tree.couplings[c].J)
@@ -202,5 +318,31 @@ TikzGraphs.plot(tree::CouplingTree; kwargs...) =
          prepend_preamble=preamble,
          kwargs...)
 
+function UnicodeFun.to_superscript(h::HalfInteger)
+    if isinteger(h)
+        to_superscript(convert(Int, h))
+    else
+        to_superscript(convert(Int, 2h)) * "⁽²⁾"
+    end
+end
 
-export AngularRoot, SumVariable, Coupling, CouplingTree, switch!, switch_9j!
+function Base.show(io::IO, tree::CouplingTree{C}, n::Int=1) where {C<:Coupling{HalfInteger,<:Number}}
+    nn = neighbors(tree.tree, n)
+    if isempty(nn)
+        show(io, tree.couplings[n])
+    else
+        amplitude = tree.couplings[n].amplitude
+        amplitude != 1 && show(io, tree.couplings[n].amplitude)
+        write(io, "[")
+        show(io, tree, nn[1])
+        write(io, " ")
+        show(io, tree, nn[2])
+        write(io, "]")
+        write(io, to_superscript(tree.couplings[n].J))
+    end
+end
+
+
+export AngularRoot, SumVariable, Coupling,
+    CouplingTree, expand_tree_upwards, final_momentum,
+    switch!, switch_9j!

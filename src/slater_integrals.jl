@@ -1,5 +1,5 @@
 abstract type AbstractRadialIntegral{O} <: Symbolic end
-abstract type AbstractSlaterIntegral{k, O} <: AbstractRadialIntegral{O} end
+abstract type AbstractSlaterIntegral{O} <: AbstractRadialIntegral{O} end
 
 # * Integrals
 
@@ -10,8 +10,7 @@ struct OverlapIntegral{O} <: AbstractRadialIntegral{O}
 end
 OverlapIntegral(p::Integer, a::O, b::O) where {O} =
     OverlapIntegral{O}(p, a, b)
-Base.:(==)(a::OverlapIntegral, b::OverlapIntegral) =
-    a.p == b.p && a.a == b.a && a.b == b.b
+@new_number OverlapIntegral
 
 Base.diff(::OverlapIntegral, orb, occ) =
     error("Not implemented")
@@ -19,73 +18,65 @@ Base.diff(::OverlapIntegral, orb, occ) =
 struct DiagonalIntegral{O} <: AbstractRadialIntegral{O}
     o::O
 end
-Base.:(==)(a::DiagonalIntegral, b::DiagonalIntegral) = a.o == b.o
+@new_number DiagonalIntegral
 
 Base.diff(I::DiagonalIntegral{O}, orb::O, occ::II) where {O,II} =
     I.o == orb ? -Sym(:𝓛)*Ket(orb)/occ : 0
 
-struct GeneralSlaterIntegral{k,O} <: AbstractSlaterIntegral{k,O}
+struct GeneralSlaterIntegral{O} <: AbstractSlaterIntegral{O}
+    k::Int
     a::O
     b::O
     c::O
     d::O
 end
-GeneralSlaterIntegral(k::Integer, a::O, b::O, c::O, d::O) where {O} =
-    GeneralSlaterIntegral{k,O}(a, b, c, d)
-Base.:(==)(a::GeneralSlaterIntegral{k}, b::GeneralSlaterIntegral{k′}) where {k,k′} =
-    k == k′ && a.a == b.a && a.b == b.b && a.c == b.c && a.d == b.d
+@new_number GeneralSlaterIntegral
 
 Base.diff(::GeneralSlaterIntegral, orb, occ) =
     error("Not implemented")
 
-struct DirectSlaterIntegral{k,O} <: AbstractSlaterIntegral{k,O}
+struct DirectSlaterIntegral{O} <: AbstractSlaterIntegral{O}
+    k::Int
     a::O
     b::O
 end
-DirectSlaterIntegral(k::Integer, a::O, b::O) where {O} =
-    DirectSlaterIntegral{k,O}(a, b)
-Base.:(==)(a::DirectSlaterIntegral{k}, b::DirectSlaterIntegral{k′}) where {k,k′} =
-    k == k′ && a.a == b.a && a.b == b.b
+@new_number DirectSlaterIntegral
 
 isdiagonal(F::DirectSlaterIntegral) = F.a == F.b
 
-function Base.diff(F::DirectSlaterIntegral{k,O}, orb::O, occ::I) where {k,O,I}
+function Base.diff(F::DirectSlaterIntegral{O}, orb::O, occ::I) where {k,O,I}
     F.a != orb && F.b != orb && return 0
     other = F.a == orb ? F.b : F.a
-    (2/Sym(:r))*(1+isdiagonal(F))/occ*SlaterPotential(k, other, other)*Ket(orb)
+    (2/Sym(:r))*(1+isdiagonal(F))/occ*SlaterPotential(F.k, other, other)*Ket(orb)
 end
 
-struct ExchangeSlaterIntegral{k,O} <: AbstractSlaterIntegral{k,O}
+struct ExchangeSlaterIntegral{O} <: AbstractSlaterIntegral{O}
+    k::Int
     a::O
     b::O
 end
-ExchangeSlaterIntegral(k::Integer, a::O, b::O) where {O} =
-    ExchangeSlaterIntegral{k,O}(a, b)
-Base.:(==)(a::ExchangeSlaterIntegral{k}, b::ExchangeSlaterIntegral{k′}) where {k,k′} =
-    k == k′ && a.a == b.a && a.b == b.b
+@new_number ExchangeSlaterIntegral
 
-function Base.diff(G::ExchangeSlaterIntegral{k,O}, orb::O, occ::I) where {k,O,I}
+function Base.diff(G::ExchangeSlaterIntegral{O}, orb::O, occ::I) where {k,O,I}
     G.a != orb && G.b != orb && return 0
     other = G.a == orb ? G.b : G.a
     (2/Sym(:r))/occ*SlaterPotential(k, orb, other)*Ket(other)
 end
 
-struct SlaterPotential{k,O} <: AbstractRadialIntegral{O}
+struct SlaterPotential{O} <: AbstractRadialIntegral{O}
+    k::Int
     a::O
     b::O
 end
-SlaterPotential(k::Integer, a::O, b::O) where {O} =
-    SlaterPotential{k,O}(a, b)
-Base.:(==)(a::SlaterPotential{k}, b::SlaterPotential{k′}) where {k,k′} =
-    k == k′ && a.a == b.a && a.b == b.b
+@new_number SlaterPotential
 
 isdiagonal(Y::SlaterPotential) = Y.a == Y.b
-isdirect(Y::SlaterPotential{k,O}, o::O) where {k,O} =
+isdirect(Y::SlaterPotential{O}, o::O) where {O} =
     Y.a != o && Y.b != o
-isexchange(Y::SlaterPotential{k,O}, o::O) where {k,O} =
+isexchange(Y::SlaterPotential{O}, o::O) where {O} =
     Y.a == o || Y.b == o
 
-Base.log(::SlaterPotential{k}) where k = k
+Base.log(Y::SlaterPotential) = Y.k
 
 # * Pretty-printing
 
@@ -104,8 +95,8 @@ function Base.show(io::IO, I::DiagonalIntegral{O}) where {O}
     write(io, ")")
 end
 
-function Base.show(io::IO, R::GeneralSlaterIntegral{k,O}) where {k,O}
-    write(io, "R", to_superscript(k), "(")
+function Base.show(io::IO, R::GeneralSlaterIntegral{O}) where {O}
+    write(io, "R", to_superscript(R.k), "(")
     show(io, R.a)
     write(io, ", ")
     show(io, R.b)
@@ -116,8 +107,8 @@ function Base.show(io::IO, R::GeneralSlaterIntegral{k,O}) where {k,O}
     write(io, ")")
 end
 
-function Base.show(io::IO, F::DirectSlaterIntegral{k,O}) where {k,O}
-    write(io, "F", to_superscript(k), "(")
+function Base.show(io::IO, F::DirectSlaterIntegral{O}) where {O}
+    write(io, "F", to_superscript(F.k), "(")
     show(io, F.a)
     if F.a != F.b
         write(io, ", ")
@@ -126,16 +117,16 @@ function Base.show(io::IO, F::DirectSlaterIntegral{k,O}) where {k,O}
     write(io, ")")
 end
 
-function Base.show(io::IO, G::ExchangeSlaterIntegral{k, O}) where {k,O}
-    write(io, "G", to_superscript(k), "(")
+function Base.show(io::IO, G::ExchangeSlaterIntegral{O}) where {O}
+    write(io, "G", to_superscript(G.k), "(")
     show(io, G.a)
     write(io, ", ")
     show(io, G.b)
     write(io, ")")
 end
 
-function Base.show(io::IO, Y::SlaterPotential{k, O}) where {k,O}
-    write(io, "Y", to_superscript(k), "(")
+function Base.show(io::IO, Y::SlaterPotential{O}) where {O}
+    write(io, "Y", to_superscript(Y.k), "(")
     show(io, Y.a)
     write(io, ", ")
     show(io, Y.b)
@@ -144,58 +135,56 @@ end
 
 # ** LaTeX
 
-function Symbolics.latex(o::Orbital)
-    "$(o.n)\\mathrm{$(spectroscopic_label(o.ℓ))}",0
-end
+import Symbolics: latex, delimit
 
 function Symbolics.latex(o::OverlapIntegral{O}) where O
-    la,mda = Symbolics.latex(o.a)
-    lb,mdb = Symbolics.latex(o.b)
-    lp,mdp = Symbolics.latex(o.p)
+    la,mda = latex(o.a)
+    lb,mdb = latex(o.b)
+    lp,mdp = latex(o.p)
     "\\langle$(la)|$(lb)\\rangle" * (o.p != 1 ? "^{$(lp)}" : ""),max(mda,mdb,mdp)
 end
 
 function Symbolics.latex(I::DiagonalIntegral{O}) where {O}
-    lo,mdo = Symbolics.latex(I.o)
-    "I($(lo))",mdo
+    lo,mdo = delimit(latex(I.o)...)
+    "I$(lo)",mdo
 end
 
-function Symbolics.latex(R::GeneralSlaterIntegral{k,O}) where {k,O}
-    la,mda = Symbolics.latex(R.a)
-    lb,mdb = Symbolics.latex(R.b)
-    lc,mdc = Symbolics.latex(R.c)
-    ld,mdd = Symbolics.latex(R.d)
-    args,md = Symbolics.delimit("$(la),$(lb);$(lc),$(ld)", max(mda,mdb,mdc,mdd))
-    "R^{$(k)}$(args)",md
+function Symbolics.latex(R::GeneralSlaterIntegral{O}) where {O}
+    la,mda = latex(R.a)
+    lb,mdb = latex(R.b)
+    lc,mdc = latex(R.c)
+    ld,mdd = latex(R.d)
+    largs,md = delimit("$(la),$(lb);$(lc),$(ld)",max(mda,mdb,mdc,mdd))
+    "R^{$(R.k)}$(largs)",md
 end
 
-function Symbolics.latex(F::DirectSlaterIntegral{k,O}) where {k,O}
-    la,mda = Symbolics.latex(F.a)
-    lb,mdb = Symbolics.latex(F.b)
-    args,md = Symbolics.delimit("$(la)"*(!isdiagonal(F) ? ", $(lb)" : ""),max(mda,mdb))
-    "F^{$(k)}$(args)",md
+function Symbolics.latex(F::DirectSlaterIntegral{O}) where {O}
+    la,mda = latex(F.a)
+    lb,mdb = latex(F.b)
+    largs,md = if isdiagonal(F)
+        delimit(la,mda)
+    else
+        delimit("$(la),$(lb)", max(mda,mdb))
+    end
+    "F^{$(F.k)}$(largs)",md
 end
 
-function Symbolics.latex(G::ExchangeSlaterIntegral{k, O}) where {k,O}
-    la,mda = Symbolics.latex(G.a)
-    lb,mdb = Symbolics.latex(G.b)
-    args,md = Symbolics.delimit("$(la),$(lb)", max(mda,mdb))
-    "G^{$(k)}$args",md
+function Symbolics.latex(G::ExchangeSlaterIntegral{O}) where {O}
+    la,mda = latex(G.a)
+    lb,mdb = latex(G.b)
+    largs,md = delimit("$(la),$(lb)",max(mda,mdb))
+    "G^{$(G.k)}$(largs)",md
 end
 
-function Symbolics.latex(Y::SlaterPotential{k,O}) where {k,O}
-    la,mda = Symbolics.latex(Y.a)
-    lb,mdb = Symbolics.latex(Y.b)
-    args,md = Symbolics.delimit("$(la)"*(!isdiagonal(Y) ? ", $(lb)" : ""),max(mda,mdb))
-    "Y^{$(k)}$args",md
+function Symbolics.latex(Y::SlaterPotential{O}) where {O}
+    la,mda = latex(Y.a)
+    lb,mdb = latex(Y.b)
+    largs,md = if isdiagonal(Y)
+        delimit(la,mda)
+    else
+        delimit("$(la),$(lb)", max(mda,mdb))
+    end
+    "Y^{$(Y.k)}$(largs)",md
 end
-# * Symbolics registration
-
-@new_number OverlapIntegral
-@new_number DiagonalIntegral
-@new_number GeneralSlaterIntegral
-@new_number DirectSlaterIntegral
-@new_number ExchangeSlaterIntegral
-@new_number SlaterPotential
 
 export OverlapIntegral, DiagonalIntegral, GeneralSlaterIntegral, DirectSlaterIntegral, ExchangeSlaterIntegral, SlaterPotential

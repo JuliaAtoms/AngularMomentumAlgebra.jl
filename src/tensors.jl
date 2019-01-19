@@ -39,14 +39,10 @@ end
 struct Bra{B} <: AbstractTensor
     v::B
 end
-Base.:(==)(a::Bra{B}, b::Bra{B}) where B =
-    a.v == b.v
 
 struct Ket{K} <: AbstractTensor
     v::K
 end
-Base.:(==)(a::Ket{K}, b::Ket{K}) where K =
-    a.v == b.v
 
 struct Braket{B,K} <: AbstractTensor
     b::B
@@ -54,8 +50,6 @@ struct Braket{B,K} <: AbstractTensor
 end
 Braket(bra::Bra{B}, ket::Ket{K}) where {B,K} =
     Braket{B,K}(bra.v, ket.v)
-Base.:(==)(a::Braket{B,K}, b::Braket{B,K}) where {B,K} =
-    a.b == b.b && a.k == b.k
 
 # The brakets are assumed to be real, hence no conjugates
 function Base.diff(bk::Braket{B,K}, orb::O, occ::I) where {B,K,O,I}
@@ -170,9 +164,6 @@ end
 LagrangeMultiplier(o::O) where O = LagrangeMultiplier(o, o)
 
 isdiagonal(λ::LagrangeMultiplier{O}) where O =  λ.a == λ.b
-
-Base.:(==)(a::LagrangeMultiplier{O}, b::LagrangeMultiplier{O}) where O =
-    a.a == b.a && a.b == b.b
 
 Base.show(io::IO, λ::LagrangeMultiplier{O}) where O =
     write(io, "λ[$(λ.a)"*(!isdiagonal(λ) ? "|$(λ.b)" : "")*"]")
