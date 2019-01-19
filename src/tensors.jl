@@ -111,13 +111,16 @@ end
 
 # * Reduced matrix elements
 
-struct ReducedMatrixElement{T<:AbstractTensor,B,K}
+struct ReducedMatrixElement{T<:AbstractTensor,B,K} <: Symbolic
     bra::Bra{B}
     ket::Ket{K}
 end
 
 ReducedMatrixElement(::Type{T},bra::Bra{B},ket::Ket{K}) where {T,B,K} =
-        ReducedMatrixElement{T,B,K}(bra, ket)
+    ReducedMatrixElement{T,B,K}(bra, ket)
+
+Base.:(==)(a::ReducedMatrixElement{T}, b::ReducedMatrixElement{T′}) where {T,T′} =
+    T == T′ && a.bra == b.bra && a.ket == b.ket
 
 function Base.show(io::IO, rme::ReducedMatrixElement{T,B,K}) where {T,B,K}
     show(io, rme.bra)
@@ -127,7 +130,7 @@ function Base.show(io::IO, rme::ReducedMatrixElement{T,B,K}) where {T,B,K}
     show(io, rme.ket)
 end
 
-function Base.show(io::IO, rme::ReducedMatrixElement{SphericalTensor{k},A,A}) where {k,A<:AngularMomentum}
+function Base.show(io::IO, ::MIME"text/plain", rme::ReducedMatrixElement{SphericalTensor{k},A,A}) where {k,A<:AngularMomentum}
     show(io, rme.bra)
     write(io, "|")
     show(io, SphericalTensor{k})
@@ -192,6 +195,7 @@ end
 @new_number Bra
 @new_number Ket
 @new_number Braket
+@new_number ReducedMatrixElement
 @new_number LagrangeMultiplier
 
 # * Exports
