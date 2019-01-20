@@ -60,7 +60,7 @@ end
 function Base.diff(G::ExchangeSlaterIntegral{O}, orb::O, occ::I) where {k,O,I}
     G.a != orb && G.b != orb && return 0
     other = G.a == orb ? G.b : G.a
-    (2/Sym(:r))/occ*SlaterPotential(k, orb, other)*Ket(other)
+    (2/Sym(:r))/occ*SlaterPotential(G.k, orb, other)*Ket(other)
 end
 
 struct SlaterPotential{O} <: AbstractRadialIntegral{O}
