@@ -4,6 +4,7 @@ using AtomicLevels
 using WignerSymbols
 using Combinatorics
 using LinearAlgebra
+using SparseArrays
 using Formatting
 using UnicodeFun
 using Parameters
