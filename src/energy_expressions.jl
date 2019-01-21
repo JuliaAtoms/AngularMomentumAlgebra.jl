@@ -7,7 +7,9 @@ Some references below to
 
 =#
 
-struct OneBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
+# * One-body energy expression
+
+mutable struct OneBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
     integrals::Vector{OneBodyIntegral{A,B}}
     signs::Vector{Int}
     function OneBodyEnergyExpression{A,B}(a::Configuration{<:SpinOrbital},
@@ -81,7 +83,17 @@ function Base.show(io::IO, eng::OneBodyEnergyExpression)
     end
 end
 
-struct TwoBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
+function diagonal_in_coord!(eng::OneBodyEnergyExpression, coord::Symbol)
+    pred = i -> getproperty(i.a, coord) == getproperty(i.b, coord)
+    sel = map(pred, eng.integrals)
+    eng.integrals = eng.integrals[sel]
+    eng.signs = eng.signs[sel]
+    eng
+end
+
+# * Two-body energy expression
+
+mutable struct TwoBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
     integrals::Vector{DirectExchangeIntegral{A,B}}
 
     function TwoBodyEnergyExpression{A,B}(a::Configuration{<:SpinOrbital},
@@ -141,6 +153,13 @@ function Base.show(io::IO, eng::TwoBodyEnergyExpression)
         write(io, string(integral))
     end
 end
+
+function diagonal_in_coord!(eng::TwoBodyEnergyExpression, coord::Symbol)
+    pred = i -> getproperty(i.a, coord) == getproperty(i.b, coord)
+    filter!(pred, eng.integrals)
+end
+
+# * Hamiltonian matrix generation
 
 function hamiltonian_matrix(::Type{Eng}, ::Type{O},
                             spcs::Vector{<:Configuration{<:SpinOrbital}};
