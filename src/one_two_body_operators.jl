@@ -26,11 +26,11 @@ function Base.show(io::IO, I::OneBodyIntegral)
     write(io, ")")
 end
 
-Base.diff(I::OneBodyIntegral{O}, orb::O, occ::II=1) where {O,II} =
-    I.o == orb ? Fock()*Bra(I.o)/occ : 0
+Base.diff(I::OneBodyIntegral{A,B}, orb::O, occ::II=1) where {A,B,O,II} =
+    I.b == orb ? Fock()*Bra(I.a)/occ : 0
 
-Base.diff(I::OneBodyIntegral{O}, corb::Conjugate{O}, occ::II=1) where {O,II} =
-    I.o == corb.orbital ? Fock()*Ket(I.o)/occ : 0
+Base.diff(I::OneBodyIntegral{A,B}, corb::Conjugate{O}, occ::II=1) where {A,B,O,II} =
+    I.a == corb.orbital ? Fock()*Ket(I.b)/occ : 0
 
 # * Repulsion potentials
 
@@ -132,6 +132,21 @@ end
 Base.:(==)(a::DirectExchangeIntegral, b::DirectExchangeIntegral) =
     a.a == b.a && a.b == b.b
 isdiagonal(FG::DirectExchangeIntegral) = FG.a == FG.b
+
+function Base.diff(FG::ExchangeIntegral{A,B}, orb::O, occ::I=1) where {A,B,O,I}
+    orb ∉ [FG.a, FG.b] && return 0
+    other = FG.a == orb ? FG.b : FG.a
+    inv(occ)*(DirectPotential(other,other)*Bra(orb)-
+              ExchangePotential(other,other)*Bra(orb))
+end
+
+
+function Base.diff(FG::DirectExchangeIntegral{A,B}, corb::Conjugate{O}, occ::I=1) where {A,B,O,I}
+    corb.orbital ∉ [FG.a, FG.b] && return 0
+    other = FG.a == corb.orbital ? FG.b : FG.a
+    inv(occ)*(DirectPotential(other,other)*Ket(corb.orbital)-
+              ExchangePotential(other,other)*Ket(corb.orbital))
+end
 
 # ** Pretty-printing
 
