@@ -7,6 +7,12 @@ struct Fock <: Symbolic end
 Base.:(==)(::Fock, ::Fock) = true
 Base.show(io::IO, ::Fock) = write(io, "f̂")
 
+# * OneBodyHamiltonian operator
+
+struct OneBodyHamiltonian <: Symbolic end
+Base.:(==)(::OneBodyHamiltonian, ::OneBodyHamiltonian) = true
+Base.show(io::IO, ::OneBodyHamiltonian) = write(io, "ĥ")
+
 # * One-body integral
 
 struct OneBodyIntegral{A,B} <: Symbolic
@@ -27,10 +33,10 @@ function Base.show(io::IO, I::OneBodyIntegral)
 end
 
 Base.diff(I::OneBodyIntegral{A,B}, orb::O, occ::II=1) where {A,B,O,II} =
-    I.b == orb ? Fock()*Bra(I.a)/occ : 0
+    I.b == orb ? OneBodyHamiltonian()*Bra(I.a)/occ : 0
 
 Base.diff(I::OneBodyIntegral{A,B}, corb::Conjugate{O}, occ::II=1) where {A,B,O,II} =
-    I.a == corb.orbital ? Fock()*Ket(I.b)/occ : 0
+    I.a == corb.orbital ? OneBodyHamiltonian()*Ket(I.b)/occ : 0
 
 # * Repulsion potentials
 
@@ -223,6 +229,7 @@ end
 # * Symbolics registration
 
 @new_number Fock
+@new_number OneBodyHamiltonian
 @new_number OneBodyIntegral
 @new_number RepulsionPotential
 @new_number GeneralRepulsionIntegral
@@ -230,6 +237,6 @@ end
 @new_number ExchangeIntegral
 
 
-export Fock, OneBodyIntegral,
+export Fock, OneBodyHamiltonian, OneBodyIntegral,
     RepulsionPotential, DirectPotential, ExchangePotential
     GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, DirectExchangeIntegral
