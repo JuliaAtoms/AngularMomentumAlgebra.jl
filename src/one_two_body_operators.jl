@@ -1,12 +1,6 @@
 using Symbolics
 import AngularMomentumAlgebra: @new_number
 
-# * Fock operator
-
-struct Fock <: Symbolic end
-Base.:(==)(::Fock, ::Fock) = true
-Base.show(io::IO, ::Fock) = write(io, "f̂")
-
 # * OneBodyHamiltonian operator
 
 struct OneBodyHamiltonian <: Symbolic end
@@ -266,7 +260,6 @@ end
 
 # * Symbolics registration
 
-@new_number Fock
 @new_number OneBodyHamiltonian
 @new_number OneBodyIntegral
 @new_number RepulsionPotential
@@ -275,6 +268,6 @@ end
 @new_number ExchangeIntegral
 
 
-export Fock, OneBodyHamiltonian, OneBodyIntegral,
+export OneBodyHamiltonian, OneBodyIntegral,
     RepulsionPotential, DirectPotential, ExchangePotential
-    GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral
+GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral
