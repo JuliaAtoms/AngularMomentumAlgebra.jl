@@ -32,9 +32,6 @@ Base.diff(I::OneBodyIntegral{O}, orb::O, occ::II=1) where {O,II} =
 Base.diff(I::OneBodyIntegral{O}, corb::Conjugate{O}, occ::II=1) where {O,II} =
     I.o == corb.orbital ? Fock()*Ket(I.o)/occ : 0
 
-Base.convert(::Type{OneBodyIntegral{SpinOrbital,SpinOrbital}}, I::OneBodyIntegral{A,B}) where {A,B} =
-    OneBodyIntegral{SpinOrbital,SpinOrbital}(I.a, I.b)
-
 # * Repulsion potentials
 
 struct RepulsionPotential{kind,A,B} <: Symbolic
@@ -135,9 +132,6 @@ end
 Base.:(==)(a::DirectExchangeIntegral, b::DirectExchangeIntegral) =
     a.a == b.a && a.b == b.b
 isdiagonal(FG::DirectExchangeIntegral) = FG.a == FG.b
-
-Base.convert(::Type{DirectExchangeIntegral{SpinOrbital,SpinOrbital}}, FG::DirectExchangeIntegral{A,B}) where {A,B} =
-    DirectExchangeIntegral{SpinOrbital,SpinOrbital}(FG.a, FG.b)
 
 # ** Pretty-printing
 

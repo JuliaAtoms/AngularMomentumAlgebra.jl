@@ -10,26 +10,32 @@ Some references below to
 struct OneBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
     integrals::Vector{OneBodyIntegral{A,B}}
     signs::Vector{Int}
+    function OneBodyEnergyExpression{A,B}(a::Configuration{<:SpinOrbital},
+                                          b::Configuration{<:SpinOrbital}) where {A,B}
+        m = length(a)
+        n = length(b)
+        N = m*n
+        integrals = Vector{OneBodyIntegral{A,B}}(undef, N)
+        signs = Vector{Int}(undef, N)
+        ii = 1
+        for i = 1:m
+            ai = a.orbitals[i]
+            for j = 1:n
+                # Cook 2005, p. 63
+                integrals[ii] = OneBodyIntegral{A,B}(ai,b.orbitals[j])
+                signs[ii] = (-1)^(i+j)
+                ii += 1
+            end
+        end
+        new{A,B}(integrals, signs)
+    end
 end
 
 function OneBodyEnergyExpression(a::Configuration{<:SpinOrbital},
                                  b::Configuration{<:SpinOrbital})
-    m = length(a)
-    n = length(b)
     A = promote_type(typeof.(a.orbitals)...)
     B = promote_type(typeof.(b.orbitals)...)
-    integrals = Vector{OneBodyIntegral{A,B}}()
-    signs = Vector{Int}()
-    for i = 1:m
-        ai = a.orbitals[i]
-        for j = 1:n
-            # Cook 2005, p. 63
-            push!(integrals, OneBodyIntegral{A,B}(ai,b.orbitals[j]))
-            push!(signs, (-1)^(i+j))
-        end
-    end
-    allunique(integrals) || throw(ArgumentError("Not all integrals are unique"))
-    OneBodyEnergyExpression(integrals, signs)
+    OneBodyEnergyExpression{A,B}(a, b)
 end
 
 function Base.:(==)(a::OneBodyEnergyExpression, b::OneBodyEnergyExpression)
@@ -50,13 +56,11 @@ function Base.adjoint(eng::OneBodyEnergyExpression{A,B}) where {A,B}
     OneBodyEnergyExpression{B,A}(integrals, eng.signs)
 end
 
-function Base.convert(::Type{OneBodyEnergyExpression{SpinOrbital,SpinOrbital}}, eng::OneBodyEnergyExpression{A,B}) where {A,B}
-    integrals = Vector{OneBodyIntegral{SpinOrbital,SpinOrbital}}()
-    append!(integrals, eng.integrals)
-    OneBodyEnergyExpression(integrals, eng.signs)
-end
-
 function Base.show(io::IO, eng::OneBodyEnergyExpression)
+    if isempty(eng.integrals)
+        write(io, "0")
+        return
+    end
     skip = if get(io, :compact, false)
         n = length(eng.integrals)
         if n > 2
@@ -79,24 +83,28 @@ end
 
 struct TwoBodyEnergyExpression{A<:SpinOrbital,B<:SpinOrbital}
     integrals::Vector{DirectExchangeIntegral{A,B}}
+
+    function TwoBodyEnergyExpression{A,B}(a::Configuration{<:SpinOrbital},
+                                          b::Configuration{<:SpinOrbital}) where {A,B}
+        m = length(a)
+        n = length(b)
+
+        integrals = Vector{DirectExchangeIntegral{A,B}}()
+        map(1:m) do i
+            ai = a.orbitals[i]
+            # Cook 2005, p. 69
+            append!(integrals,
+                    map(j -> DirectExchangeIntegral{A,B}(ai,b.orbitals[j]), 1:i-1))
+        end |> oo -> vcat(oo...)
+        new{A,B}(integrals)
+    end
 end
 
 function TwoBodyEnergyExpression(a::Configuration{<:SpinOrbital},
                                  b::Configuration{<:SpinOrbital})
-    m = length(a)
-    n = length(b)
     A = promote_type(typeof.(a.orbitals)...)
     B = promote_type(typeof.(b.orbitals)...)
-
-    integrals = Vector{DirectExchangeIntegral{A,B}}()
-    map(1:m) do i
-        ai = a.orbitals[i]
-        # Cook 2005, p. 69
-        append!(integrals,
-                map(j -> DirectExchangeIntegral{A,B}(ai,b.orbitals[j]), 1:i-1))
-    end |> oo -> vcat(oo...)
-    allunique(integrals) || throw(ArgumentError("Not all integrals unique"))
-    TwoBodyEnergyExpression(integrals)
+    TwoBodyEnergyExpression{A,B}(a,b)
 end
 
 Base.:(==)(a::TwoBodyEnergyExpression, b::TwoBodyEnergyExpression) =
@@ -109,13 +117,11 @@ function Base.adjoint(eng::TwoBodyEnergyExpression{A,B}) where {A,B}
     TwoBodyEnergyExpression{B,A}(integrals)
 end
 
-function Base.convert(::Type{TwoBodyEnergyExpression{SpinOrbital,SpinOrbital}}, eng::TwoBodyEnergyExpression{A,B}) where {A,B}
-    integrals = Vector{DirectExchangeIntegral{SpinOrbital,SpinOrbital}}()
-    append!(integrals, eng.integrals)
-    TwoBodyEnergyExpression(integrals)
-end
-
 function Base.show(io::IO, eng::TwoBodyEnergyExpression)
+    if isempty(eng.integrals)
+        write(io, "0")
+        return
+    end
     skip = if get(io, :compact, false)
         n = length(eng.integrals)
         if n > 2
@@ -136,29 +142,25 @@ function Base.show(io::IO, eng::TwoBodyEnergyExpression)
     end
 end
 
-Base.show(io::IO, eng::TwoBodyEnergyExpression) =
-    write(io, join(string.(eng.integrals), " + "))
-
-
-function hamiltonian_matrix(::Type{Eng}, spcs::Vector{<:Configuration{<:SpinOrbital}};
-                            selector::Function = peel) where {Eng}
+function hamiltonian_matrix(::Type{Eng}, ::Type{O},
+                            spcs::Vector{<:Configuration{<:SpinOrbital}};
+                            selector::Function = peel) where {Eng,O<:SpinOrbital}
     spcs = selector.(spcs)
     m = length(spcs)
-    O = promote_type(first.(eltype.(spcs))...)
     H = Matrix{Eng{O,O}}(undef, m, m)
     for i = 1:m
         for j = 1:m
-            H[i,j] = Eng(spcs[i],spcs[j])
+            H[i,j] = Eng{O,O}(spcs[i],spcs[j])
         end
     end
     H
 end
 
-one_body_hamiltonian_matrix(spcs::Vector{<:Configuration{<:SpinOrbital}}; kwargs...) =
-    hamiltonian_matrix(OneBodyEnergyExpression, spcs; kwargs...)
+one_body_hamiltonian_matrix(::Type{O}, spcs::Vector{<:Configuration{<:SpinOrbital}}; kwargs...) where {O<:SpinOrbital} =
+    hamiltonian_matrix(OneBodyEnergyExpression, O, spcs; kwargs...)
 
-two_body_hamiltonian_matrix(spcs::Vector{<:Configuration{<:SpinOrbital}}; kwargs...) =
-    hamiltonian_matrix(TwoBodyEnergyExpression, spcs; kwargs...)
+two_body_hamiltonian_matrix(::Type{O}, spcs::Vector{<:Configuration{<:SpinOrbital}}; kwargs...) where {O<:SpinOrbital} =
+    hamiltonian_matrix(TwoBodyEnergyExpression, O, spcs; kwargs...)
 
 
 export OneBodyEnergyExpression, TwoBodyEnergyExpression,
