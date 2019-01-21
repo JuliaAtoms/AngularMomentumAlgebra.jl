@@ -3,9 +3,17 @@ import AngularMomentumAlgebra: @new_number
 
 # * OneBodyHamiltonian operator
 
-struct OneBodyHamiltonian <: Symbolic end
-Base.:(==)(::OneBodyHamiltonian, ::OneBodyHamiltonian) = true
-Base.show(io::IO, ::OneBodyHamiltonian) = write(io, "ĥ")
+struct OneBodyHamiltonian{O} <: Symbolic
+    orb::O
+end
+Base.:(==)(a::OneBodyHamiltonian, b::OneBodyHamiltonian) = a.orb == b.orb
+function Base.show(io::IO, h::OneBodyHamiltonian)
+    h.orb isa Bra && show(io, h.orb)
+    write(io, "ĥ")
+    h.orb isa Bra || show(io, h.orb)
+end
+
+Base.iszero(h::OneBodyHamiltonian) = h.orb == 0
 
 # * One-body integral
 
@@ -26,11 +34,17 @@ function Base.show(io::IO, I::OneBodyIntegral)
     write(io, ")")
 end
 
-Base.diff(I::OneBodyIntegral{A,B}, orb::O, occ::II=1) where {A,B,O,II} =
-    I.b == orb ? OneBodyHamiltonian()*Bra(I.a)/occ : 0
+Base.diff(I::OneBodyIntegral{A,B}, orb::O) where {A,B,O,II} =
+    OneBodyHamiltonian(I.b == orb ? Bra(I.a) : 0)
 
-Base.diff(I::OneBodyIntegral{A,B}, corb::Conjugate{O}, occ::II=1) where {A,B,O,II} =
-    I.a == corb.orbital ? OneBodyHamiltonian()*Ket(I.b)/occ : 0
+Base.diff(I::OneBodyIntegral{A,B}, orb::O, occ::II) where {A,B,O,II} =
+    diff(I, orb)/occ
+
+Base.diff(I::OneBodyIntegral{A,B}, corb::Conjugate{O}) where {A,B,O,II} =
+    OneBodyHamiltonian(I.a == corb.orbital ? Ket(I.b) : 0)
+
+Base.diff(I::OneBodyIntegral{A,B}, corb::Conjugate{O}, occ::II) where {A,B,O,II} =
+    diff(I, corb)/occ
 
 # * Repulsion potentials
 
@@ -269,5 +283,5 @@ end
 
 
 export OneBodyHamiltonian, OneBodyIntegral,
-    RepulsionPotential, DirectPotential, ExchangePotential
+    RepulsionPotential, DirectPotential, ExchangePotential, DirectExchangePotentials,
 GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral
