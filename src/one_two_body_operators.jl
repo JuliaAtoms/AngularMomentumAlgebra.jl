@@ -86,6 +86,9 @@ end
 Base.:(==)(a::DirectExchangePotentials,b::DirectExchangePotentials) =
     a.a == b.a && a.b == b.b && a.o == b.o
 
+isdiagonal(dxp::DirectExchangePotentials) =
+    dxp.a == dxp.b
+
 function Base.show(io::IO, JK::DirectExchangePotentials)
     write(io, "[Ĵ{")
     show(io, JK.a)
@@ -284,4 +287,5 @@ end
 
 export OneBodyHamiltonian, OneBodyIntegral,
     RepulsionPotential, DirectPotential, ExchangePotential, DirectExchangePotentials,
-GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral
+    GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral,
+    isdiagonal
