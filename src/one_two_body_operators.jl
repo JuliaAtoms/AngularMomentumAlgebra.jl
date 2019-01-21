@@ -70,6 +70,29 @@ function Base.show(io::IO, K::ExchangePotential)
     write(io, "}")
 end
 
+struct DirectExchangePotentials{A,B,O}
+    a::A
+    b::B
+    o::O # The orbital o feels the potentials formed by a & b
+end
+Base.:(==)(a::DirectExchangePotentials,b::DirectExchangePotentials) =
+    a.a == b.a && a.b == b.b && a.o == b.o
+
+function Base.show(io::IO, JK::DirectExchangePotentials)
+    write(io, "[Ĵ{")
+    show(io, JK.a)
+    write(io, ";")
+    show(io, JK.b)
+    write(io, "}")
+    write(io, " - ")
+    write(io, "K̂{")
+    show(io, JK.a)
+    write(io, ";")
+    show(io, JK.b)
+    write(io, "}]")
+    show(io, JK.o)
+end
+
 # * Repulsion integrals
 
 abstract type AbstractRepulsionIntegral{A,B,C,D} <: Symbolic end
@@ -131,27 +154,42 @@ Base.:(==)(a::DirectIntegral, b::ExchangeIntegral) =
 Base.:(==)(a::ExchangeIntegral, b::DirectIntegral) =
     b == a
 
-struct DirectExchangeIntegral{A,B}
+struct TwoBodyIntegral{A,B,C,D} <: AbstractRepulsionIntegral{A,B,C,D}
     a::A
     b::B
+    c::C
+    d::D
+    TwoBodyIntegral{A,B,C,D}(a::A, b::B, c::C=a, d::D=b) where {A,B,C,D} =
+        new{A,B,C,D}(a, b, c, d)
 end
-Base.:(==)(a::DirectExchangeIntegral, b::DirectExchangeIntegral) =
-    a.a == b.a && a.b == b.b
-isdiagonal(FG::DirectExchangeIntegral) = FG.a == FG.b
+Base.:(==)(a::TwoBodyIntegral, b::TwoBodyIntegral) =
+    a.a == b.a && a.b == b.b && a.c == b.c && a.d == b.d
+isdiagonal(FG::TwoBodyIntegral) = FG.a == FG.b == FG.c == FG.d
 
-function Base.diff(FG::ExchangeIntegral{A,B}, orb::O, occ::I=1) where {A,B,O,I}
-    orb ∉ [FG.a, FG.b] && return 0
-    other = FG.a == orb ? FG.b : FG.a
-    inv(occ)*(DirectPotential(other,other)*Bra(orb)-
-              ExchangePotential(other,other)*Bra(orb))
+function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, orb::O, occ::I=1) where {A,B,C,D,O,I}
+    orb ∉ [FG.c, FG.d] && return 0
+    other,pot_orbs = FG.d == orb ? (FG.b,(FG.a,FG.c)) : (FG.a,(FG.b,FG.d))
+    inv(occ)*(DirectPotential(pot_orbs...)*Bra(other)-
+              ExchangePotential(pot_orbs...)*Bra(other))
 end
 
+function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, orb::O) where {A<:SpinOrbital,B<:SpinOrbital,C<:SpinOrbital,D<:SpinOrbital,O<:SpinOrbital,I}
+    orb ∉ [FG.c, FG.d] && return 0
+    other,pot_orbs = FG.d == orb ? (FG.b,(FG.a,FG.c)) : (FG.a,(FG.b,FG.d))
+    DirectExchangePotentials(pot_orbs..., Bra(other))
+end
 
-function Base.diff(FG::DirectExchangeIntegral{A,B}, corb::Conjugate{O}, occ::I=1) where {A,B,O,I}
+function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, corb::Conjugate{O}, occ::I=1) where {A,B,C,D,O,I}
     corb.orbital ∉ [FG.a, FG.b] && return 0
-    other = FG.a == corb.orbital ? FG.b : FG.a
-    inv(occ)*(DirectPotential(other,other)*Ket(corb.orbital)-
-              ExchangePotential(other,other)*Ket(corb.orbital))
+    other,pot_orbs = FG.b == corb.orbital ? (FG.d,(FG.a,FG.c)) : (FG.c,(FG.b,FG.d))
+    inv(occ)*(DirectPotential(pot_orbs...)*Ket(other)-
+              ExchangePotential(pot_orbs...)*Ket(other))
+end
+
+function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, corb::Conjugate{O}) where {A<:SpinOrbital,B<:SpinOrbital,C<:SpinOrbital,D<:SpinOrbital,O<:SpinOrbital,I}
+    corb.orbital ∉ [FG.a, FG.b] && return 0
+    other,pot_orbs = FG.b == corb.orbital ? (FG.d,(FG.a,FG.c)) : (FG.c,(FG.b,FG.d))
+    DirectExchangePotentials(pot_orbs..., Ket(other))
 end
 
 # ** Pretty-printing
@@ -192,15 +230,15 @@ function Base.show(io::IO, G::ExchangeIntegral)
     write(io, "⟩")
 end
 
-function Base.show(io::IO, FG::DirectExchangeIntegral)
+function Base.show(io::IO, FG::TwoBodyIntegral)
     write(io, "[")
     show(io, FG.a)
     write(io, " ")
     show(io, FG.b)
     write(io, "||")
-    show(io, FG.a)
+    show(io, FG.c)
     write(io, " ")
-    show(io, FG.b)
+    show(io, FG.d)
     write(io, "]")
 end
 
@@ -239,4 +277,4 @@ end
 
 export Fock, OneBodyHamiltonian, OneBodyIntegral,
     RepulsionPotential, DirectPotential, ExchangePotential
-    GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, DirectExchangeIntegral
+    GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral
