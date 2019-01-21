@@ -12,6 +12,11 @@ repo-url = "https://github.com/jagot/AtomicLevels.jl.git"
 uuid = "10933b4c-d60f-11e8-1fc6-bd9035a249a1"
 version = "0.1.0"
 
+[[AutoHashEquals]]
+git-tree-sha1 = "45bb6705d93be619b81451bb2006b7ee5d4e4453"
+uuid = "15f4f7f2-30c1-5605-9d31-71845cf9641f"
+version = "0.2.0"
+
 [[BandedMatrices]]
 deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "Random", "SparseArrays", "Test"]
 git-tree-sha1 = "3804222a671e7e4f697cc31b6639592ba8ae00ae"
