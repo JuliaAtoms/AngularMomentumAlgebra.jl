@@ -86,6 +86,12 @@ end
 Base.:(==)(a::DirectExchangePotentials,b::DirectExchangePotentials) =
     a.a == b.a && a.b == b.b && a.o == b.o
 
+Base.zero(::Type{DirectExchangePotentials}) =
+    DirectExchangePotentials(0,0,0)
+
+Base.iszero(JK::DirectExchangePotentials) =
+    JK.a == JK.b == JK.o == 0
+
 isdiagonal(dxp::DirectExchangePotentials) =
     dxp.a == dxp.b
 
@@ -185,7 +191,7 @@ function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, orb::O, occ::I=1) where {A,B,C,
 end
 
 function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, orb::O) where {A<:SpinOrbital,B<:SpinOrbital,C<:SpinOrbital,D<:SpinOrbital,O<:SpinOrbital,I}
-    orb ∉ [FG.c, FG.d] && return 0
+    orb ∉ [FG.c, FG.d] && return zero(DirectExchangePotentials)
     other,pot_orbs = FG.d == orb ? (FG.b,(FG.a,FG.c)) : (FG.a,(FG.b,FG.d))
     DirectExchangePotentials(pot_orbs..., Bra(other))
 end
@@ -198,7 +204,7 @@ function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, corb::Conjugate{O}, occ::I=1) w
 end
 
 function Base.diff(FG::TwoBodyIntegral{A,B,C,D}, corb::Conjugate{O}) where {A<:SpinOrbital,B<:SpinOrbital,C<:SpinOrbital,D<:SpinOrbital,O<:SpinOrbital,I}
-    corb.orbital ∉ [FG.a, FG.b] && return 0
+    corb.orbital ∉ [FG.a, FG.b] && return zero(DirectExchangePotentials)
     other,pot_orbs = FG.b == corb.orbital ? (FG.d,(FG.a,FG.c)) : (FG.c,(FG.b,FG.d))
     DirectExchangePotentials(pot_orbs..., Ket(other))
 end
