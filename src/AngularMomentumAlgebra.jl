@@ -5,23 +5,18 @@ using WignerSymbols
 using Combinatorics
 using LinearAlgebra
 using SparseArrays
-using Formatting
 using UnicodeFun
-using Parameters
 using Printf
 
-include("symbolics.jl")
-include("j.jl")
-include("common.jl")
-include("clebsch_gordan.jl")
-include("kronecker.jl")
-include("tensors.jl")
-include("slater_integrals.jl")
 include("conjugate_orbitals.jl")
-include("slater_determinants.jl")
-include("one_two_body_operators.jl")
+include("one_body.jl")
+include("repulsion_potentials.jl")
+include("two_body.jl")
+include("multipole_expansion.jl")
 include("energy_expressions.jl")
-include("couplings.jl")
+include("invariant_sets.jl")
+
+include("slater_determinants.jl")
 
 # Forward declaration, to be implemented on case-by-case basis by
 # other packages. Should return a
