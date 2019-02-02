@@ -88,6 +88,8 @@ struct TwoBodyIntegral{A,B,C,D} <: AbstractRepulsionIntegral{A,B,C,D}
     b::B
     c::C
     d::D
+    TwoBodyIntegral{A,B,C,D}(a::A, b::B, c::C=a, d::D=b) where {A,B,C,D} =
+        new{A,B,C,D}(a, b, c, d)
     TwoBodyIntegral(a::A, b::B, c::C=a, d::D=b) where {A,B,C,D} =
         new{A,B,C,D}(a, b, c, d)
 end
