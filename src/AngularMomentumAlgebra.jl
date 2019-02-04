@@ -1,21 +1,11 @@
 module AngularMomentumAlgebra
 
 using AtomicLevels
+using EnergyExpressions
 using WignerSymbols
 using Combinatorics
-using LinearAlgebra
-using SparseArrays
-using UnicodeFun
-using Printf
 
-include("conjugate_orbitals.jl")
-include("one_body.jl")
-include("repulsion_potentials.jl")
-include("two_body.jl")
 include("multipole_expansion.jl")
-include("energy_expressions.jl")
-include("invariant_sets.jl")
-
 include("slater_determinants.jl")
 
 # Forward declaration, to be implemented on case-by-case basis by
@@ -25,6 +15,18 @@ include("slater_determinants.jl")
 energy_expression(::Any; verbosity=0) =
     error("Not implemented")
 
-export energy_expression
+export energy_expression,
+    # Re-exports from EnergyExpressions.jl
+    Conjugate,
+    OneBodyHamiltonian, OneBodyIntegral,
+    RepulsionPotential, DirectPotential, ExchangePotential, DirectExchangePotentials,
+    GeneralRepulsionIntegral, DirectIntegral, ExchangeIntegral, TwoBodyIntegral,
+    isdiagonal,
+    OneBodyEnergyExpression, TwoBodyEnergyExpression,
+    adjacent_in_coord!, diagonal_in_coord!,
+    adjacent_in_coord, diagonal_in_coord,
+    hamiltonian_matrix, one_body_hamiltonian_matrix, two_body_hamiltonian_matrix,
+    coupled_states, invariant_sets
+
 
 end # module
