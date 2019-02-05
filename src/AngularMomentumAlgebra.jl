@@ -3,10 +3,8 @@ module AngularMomentumAlgebra
 using AtomicLevels
 using EnergyExpressions
 using WignerSymbols
-using Combinatorics
 
 include("multipole_expansion.jl")
-include("slater_determinants.jl")
 
 # Forward declaration, to be implemented on case-by-case basis by
 # other packages. Should return a

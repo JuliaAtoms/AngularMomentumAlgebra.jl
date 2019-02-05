@@ -52,8 +52,8 @@ deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[EnergyExpressions]]
-deps = ["AtomicLevels", "LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "8c82aa381b8ab1d5b4893939e545abeeba6670d3"
+deps = ["AtomicLevels", "Combinatorics", "LinearAlgebra", "SparseArrays", "Test", "UnicodeFun"]
+git-tree-sha1 = "56f196b376e140c80c63c3c08f3679f76ee6dc5b"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaAtoms/EnergyExpressions.jl.git"
 uuid = "f4b57a2e-27c7-11e9-0cb0-edd185b706f6"
