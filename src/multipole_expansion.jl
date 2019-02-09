@@ -4,7 +4,7 @@
 
 Equations (3.42–44) of
 
-- Lindgren, I. (1986). Atomic many-body theory. Berlin New York:
+- Lindgren, I. (1986). Atomic Many-Body Theory. Berlin New York:
   Springer-Verlag.
 
 \[\langle ab|r_{12}^{-1}|cd\rangle =
@@ -57,13 +57,40 @@ function multipole_expand(a::SpinOrbital, b::SpinOrbital, c::SpinOrbital, d::Spi
     multipole_terms
 end
 
-function multipole_expand(integral::TwoBodyIntegral)
-    a,b,c,d = integral.a,integral.b,integral.c,integral.d
+multipole_expand(integral::NBodyTermFactor) =
+    NBodyMatrixElement([integral])
 
-    direct_terms = multipole_expand(a,b,c,d)
-    exchange_terms = multipole_expand(a,b,d,c,-1)
+struct CoulombInteractionMultipole <: TwoBodyOperator
+    k::Int
+end
 
-    direct_terms,exchange_terms
+Base.show(io::IO, ci::CoulombInteractionMultipole) = write(io, "ĝ", to_superscript(ci.k))
+
+function Base.show(io::IO, me::OrbitalMatrixElement{2,A,CoulombInteractionMultipole,B}) where {A,B}
+    if me.a == me.b # Direct interaction
+        write(io, "F",to_superscript(me.o.k),"($(me.a[1]),$(me.a[2]))")
+    elseif me.a[1] == me.b[2] && me.a[2] == me.b[1] # Exchange interaction
+        write(io, "G",to_superscript(me.o.k),"($(me.a[1]),$(me.a[2]))")
+    else # General case
+        write(io, "R",to_superscript(me.o.k),"(", join(string.(me.a), ","), ";", join(string.(me.b), ","), ")")
+    end
+end
+
+Base.show(io::IO, me::ContractedOperator{1,2,1,A,CoulombInteractionMultipole,B}) where {A,B}=
+    write(io, "Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
+
+function multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,B}) where {A,B}
+    (a,b),(c,d) = integral.a,integral.b
+
+    terms = NBodyTerm[]
+
+    for (k,coeff) in multipole_expand(a,b,c,d)
+        push!(terms, NBodyTerm([OrbitalMatrixElement(NTuple{2,A}((a,b)),
+                                                     CoulombInteractionMultipole(k),
+                                                     NTuple{2,B}((c,d)))], coeff))
+    end
+
+    sum(terms)
 end
 
 export multipole_expand

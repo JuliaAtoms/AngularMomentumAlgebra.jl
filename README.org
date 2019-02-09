@@ -7,4 +7,7 @@
 [[https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl][https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl/branch/master/graph/badge.svg]]
 
 
-Library for finding energy expressions of atomic configurations.
+This library is a thin wrapper around [[https://github.com/JuliaAtoms/EnergyExpressions.jl][EnergyExpressions.jl]] for finding
+energy expressions of atomic configurations. At the moment, it only
+support configurations of spin-orbitals, but in the future, support
+for atomic configuration-state functions is a possibility.
