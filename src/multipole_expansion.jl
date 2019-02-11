@@ -63,6 +63,7 @@ multipole_expand(integral::NBodyTermFactor) =
 struct CoulombInteractionMultipole <: TwoBodyOperator
     k::Int
 end
+const CoulombPotentialMultipole{A,B} = ContractedOperator{1,2,1,A,CoulombInteractionMultipole,B}
 
 Base.show(io::IO, ci::CoulombInteractionMultipole) = write(io, "ĝ", to_superscript(ci.k))
 
@@ -76,8 +77,8 @@ function Base.show(io::IO, me::OrbitalMatrixElement{2,A,CoulombInteractionMultip
     end
 end
 
-Base.show(io::IO, me::ContractedOperator{1,2,1,A,CoulombInteractionMultipole,B}) where {A,B}=
-    write(io, "Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
+Base.show(io::IO, me::CoulombPotentialMultipole{A,B}) where {A,B}=
+    write(io, "r⁻¹×Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
 
 function multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,B}) where {A,B}
     (a,b),(c,d) = integral.a,integral.b

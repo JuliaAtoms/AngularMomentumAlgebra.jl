@@ -8,7 +8,8 @@ using UnicodeFun
 
 include("multipole_expansion.jl")
 
-Base.Matrix(::QuantumOperator, csfs::Vector{<:CSF}, overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) =
+Base.Matrix(::QuantumOperator, csfs::Vector{<:CSF},
+            overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) =
     throw(ArgumentError("Derivation of energy expression for atomic CSFs not yet implemented"))
 
 function Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
@@ -26,6 +27,8 @@ end
 
 export # Re-exports from EnergyExpressions.jl
     Conjugate, OrbitalOverlap, EnergyExpression,
-    FieldFreeOneBodyHamiltonian, OneBodyHamiltonian, CoulombInteraction, CoulombPotential
+    FieldFreeOneBodyHamiltonian, OneBodyHamiltonian, CoulombInteraction, CoulombPotential,
+    # Own types
+    CoulombInteractionMultipole, CoulombPotentialMultipole
 
 end # module
