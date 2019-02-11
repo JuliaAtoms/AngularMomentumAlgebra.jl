@@ -25,7 +25,7 @@ function Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
 end
 
 export # Re-exports from EnergyExpressions.jl
-    Conjugate,
-    OneBodyHamiltonian, CoulombInteraction
+    Conjugate, OrbitalOverlap, EnergyExpression,
+    FieldFreeOneBodyHamiltonian, OneBodyHamiltonian, CoulombInteraction, CoulombPotential
 
 end # module
