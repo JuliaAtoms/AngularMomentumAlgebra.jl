@@ -3,7 +3,7 @@
 #+EMAIL: stefanos.carlstrom@gmail.com
 
 [[https://travis-ci.org/JuliaAtoms/AngularMomentumAlgebra.jl][https://travis-ci.org/JuliaAtoms/AngularMomentumAlgebra.jl.svg?branch=master]]
-[[https://ci.appveyor.com/project/jagot/angularmomentumalgebra-jl][https://img.shields.io/appveyor/ci/jagot/angularmomentumalgebra-jl.svg?logo=appveyor]]
+[[https://ci.appveyor.com/project/juliaatoms/angularmomentumalgebra-jl][https://img.shields.io/appveyor/ci/juliaatoms/angularmomentumalgebra-jl.svg?logo=appveyor]]
 [[https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl][https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl/branch/master/graph/badge.svg]]
 
 
