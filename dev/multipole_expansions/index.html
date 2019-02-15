@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Multipole expansions · AngularMomentumAlgebra</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script src="../assets/latex.js"></script></head><body><nav class="toc"><h1>AngularMomentumAlgebra</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../common/">Common routines</a></li><li><a class="toctext" href="../clebsch_gordan/">Clebsch–Gordan coefficients</a></li><li><a class="toctext" href="../tensors/">Tensors</a></li><li><a class="toctext" href="../coulomb/">Coulomb interaction</a></li><li class="current"><a class="toctext" href>Multipole expansions</a><ul class="internal"><li><a class="toctext" href="#Spherical-tensors-1">Spherical tensors</a></li></ul></li><li><a class="toctext" href="../energy_expressions/">Energy expressions</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Multipole expansions</a></li></ul><a class="edit-page" href="https://github.com/JuliaAtoms/AngularMomentumAlgebra.jl/blob/master/docs/src/multipole_expansions.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Multipole expansions</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Multipole-expansions-1" href="#Multipole-expansions-1">Multipole expansions</a></h1><p>The matrix element of scalar product of two tensors acting on different coordinates is given by</p><div>\[\begin{equation}
+\begin{aligned}
+&amp;\matrixel{n_aj_am_a;n_bj_bm_b}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_cj_cm_c;n_dj_dm_d}\\
+=&amp;
+\frac{1}{\angroot{j_aj_b}}
+\sum_\alpha(-)^{-\alpha}
+C_{j_cm_c;k,\alpha}^{j_am_a}
+C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
+&amp;\times
+\redmatrixel{n_aj_a}{\tensor{P}^{(k)}(1)}{n_cj_c}
+\redmatrixel{n_bj_b}{\tensor{Q}^{(k)}(2)}{n_dj_d}
+\end{aligned}
+\tag{V13.1.26}
+\end{equation}\]</div><p>Since the <a href="../clebsch_gordan/#Clebsch–Gordan-coefficients-1">Clebsch–Gordan coefficients</a> can be rewritten using 3j symbols and the 3j symbols vanish unless <span>$m_c + \alpha - m_3 = m_d - \alpha - m_b = 0$</span>, we have</p><div>\[\begin{equation}
+\alpha = m_a - m_c = m_d-m_b
+\implies
+-\alpha + m_a + m_b = m_b + m_c.
+\end{equation}\]</div><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AngularMomentumAlgebra.multipole_expand_scalar_product" href="#AngularMomentumAlgebra.multipole_expand_scalar_product"><code>AngularMomentumAlgebra.multipole_expand_scalar_product</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-none">multipole_expand_scalar_product(a, b, P, Q, c, d)</code></pre><p>Multipole expand the matrix element <code>⟨ab|P⋅Q|cd⟩</code>, where the tensor <code>P</code> acts on orbitals <code>a</code> &amp; <code>c</code>, and the tensor <code>Q</code> acts on orbitals <code>b</code> &amp; <code>d</code>. The definition is taken from Eq. (13.1.26) of Varshalovich (1988).</p></div></div><a class="source-link" target="_blank" href="https://github.com/JuliaAtoms/AngularMomentumAlgebra.jl/blob/f560bc829371bdaf7673f83af30d45ec97e218e8/src/multipole_expansion.jl#L3-L10">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AngularMomentumAlgebra.multipole_expand" href="#AngularMomentumAlgebra.multipole_expand"><code>AngularMomentumAlgebra.multipole_expand</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-none">multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,B})</code></pre><p>Multipole-expand the two-body integral resulting from the Coulomb repulsion between two electrons.</p></div></div><a class="source-link" target="_blank" href="https://github.com/JuliaAtoms/AngularMomentumAlgebra.jl/blob/f560bc829371bdaf7673f83af30d45ec97e218e8/src/multipole_expansion.jl#L92-L97">source</a><div><div><pre><code class="language-none">multipole_expand(integral::NBodyTermFactor)</code></pre><p>Dummy method that returns <code>integral</code> unchanged, used for all <code>NBodyTermFactor</code>s that are <em>not</em> to be multipole-expanded.</p></div></div><a class="source-link" target="_blank" href="https://github.com/JuliaAtoms/AngularMomentumAlgebra.jl/blob/f560bc829371bdaf7673f83af30d45ec97e218e8/src/multipole_expansion.jl#L113-L118">source</a></section><h2><a class="nav-anchor" id="Spherical-tensors-1" href="#Spherical-tensors-1">Spherical tensors</a></h2><p>For spherical tensors, we can insert the expression for the reduced matrix elements (V13.2.107) into (V13.1.26) above, to get</p><div>\[\begin{equation}
+\begin{aligned}
+\implies
+&amp;\matrixel{\ell_am_a;\ell_bm_b}{[\tensor{C}^{(k)}(1)\cdot\tensor{C}^{(k)}(2)]}{\ell_cm_c;\ell_dm_d}\\
+=&amp;
+\frac{1}{\angroot{\ell_a\ell_b}}
+\sum_\alpha(-)^{-\alpha}
+C_{\ell_cm_c;k,\alpha}^{\ell_am_a}
+C_{\ell_dm_d;k,-\alpha}^{\ell_bm_b}
+\redmatrixel{\ell_a}{\tensor{C}^{(k)}(1)}{\ell_c}
+\redmatrixel{\ell_b}{\tensor{C}^{(k)}(2)}{\ell_d}\\
+=&amp;
+\frac{\angroot{\ell_c\ell_d}}{\angroot{\ell_a\ell_b}}
+C_{\ell_c0;k0}^{\ell_a0}
+C_{\ell_d0;k0}^{\ell_b0}
+\sum_\alpha(-)^{-\alpha}
+C_{\ell_cm_c;k,\alpha}^{\ell_am_a}
+C_{\ell_dm_d;k,-\alpha}^{\ell_bm_b}\\
+=&amp;\begin{aligned}[t]
+\sum_\alpha&amp;
+(-)^{-\alpha + m_a + m_b}
+\angroot{\ell_a\ell_b\ell_c\ell_d}\\
+&amp;\times
+\begin{pmatrix}
+\ell_c&amp;k&amp;\ell_a\\
+m_c&amp;\alpha&amp;-m_a
+\end{pmatrix}
+\begin{pmatrix}
+\ell_d&amp;k&amp;\ell_b\\
+m_d&amp;-\alpha&amp;-m_b
+\end{pmatrix}\\
+&amp;\times
+\begin{pmatrix}
+\ell_c&amp;k&amp;\ell_a\\0&amp;0&amp;0
+\end{pmatrix}
+\begin{pmatrix}
+\ell_d&amp;k&amp;\ell_b\\0&amp;0&amp;0
+\end{pmatrix}.
+\end{aligned}
+\end{aligned}
+\end{equation}\]</div><footer><hr/><a class="previous" href="../coulomb/"><span class="direction">Previous</span><span class="title">Coulomb interaction</span></a><a class="next" href="../energy_expressions/"><span class="direction">Next</span><span class="title">Energy expressions</span></a></footer></article></body></html>
