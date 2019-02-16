@@ -12,7 +12,7 @@ $2$, respectively, can in spherical coordinates be multipole-expanded
 as:
 
 $$\begin{equation}
-\frac{1}{r_{12}} = ()
+\frac{1}{r_{12}} =
 \sum_{k=0}^\infty
 \frac{r_<^k}{r_>^{k+1}}
 P_k(\cos\theta)

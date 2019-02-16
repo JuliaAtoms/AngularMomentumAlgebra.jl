@@ -3,7 +3,7 @@
 
 Find all (even) `k` such that `|a-b| ≤ k ≤ a + b`. This is useful when
 expanding matrix elements of tensors between angular momenta `a` and
-`b` in multipoles `k`; `triangl_range` can then be used to decided
+`b` in multipoles `k`; `triangle_range` can then be used to decided
 which multipole terms are required.
 """
 function triangle_range(a,b)
