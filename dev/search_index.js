@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Common routines",
     "title": "AngularMomentumAlgebra.triangle_range",
     "category": "function",
-    "text": "triangle_range(a,b)\n\nFind all (even) k such that |a-b| ≤ k ≤ a + b. This is useful when expanding matrix elements of tensors between angular momenta a and b in multipoles k; triangl_range can then be used to decided which multipole terms are required.\n\n\n\n\n\n"
+    "text": "triangle_range(a,b)\n\nFind all (even) k such that |a-b| ≤ k ≤ a + b. This is useful when expanding matrix elements of tensors between angular momenta a and b in multipoles k; triangle_range can then be used to decided which multipole terms are required.\n\n\n\n\n\n"
 },
 
 {
@@ -173,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Coulomb interaction",
     "title": "Coulomb interaction",
     "category": "section",
-    "text": "DocTestSetup = quote\n    using AngularMomentumAlgebra\n    using AtomicLevels\nendThe Coulomb interaction between two electrons at coordinates 1 and 2, respectively, can in spherical coordinates be multipole-expanded as:beginequation\nfrac1r_12 = ()\nsum_k=0^infty\nfracr_^kr_^k+1\nP_k(costheta)\nendequationwhich by the addition theorem for the spherical harmonics can be further expanded asbeginequation\nfrac1r_12 =\nsum_kq\nfrac4pi2k+1\nfracr_^kr_^k+1\nconjY^k_q(1)Y^k_q(2)equiv\nsum_kq\nfracr_^kr_^k+1\ntensorC^k_q(1)cdottensorC^k_q(2)\ntagV5179\nendequationwhere we in the last step have used the definition of the Spherical tensors.CoulombInteractionMultipole\nCoulombPotentialMultipole DocTestSetup = nothing"
+    "text": "DocTestSetup = quote\n    using AngularMomentumAlgebra\n    using AtomicLevels\nendThe Coulomb interaction between two electrons at coordinates 1 and 2, respectively, can in spherical coordinates be multipole-expanded as:beginequation\nfrac1r_12 =\nsum_k=0^infty\nfracr_^kr_^k+1\nP_k(costheta)\nendequationwhich by the addition theorem for the spherical harmonics can be further expanded asbeginequation\nfrac1r_12 =\nsum_kq\nfrac4pi2k+1\nfracr_^kr_^k+1\nconjY^k_q(1)Y^k_q(2)equiv\nsum_kq\nfracr_^kr_^k+1\ntensorC^k_q(1)cdottensorC^k_q(2)\ntagV5179\nendequationwhere we in the last step have used the definition of the Spherical tensors.CoulombInteractionMultipole\nCoulombPotentialMultipole DocTestSetup = nothing"
 },
 
 {
