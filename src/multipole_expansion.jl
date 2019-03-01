@@ -107,7 +107,7 @@ function multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,
                                                      NTuple{2,B}((c,d)))], coeff))
     end
 
-    sum(terms)
+    NBodyMatrixElement(terms)
 end
 
 """

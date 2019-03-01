@@ -55,7 +55,7 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[EnergyExpressions]]
 deps = ["AtomicLevels", "Combinatorics", "LinearAlgebra", "SparseArrays", "Test", "UnicodeFun"]
-git-tree-sha1 = "b157bb1b41b734f3e0edddc2543c220b66d382e2"
+git-tree-sha1 = "0a55cb5e7ca1e8684fde73b72378ce4157549374"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaAtoms/EnergyExpressions.jl.git"
 uuid = "f4b57a2e-27c7-11e9-0cb0-edd185b706f6"
@@ -166,9 +166,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[StaticArrays]]
 deps = ["InteractiveUtils", "LinearAlgebra", "Random", "Statistics", "Test"]
-git-tree-sha1 = "1eb114d6e23a817cd3e99abc3226190876d7c898"
+git-tree-sha1 = "3841b39ed5f047db1162627bf5f80a9cd3e39ae2"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.10.2"
+version = "0.10.3"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
