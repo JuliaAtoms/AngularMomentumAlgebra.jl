@@ -14,7 +14,7 @@ function multipole_expand_scalar_product(a::O, b::O,
                                          f::Int=1) where {O,P<:Tensor,Q<:Tensor}
     multipole_terms = Pair{Int,Float64}[]
 
-    couples_spin(spin(a), P, spin(c)) && couples_spin(spin(b), P, spin(d)) ||
+    couples_spin(spin(a), P, spin(c)) && couples_spin(spin(b), Q, spin(d)) ||
         return multipole_terms
 
     ja,ma = jmⱼ(a)
