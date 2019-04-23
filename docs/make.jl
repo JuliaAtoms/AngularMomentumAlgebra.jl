@@ -6,6 +6,7 @@ makedocs(
     sitename = "AngularMomentumAlgebra",
     pages = [
         "Home" => "index.md",
+        "Definitions" => "definitions.md",
         "Common routines" => "common.md",
         "Clebsch–Gordan coefficients" => "clebsch_gordan.md",
         "Tensors" => "tensors.md",
