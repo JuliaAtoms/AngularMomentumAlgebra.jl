@@ -22,6 +22,8 @@ triangle_range
 powneg1
 jmⱼ
 spin
+LinearCombination
+@linearly_combinable
 ```
 
 ```@meta

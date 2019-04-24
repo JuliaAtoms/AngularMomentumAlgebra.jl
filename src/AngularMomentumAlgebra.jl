@@ -9,6 +9,7 @@ using UnicodeFun
 
 include("common.jl")
 include("clebsch_gordan.jl")
+include("linear_combinations.jl")
 include("tensors.jl")
 include("coulomb.jl")
 include("multipole_expansion.jl")
