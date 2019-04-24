@@ -1,13 +1,11 @@
 import AngularMomentumAlgebra: @linearly_combinable
 
+struct MySym
+    s::Symbol
+end
+@linearly_combinable MySym
+
 @testset "Linear combinations" begin
-    # # This is type piracy, but hey
-    # @linearly_combinable Symbol
-    struct MySym
-        s::Symbol
-    end
-    @linearly_combinable MySym
-    
     x = MySym(:x)
     y = MySym(:y)
 
