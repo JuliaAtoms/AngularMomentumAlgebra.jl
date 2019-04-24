@@ -4,6 +4,7 @@ using AtomicLevels
 using EnergyExpressions
 import EnergyExpressions: QuantumOperator, NBodyTermFactor, NBodyTerm,
     OrbitalMatrixElement, NBodyMatrixElement
+using LinearAlgebra
 using WignerSymbols
 using UnicodeFun
 
