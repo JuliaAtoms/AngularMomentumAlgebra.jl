@@ -8,7 +8,6 @@ makedocs(
         "Home" => "index.md",
         "Definitions" => "definitions.md",
         "Common routines" => "common.md",
-        "Clebsch–Gordan coefficients" => "clebsch_gordan.md",
         "Tensors" => "tensors.md",
         "Coulomb interaction" => "coulomb.md",
         "Multipole expansions" => "multipole_expansions.md",

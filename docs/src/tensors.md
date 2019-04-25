@@ -42,12 +42,12 @@ wigner_eckart
 
 The spherical tensors are related to the spherical harmonics as
 
-$$\begin{equation}
+```math
 \tensor{C}^{(k)}_q \defd
 \sqrt{\frac{4\pi}{2k+1}}
 Y^k_q.
 \tag{V5.1.7}
-\end{equation}$$
+```
 
 ```@docs
 SphericalTensor
@@ -55,7 +55,7 @@ SphericalTensor
 
 The reduced matrix element of the spherical tensor is given by
 
-$$\begin{equation}
+```math
 \begin{aligned}
 \redmatrixel{\ell'}{\tensor{C}^{(k)}}{\ell}
 &=
@@ -68,7 +68,7 @@ C_{\ell 0;k,0}^{\ell'0} =
 \end{pmatrix}.
 \end{aligned}
 \tag{V13.2.107}
-\end{equation}$$
+```
 
 ```@docs
 rme
