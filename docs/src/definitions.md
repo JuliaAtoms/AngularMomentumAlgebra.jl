@@ -85,7 +85,7 @@ m_1    & m_2    & m_3
 
     **Index placement convention**
     Unlike the ISO standard, we put the ``\ell`` index on top and ``m`` on the bottom, to be
-    consistent with the way the ``J`` and ``M`` indices are normally written for tensor
+    consistent with the way the ``k`` and ``q`` indices are normally written for tensor
     operators.
 
     **Spherical harmonics with negative ``m``.**
