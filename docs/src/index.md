@@ -2,7 +2,7 @@
 
 Documentation for AngularMomentumAlgebra.jl
 
-Equations labelled (Vx.y.z) reference
+Equation labelled (Vx.y.z) references equation (z) from section x.y of
 
 - Varshalovich, D. A. (1988). Quantum Theory of Angular Momentum:
   Irreducible Tensors, Spherical Harmonics, Vector Coupling
