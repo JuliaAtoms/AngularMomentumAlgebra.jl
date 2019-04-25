@@ -1,6 +1,6 @@
 # Definitions
 
-``@meta
+```@meta
 CurrentModule = AngularMomentumAlgebra
 ```
 
