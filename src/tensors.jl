@@ -51,7 +51,7 @@ const LinearCombinationTensor{T<:Tensor,N<:Number} = LinearCombination{<:TensorC
 
 Computes the (spin-angular part of the) matrix element
 `⟨n′j′m′|Tᵏq|njm⟩`, where `T⁽ᵏ⁾q` is the `q`th component of a tensor
-of rank `k`, using the definition of Eq. (13.1.1) in Varshalovich (1988).
+of rank `k`, using the definition of Eq. (13.1.2) in Varshalovich (1988).
 """
 function wigner_eckart(j′, m′, Tkq::TensorComponent, j, m)
     Tk,q = Tkq.tensor, Tkq.q
