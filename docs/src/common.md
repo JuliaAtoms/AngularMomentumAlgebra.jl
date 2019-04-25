@@ -20,5 +20,6 @@ clebsch_gordan_condon_shortley
 ```
 
 ```@meta
- DocTestSetup = nothing
+CurrentModule = nothing
+DocTestSetup = nothing
 ```

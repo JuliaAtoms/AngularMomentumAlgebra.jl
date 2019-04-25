@@ -74,6 +74,31 @@ C_{\ell 0;k,0}^{\ell'0} =
 rme
 ```
 
+### Dipole operator
+
+The dipole operator is a rank-1 Cartesian tensor that may be expressed
+using the rank-1 spherical tensor:
+
+```math
+\hat{\vec{r}} \equiv
+\begin{bmatrix}\hat{x}\\\hat{y}\\\hat{z}\end{bmatrix}
+\equiv
+\begin{bmatrix}
+\frac{1}{\sqrt{2}}[-\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_1]\\
+\frac{\im}{\sqrt{2}}[\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_1]\\
+\tensor{C}^{(1)}_0
+\end{bmatrix}
+```
+
 ```@meta
- DocTestSetup = nothing
+CurrentModule = AngularMomentumAlgebra
+```
+
+```@docs
+Dipoles.𝐫̂
+```
+
+```@meta
+CurrentModule = nothing
+DocTestSetup = nothing
 ```

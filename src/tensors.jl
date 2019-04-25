@@ -98,4 +98,36 @@ rme(ℓ′,Cᵏ::SphericalTensor,ℓ) = powneg1(ℓ-Cᵏ.k)*∏(ℓ,ℓ′)*wign
 
 couples_spin(a, ::Type{SphericalTensor}, b) = a == b
 
+module Dipoles
+import ..TensorComponent, ..SphericalTensor
+const C11 = TensorComponent(SphericalTensor(1), 1)
+const C10 = TensorComponent(SphericalTensor(1), 0)
+const C1n1 = TensorComponent(SphericalTensor(1), -1)
+
+"""
+    𝐫̂
+
+The angular part of the dipole operator; the elements correspond to
+`[x,y,z]`, i.e. the Cartesian tensor components. Can be entered as
+`\\bfr\\hat`.
+
+# Examples
+
+```jldoctest
+julia> using AngularMomentumAlgebra.Dipoles
+
+julia> z = 𝐫̂[3]
+𝐂⁽¹⁾₀
+
+julia> wigner_eckart(0, 0, z, 1, 0)
+0.5773502691896256
+```
+
+"""
+const 𝐫̂ = [(-C11 + C1n1)/√2,
+           (im*C11 + im*C1n1)/√2,
+           C10]
+export 𝐫̂
+end
+
 export Tensor, TensorComponent, SphericalTensor, rme, wigner_eckart
