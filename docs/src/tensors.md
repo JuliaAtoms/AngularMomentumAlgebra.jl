@@ -27,7 +27,7 @@ j'&k&j\\
 -m'&\kappa&m
 \end{pmatrix}
 \redmatrixel{n'j'}{\tensor{T}^{(k)}_q}{nj},
-\tag{V13.1.1}
+\tag{V13.1.2}
 \end{equation}$$
 
 where the _reduced matrix element_
