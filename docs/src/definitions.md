@@ -161,6 +161,6 @@ The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
     But it must be noted that, as the Wigner-Eckart theorem functions as a definition
     for the reduced matrix elements, this choice will change the values of the RMEs.
 
-``@meta
+```@meta
 CurrentModule = nothing
 ```
