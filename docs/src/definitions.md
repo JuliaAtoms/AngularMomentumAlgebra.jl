@@ -5,7 +5,7 @@ CurrentModule = AngularMomentumAlgebra
 ```
 
 This page defines much of the general notation and conventions used in the code. Where possible,
-the we are consistent with Varshalovich (1988).
+we are consistent with Varshalovich (1988).
 
 ## Shorthands
 
