@@ -107,7 +107,7 @@ m_1    & m_2    & m_3
     We opt to follow the (arguably, more common) non-ISO definition to stay consistent with the
     primary reference of Varshalovich (1988).
 
-## Clebsch-Gordan coefficients
+## Clebsch–Gordan coefficients
 
 The Clebsch–Gordan coefficients are related to the 3j symbols as
 
@@ -124,9 +124,9 @@ m_1&m_2&-m_3
 
 They can be calculated with the [`clebsch_gordan_condon_shortley`](@ref) function.
 
-## Wigner-Eckart theorem
+## Wigner–Eckart theorem
 
-For the Wigner-Eckart theorem, which defines the **reduced matrix elements** (RMEs)
+For the Wigner–Eckart theorem, which defines the **reduced matrix elements** (RMEs)
 ``\redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j}``
 of a tensor operator of rank ``k``, the convention is the following
 
@@ -147,7 +147,7 @@ of a tensor operator of rank ``k``, the convention is the following
 \end{align}
 ```
 
-The second form can be derived by using the relationship between the Clebsch-Gordan coefficients and the Wigner 3j symbols, and the permutation symmetries of the 3j symbol.
+The second form can be derived by using the relationship between the Clebsch–Gordan coefficients and the Wigner 3j symbols, and the permutation symmetries of the 3j symbol.
 The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
 
 !!! note "Other conventions for RMEs"
@@ -158,7 +158,7 @@ The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
     \redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j}
     ```
     However, again to stay consistent with Varshalovich (1988), we shall not use it.
-    But it must be noted that, as the Wigner-Eckart theorem functions as a definition
+    But it must be noted that, as the Wigner–Eckart theorem functions as a definition
     for the reduced matrix elements, this choice will change the values of the RMEs.
 
 ```@meta
