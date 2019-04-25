@@ -127,19 +127,12 @@ For the Wigner-Eckart theorem, which defines the **reduced matrix elements** (RM
 of a tensor operator of rank ``k``, the convention is the following
 
 ```math
+\begin{align}
 \matrixel{n' j' m'}{\tensor{T}^{(k)}_q}{n j m}
-=
-(-1)^{2k} \frac{\braket{j_1 m_1 j_2 m_2}{j_3 m_3}}{\angroot{j'}}
-\redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j}
-\tag{V13.1.2}
-```
-
-Using the relationship between the Clebsch-Gordan coefficients and Wigner 3j symbols,
-the Wigner-Eckart theorem (in the chosen convention) can also be written as
-
-```math
-\matrixel{n' j' m'}{\tensor{T}^{(k)}_q}{n j m}
-=
+&\defd
+(-1)^{2k} \frac{\braket{j~m~k~q}{j' m'}}{\angroot{j'}}
+\redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j} \nonumber \\
+&=
 (-1)^{j'-m'}
 \begin{pmatrix}
  j' & k & j \\
@@ -147,8 +140,10 @@ the Wigner-Eckart theorem (in the chosen convention) can also be written as
 \end{pmatrix}
 \redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j}
 \tag{V13.1.2}
+\end{align}
 ```
 
+The second form can be derived by using the relationship between the Clebsch-Gordan coefficients and the Wigner 3j symbols, and the permutation symmetries of the 3j symbol.
 The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
 
 !!! note "Other conventions for RMEs"
@@ -159,5 +154,5 @@ The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
     \redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j}
     ```
     However, again to stay consistent with Varshalovich (1988), we shall not use it.
-    But it must be noted that, as the Wigner-Eckart theorem functions as a _definition_
-    for the reduced matrix elements, this choice _will_ change the values of the RMEs.
+    But it must be noted that, as the Wigner-Eckart theorem functions as a definition
+    for the reduced matrix elements, this choice will change the values of the RMEs.
