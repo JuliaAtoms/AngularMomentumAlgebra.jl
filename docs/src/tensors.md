@@ -24,14 +24,14 @@ $$\begin{equation}
 (-)^{j'-m'}
 \begin{pmatrix}
 j'&k&j\\
--m'&\kappa&m
+-m'&q&m
 \end{pmatrix}
-\redmatrixel{n'j'}{\tensor{T}^{(k)}_q}{nj},
+\redmatrixel{n'j'}{\tensor{T}^{(k)}}{nj},
 \tag{V13.1.2}
 \end{equation}$$
 
 where the _reduced matrix element_
-$\redmatrixel{n'j'}{\tensor{T}^{(k)}_q}{nj}$ does not depend on
+$\redmatrixel{n'j'}{\tensor{T}^{(k)}}{nj}$ does not depend on
 $m,m'$.
 
 ```@docs
