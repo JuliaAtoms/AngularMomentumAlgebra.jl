@@ -1,5 +1,9 @@
 # Definitions
 
+``@meta
+CurrentModule = AngularMomentumAlgebra
+```
+
 This page defines much of the general notation and conventions used in the code. Where possible,
 the we are consistent with Varshalovich (1988).
 
@@ -156,3 +160,7 @@ The ``n`` and ``n'`` labels represent all non angular momentum quantum numbers.
     However, again to stay consistent with Varshalovich (1988), we shall not use it.
     But it must be noted that, as the Wigner-Eckart theorem functions as a definition
     for the reduced matrix elements, this choice will change the values of the RMEs.
+
+``@meta
+CurrentModule = nothing
+```

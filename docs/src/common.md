@@ -14,6 +14,8 @@ triangle_range
 powneg1
 jmⱼ
 spin
+LinearCombination
+@linearly_combinable
 clebsch_gordan_condon_shortley
 ```
 
