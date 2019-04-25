@@ -33,19 +33,19 @@ where ``\theta`` and ``\varphi`` are the usual [spherical
 coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system) and ``P_\ell^m(z)``
 are the [associated Legendre
 polynomials](https://en.wikipedia.org/wiki/Associated_Legendre_polynomials#Definition_for_non-negative_integer_parameters_%E2%84%93_and_m).
-The Condon-Shortley phase ``(-1)^m`` is included in the definition of the Legendre
+The Condon-Shortley phase ``(-)^m`` is included in the definition of the Legendre
 polynomials, consistent with Varshalovich (1988).
 
 An explicit expression for the Legendre polynomials is given by the [Rodrigues formula](https://en.wikipedia.org/wiki/Rodrigues%27_formula):
 
 ```math
-P_{\ell}^{m}(x) = \frac{(-1)^m}{2^{\ell} \ell !} (1 - x^2)^{m/2} \frac{\mathrm{d}^{\ell+m}}{\mathrm{d}x^{\ell+m}} (x^2 - 1)^\ell
+P_{\ell}^{m}(x) = \frac{(-)^m}{2^{\ell} \ell !} (1 - x^2)^{m/2} \frac{\mathrm{d}^{\ell+m}}{\mathrm{d}x^{\ell+m}} (x^2 - 1)^\ell
 ```
 
 **Properties.**
 The complex conjugate of a spherical harmonic can be expressed in terms of spherical harmonics:
 ```math
-\bar{Y}^{\ell}_{m}(\theta,\varphi) = (-1)^m Y^{\ell}_{-m}(\theta,\varphi)
+\bar{Y}^{\ell}_{m}(\theta,\varphi) = (-)^m Y^{\ell}_{-m}(\theta,\varphi)
 ```
 
 The spherical harmonics are normalized
@@ -114,7 +114,7 @@ The Clebsch–Gordan coefficients are related to the 3j symbols as
 ```math
 C_{j_1m_1j_2m_2}^{j_3m_3} \equiv
 \braket{j_1m_1j_2m_2}{j_3m_3} =
-(-1)^{j_1-j_2+m_3}\angroot{j_3}
+(-)^{j_1-j_2+m_3}\angroot{j_3}
 \begin{pmatrix}
 j_1&j_2&j_3\\
 m_1&m_2&-m_3
@@ -134,10 +134,10 @@ of a tensor operator of rank ``k``, the convention is the following
 \begin{align}
 \matrixel{n' j' m'}{\tensor{T}^{(k)}_q}{n j m}
 &\defd
-(-1)^{2k} \frac{\braket{j~m~k~q}{j' m'}}{\angroot{j'}}
+(-)^{2k} \frac{\braket{j~m~k~q}{j' m'}}{\angroot{j'}}
 \redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j} \nonumber \\
 &=
-(-1)^{j'-m'}
+(-)^{j'-m'}
 \begin{pmatrix}
  j' & k & j \\
 -m' & q & m
