@@ -84,8 +84,8 @@ using the rank-1 spherical tensor:
 \begin{bmatrix}\hat{x}\\\hat{y}\\\hat{z}\end{bmatrix}
 \equiv
 \begin{bmatrix}
-\frac{1}{\sqrt{2}}[-\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_1]\\
-\frac{\im}{\sqrt{2}}[\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_1]\\
+\frac{1}{\sqrt{2}}[-\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_{-1}]\\
+\frac{\im}{\sqrt{2}}[\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_{-1}]\\
 \tensor{C}^{(1)}_0
 \end{bmatrix}
 ```
