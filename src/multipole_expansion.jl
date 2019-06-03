@@ -8,10 +8,8 @@ Multipole expand the matrix element `⟨ab|P⋅Q|cd⟩`, where the tensor
 `b` & `d`. The definition is taken from Eq. (13.1.26) of Varshalovich
 (1988).
 """
-function multipole_expand_scalar_product(a::O, b::O,
-                                         ::Type{P}, ::Type{Q},
-                                         c::O, d::O,
-                                         f::Int=1) where {O,P<:Tensor,Q<:Tensor}
+function multipole_expand_scalar_product(a, b, ::Type{P}, ::Type{Q}, c, d,
+                                         f::Int=1) where {P<:Tensor,Q<:Tensor}
     multipole_terms = Pair{Int,Float64}[]
 
     couples_spin(spin(a), P, spin(c)) && couples_spin(spin(b), Q, spin(d)) ||
