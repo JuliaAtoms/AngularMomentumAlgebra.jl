@@ -102,9 +102,9 @@ function multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,
 
     # for (k,coeff) in multipole_expand_coulomb(a,b,c,d)
     for (k,coeff) in multipole_expand_scalar_product(a,b, SphericalTensor, SphericalTensor, c,d)
-        push!(terms, NBodyTerm([OrbitalMatrixElement(NTuple{2,A}((a,b)),
+        push!(terms, NBodyTerm([OrbitalMatrixElement(A[a,b],
                                                      CoulombInteractionMultipole(k),
-                                                     NTuple{2,B}((c,d)))], coeff))
+                                                     B[c,d])], coeff))
     end
 
     NBodyMatrixElement(terms)
