@@ -17,10 +17,12 @@ function Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
                      overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}}
     M = Matrix(op, SlaterDeterminant.(spin_cfgs), overlaps)
     m,n = size(M)
-    Mm = zeros(eltype(M), m, n)
+    Mm = spzeros(eltype(M), m, n)
     for i = 1:m
         for j = 1:n
-            Mm[i,j] = transform(multipole_expand, M[i,j])
+            me = transform(multipole_expand, M[i,j])
+            iszero(me) && continue
+            Mm[i,j] = me
         end
     end
     Mm

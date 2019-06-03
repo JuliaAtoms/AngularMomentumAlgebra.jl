@@ -5,6 +5,7 @@ using EnergyExpressions
 import EnergyExpressions: QuantumOperator, NBodyTermFactor, NBodyTerm,
     OrbitalMatrixElement, NBodyMatrixElement
 using LinearAlgebra
+using SparseArrays
 using WignerSymbols
 using UnicodeFun
 
