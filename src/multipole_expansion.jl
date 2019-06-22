@@ -88,20 +88,20 @@ end
 # end
 
 """
-    multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,B})
+    multipole_expand(integral::OrbitalMatrixElement{2,A,<:CoulombInteraction,B})
 
 Multipole-expand the two-body integral resulting from the Coulomb
 repulsion between two electrons.
 """
-function multipole_expand(integral::OrbitalMatrixElement{2,A,CoulombInteraction,B}) where {A,B}
-    (a,b),(c,d) = integral.a,integral.b
+function multipole_expand(integral::OrbitalMatrixElement{2,A,<:CoulombInteraction,B}) where {A,B}
+    (a,b),g,(c,d) = integral.a,integral.o,integral.b
 
     terms = NBodyTerm[]
 
     # for (k,coeff) in multipole_expand_coulomb(a,b,c,d)
     for (k,coeff) in multipole_expand_scalar_product(a,b, SphericalTensor, SphericalTensor, c,d)
         push!(terms, NBodyTerm([OrbitalMatrixElement(A[a,b],
-                                                     CoulombInteractionMultipole(k),
+                                                     CoulombInteractionMultipole(k,g),
                                                      B[c,d])], coeff))
     end
 
