@@ -1,2 +1,8 @@
 [deps]
+AngularMomentumAlgebra = "0bb1b1ac-0216-11e9-361b-bb110c659ce1"
+AtomicLevels = "10933b4c-d60f-11e8-1fc6-bd9035a249a1"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+EnergyExpressions = "f4b57a2e-27c7-11e9-0cb0-edd185b706f6"
+
+[compat]
+Documenter = "0.24"
