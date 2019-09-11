@@ -3,7 +3,7 @@ module AngularMomentumAlgebra
 using AtomicLevels
 using EnergyExpressions
 import EnergyExpressions: QuantumOperator, NBodyTermFactor, NBodyTerm,
-    OrbitalMatrixElement, NBodyMatrixElement
+    OrbitalMatrixElement, NBodyMatrixElement, overlap_matrix
 using LinearAlgebra
 using SparseArrays
 using WignerSymbols
