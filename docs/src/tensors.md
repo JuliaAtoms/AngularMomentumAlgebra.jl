@@ -14,6 +14,48 @@ TensorComponent
 AngularMomentumAlgebra.LinearCombinationTensor
 ```
 
+## Product tensors
+
+```@docs
+TensorProduct
+```
+
+### Scalar product
+
+The matrix element of scalar product of two tensors acting on
+different coordinates is given by
+
+$$\begin{equation}
+\begin{aligned}
+&\matrixel{n_aj_am_a;n_bj_bm_b}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_cj_cm_c;n_dj_dm_d}\\
+=&
+\frac{1}{\angroot{j_aj_b}}
+\sum_\alpha(-)^{-\alpha}
+C_{j_cm_c;k,\alpha}^{j_am_a}
+C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
+&\times
+\redmatrixel{n_aj_a}{\tensor{P}^{(k)}(1)}{n_cj_c}
+\redmatrixel{n_bj_b}{\tensor{Q}^{(k)}(2)}{n_dj_d}
+\end{aligned}
+\tag{V13.1.26}
+\end{equation}$$
+
+Since the [Clebsch–Gordan coefficients](@ref) can be rewritten using 3j
+symbols and the 3j symbols vanish unless $m_c + \alpha - m_3 = m_d -
+\alpha - m_b = 0$, we have
+
+$$\begin{equation}
+\alpha = m_a - m_c = m_d-m_b
+\implies
+-\alpha + m_a + m_b = m_b + m_c.
+\end{equation}$$
+
+```@docs
+TensorScalarProduct
+dot(::Tensor, ::Tensor)
+AngularMomentumAlgebra.integrate_spinors((a,b), X::TensorScalarProduct, (c,d))
+```
+
 ## The Wigner–Eckart theorem
 
 The Wigner–Eckart theorem states that the matrix element of a tensor
@@ -36,66 +78,6 @@ $m,m'$.
 
 ```@docs
 wigner_eckart
-```
-
-## [Spherical tensors](@id tensors_spherical_tensors)
-
-The spherical tensors are related to the spherical harmonics as
-
-```math
-\tensor{C}^{(k)}_q \defd
-\sqrt{\frac{4\pi}{2k+1}}
-Y^k_q.
-\tag{V5.1.7}
-```
-
-```@docs
-SphericalTensor
-```
-
-The reduced matrix element of the spherical tensor is given by
-
-```math
-\begin{aligned}
-\redmatrixel{\ell'}{\tensor{C}^{(k)}}{\ell}
-&=
-\angroot{\ell}
-C_{\ell 0;k,0}^{\ell'0} =
-(-)^{\ell-k}
-\angroot{\ell\ell'}
-\begin{pmatrix}
-\ell&k&\ell'\\0&0&0
-\end{pmatrix}.
-\end{aligned}
-\tag{V13.2.107}
-```
-
-```@docs
-rme
-```
-
-### Dipole operator
-
-The dipole operator is a rank-1 Cartesian tensor that may be expressed
-using the rank-1 spherical tensor:
-
-```math
-\hat{\vec{r}} \equiv
-\begin{bmatrix}\hat{x}\\\hat{y}\\\hat{z}\end{bmatrix}
-\equiv
-\begin{bmatrix}
-\frac{1}{\sqrt{2}}[-\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_{-1}]\\
-\frac{\im}{\sqrt{2}}[\tensor{C}^{(1)}_1 + \tensor{C}^{(1)}_{-1}]\\
-\tensor{C}^{(1)}_0
-\end{bmatrix}
-```
-
-```@meta
-CurrentModule = AngularMomentumAlgebra
-```
-
-```@docs
-Dipoles.𝐫̂
 ```
 
 ```@meta

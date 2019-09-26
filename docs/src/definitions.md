@@ -19,6 +19,9 @@ A commonly occurring factor in angular momentum algebra is
 ```
 It can be calculated with the unexported [`AngularMomentumAlgebra.∏`](@ref) function.
 
+Indices appearing in pairs on only one side of an equation are
+[implicitly summed
+over](https://en.wikipedia.org/wiki/Einstein_notation).
 
 ## Spherical harmonics
 

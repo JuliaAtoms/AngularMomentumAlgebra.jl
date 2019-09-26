@@ -41,11 +41,12 @@ powneg1(k::Integer) = isodd(k) ? -1 : 1
 Return the angular momentum and its projection on the z axis of the
 spin-orbital `o`.
 """
-jmⱼ(o::SpinOrbital) = o.orb.ℓ, o.mℓ
+jmⱼ(o::SpinOrbital{<:Orbital}) = o.orb.ℓ, o.m[1]
+jmⱼ(o::SpinOrbital{<:RelativisticOrbital}) = o.orb.j, o.m[1]
 
 """
     spin(o::SpinOrbital)
 
 Return the spin of the spin-orbital `o`.
 """
-spin(o::SpinOrbital) = o.spin
+spin(o::SpinOrbital{<:Orbital}) = o.m[2]

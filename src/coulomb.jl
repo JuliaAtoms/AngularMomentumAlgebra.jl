@@ -33,4 +33,7 @@ end
 Base.show(io::IO, me::CoulombPotentialMultipole{A,B}) where {A,B}=
 write(io, "r⁻¹×Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
 
+radial_integral(a, (k,g)::Tuple{<:Integer,<:CoulombInteraction}, b) =
+    OrbitalMatrixElement(a, CoulombInteractionMultipole(k,g), b)
+
 export CoulombInteractionMultipole, CoulombPotentialMultipole

@@ -8,6 +8,7 @@ end
 ```
 
 ```@docs
+AngularMomentumAlgebra.integrate_spinor
 Matrix
 ```
 

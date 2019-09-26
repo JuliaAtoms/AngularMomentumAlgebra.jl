@@ -37,7 +37,9 @@ require(['mathjax'], function(MathJax) {
                 direct : ["{\\operator{J}_{#1}}",1],
                 exchange : ["{\\operator{K}_{#1}}",1],
                 diff : ["\\mathrm{d}#1\\,",1],
-                angroot : ["{\\prod}_{#1}", 1]
+                angroot : ["{\\prod}_{#1}", 1],
+                wignerthreej : ["\\begin{pmatrix}#1\\end{pmatrix}", 1],
+                wignersixj : ["\\begin{Bmatrix}#1\\end{Bmatrix}", 1]
             }
         }
     });

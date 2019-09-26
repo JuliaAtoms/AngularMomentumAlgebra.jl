@@ -9,6 +9,7 @@ makedocs(
         "Definitions" => "definitions.md",
         "Common routines" => "common.md",
         "Tensors" => "tensors.md",
+        "Spherical Tensors" => "spherical_tensors.md",
         "Coulomb interaction" => "coulomb.md",
         "Multipole expansions" => "multipole_expansions.md",
         "Energy expressions" => "energy_expressions.md",
