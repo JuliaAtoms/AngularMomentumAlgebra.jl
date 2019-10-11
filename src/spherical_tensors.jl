@@ -48,6 +48,9 @@ end
 couples(a::SpinOrbital{<:Orbital}, ::Type{SphericalTensor}, b::SpinOrbital{<:Orbital}) =
     a.m[2] == b.m[2]
 
+jmⱼ(o′::SpinOrbital{<:Orbital}, Cᵏ::SphericalTensor, o::SpinOrbital{<:Orbital}) =
+    o′.orb.ℓ,o′.m[1],o.orb.ℓ,o.m[1],o′.m[2]==o.m[2]
+
 """
     ranks(a, ::Type{SphericalTensor}, b)
 

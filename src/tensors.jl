@@ -18,6 +18,9 @@ function Base.show(io::IO, ::Tensor{k,label}) where {k,label}
     write(io,"⁽",to_superscript(k),"⁾")
 end
 
+jmⱼ(o′::SpinOrbital{<:RelativisticOrbital}, Tᵏ::Tensor, o::SpinOrbital{<:RelativisticOrbital}) =
+    o′.orb.j,o′.m[1],o.orb.j,o.m[1],true
+
 # * Tensor components
 
 """
@@ -40,6 +43,9 @@ function Base.show(io::IO, Tq::TensorComponent)
     show(io, Tq.tensor)
     write(io, to_subscript(Tq.q))
 end
+
+jmⱼ(o′::SpinOrbital, Tᵏq::TensorComponent, o::SpinOrbital) =
+    jmⱼ(o′, Tᵏq.tensor, o)
 
 # * Tensor products
 
@@ -137,12 +143,13 @@ Perform the spin-angular integration of the scalar-product tensor
 `d`, according to Eq. (13.1.26) of Varshalovich (1988).
 """
 function integrate_spinors((a,b), X::TensorScalarProduct, (c,d))
-    k = rank(X.T)
+    T,U = X.T,X.U
+    k = rank(T)
 
-    ja,ma = jmⱼ(a)
-    jb,mb = jmⱼ(b)
-    jc,mc = jmⱼ(c)
-    jd,md = jmⱼ(d)
+    ja,ma,jc,mc,Tdiag = jmⱼ(a,T,c)
+    jb,mb,jd,md,Udiag = jmⱼ(b,U,d)
+
+    Tdiag && Udiag || return zero(Float64)
 
     α = Int(ma-mc)
     (α != md-mb || abs(α) > k) && return zero(Float64)
@@ -174,15 +181,44 @@ Computes the (spin-angular part of the) matrix element
 `⟨n′j′m′|Tᵏq|njm⟩`, where `T⁽ᵏ⁾q` is the `q`th component of a tensor
 of rank `k`, using the definition of Eq. (13.1.2) in Varshalovich (1988).
 """
-function wigner_eckart(j′, m′, Tkq::TensorComponent, j, m)
-    Tk,q = Tkq.tensor, Tkq.q
-    k = rank(Tk)
+function wigner_eckart(j′, m′, Tᵏq::TensorComponent, j, m)
+    Tᵏ,q = Tᵏq.tensor, Tᵏq.q
+    k = rank(Tᵏ)
     powneg1(Int(j′-m′))*wigner3j(j′, k, j,
-                                 -m′, q, m)*rme(j′, Tk, j)
+                                 -m′, q, m)*rme(j′, Tᵏ, j)
 end
 
 wigner_eckart(j′, m′, lct::LinearCombinationTensor, j, m) =
-    sum(c*wigner_eckart(j′, m′, Tkq, j, m) for (Tkq,c) in lct)
+    sum(c*wigner_eckart(j′, m′, Tᵏq, j, m) for (Tᵏq,c) in lct)
+
+"""
+    wigner_eckart(o′, T⁽ᵏ⁾q, o)
+
+Computes the (spin-angular part of the) matrix element `⟨o′|Tᵏq|o⟩`,
+where `T⁽ᵏ⁾q` is the `q`th component of a tensor of rank `k`, using
+the definition of Eq. (13.1.2) in Varshalovich (1988).
+"""
+function wigner_eckart(o′::SpinOrbital, Tᵏq::TensorComponent, o::SpinOrbital)
+    Tᵏ = Tᵏq.tensor
+    r = rme(o′.orb, Tᵏ, o.orb)
+    iszero(r) && return r
+    k,q = rank(Tᵏ), Tᵏq.q
+    j′,m′,j,m,isdiagonal = jmⱼ(o′,Tᵏq,o)
+    isdiagonal || return zero(r)
+    powneg1(Int(j′-m′))*wigner3j(j′, k, j,
+                                 -m′, q, m)*r
+end
+
+wigner_eckart(o′, lct::LinearCombinationTensor, o) =
+    sum(c*wigner_eckart(o′, Tᵏq, o) for (Tᵏq,c) in lct)
+
+"""
+    dot(o′, T, o)
+
+Calculates the matrix element `⟨o′|T|o⟩` using [`wigner_eckart`](@ref).
+"""
+LinearAlgebra.dot(o′::SpinOrbital, T::Union{TensorComponent,LinearCombinationTensor}, o::SpinOrbital) =
+    wigner_eckart(o′, T, o)
 
 export Tensor, TensorComponent,
     TensorProduct, TensorScalarProduct,
