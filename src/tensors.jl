@@ -201,16 +201,18 @@ the definition of Eq. (13.1.2) in Varshalovich (1988).
 function wigner_eckart(o′::SpinOrbital, Tᵏq::TensorComponent, o::SpinOrbital)
     Tᵏ = Tᵏq.tensor
     r = rme(o′.orb, Tᵏ, o.orb)
-    iszero(r) && return r
+    iszero(r) && return 0
     k,q = rank(Tᵏ), Tᵏq.q
     j′,m′,j,m,isdiagonal = jmⱼ(o′,Tᵏq,o)
-    isdiagonal || return zero(r)
-    powneg1(Int(j′-m′))*wigner3j(j′, k, j,
-                                 -m′, q, m)*r
+    isdiagonal || return 0
+    c = powneg1(Int(j′-m′))*wigner3j(j′, k, j,
+                                     -m′, q, m)
+    iszero(c) && return 0
+    c*r
 end
 
 wigner_eckart(o′, lct::LinearCombinationTensor, o) =
-    sum(c*wigner_eckart(o′, Tᵏq, o) for (Tᵏq,c) in lct)
+    sum(filter!(!iszero, [c*wigner_eckart(o′, Tᵏq, o) for (Tᵏq,c) in lct]))
 
 """
     dot(o′, T, o)

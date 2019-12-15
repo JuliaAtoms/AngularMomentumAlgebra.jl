@@ -6,6 +6,13 @@ This returns the Cartesian tensor component `c` (valid choices are
 of its "natural" [`TensorComponent`](@ref)s `1`, `0`, and `-1`. The
 transform matrix is `M(+1, 0, -1 ← x, y, z)` given in Table 1.2 on
 p. 14 of Varshalovich (1988).
+
+# Examples
+
+```jldoctest
+julia> cartesian_tensor_component(Gradient(), :x)
+- 0.7071067811865475 𝛁⁽¹⁾₁ + 0.7071067811865475 𝛁⁽¹⁾₋₁
+```
 """
 function cartesian_tensor_component(t::Tensor{1}, c::Symbol)
     if c == :x

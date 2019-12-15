@@ -1,5 +1,6 @@
 using Documenter
 using AngularMomentumAlgebra
+using AtomicLevels
 
 makedocs(
     modules = [AngularMomentumAlgebra],
@@ -11,10 +12,13 @@ makedocs(
         "Home" => "index.md",
         "Definitions" => "definitions.md",
         "Common routines" => "common.md",
-        "Tensors" => "tensors.md",
-        "Spherical Tensors" => "spherical_tensors.md",
-        "Coulomb interaction" => "coulomb.md",
-        "Multipole expansions" => "multipole_expansions.md",
+        "Tensors" => [
+            "General tensors" => "tensors.md",
+            "Spherical Tensors" => "spherical_tensors.md",
+            "Coulomb interaction" => "coulomb.md",
+            "Multipole expansions" => "multipole_expansions.md",
+            "Gradients" => "gradients.md"
+        ],
         "Energy expressions" => "energy_expressions.md",
     ],
     repo="https://github.com/JuliaAtoms/AngularMomentumalgebra.jl/blob/{commit}{path}#L{line}",

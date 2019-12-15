@@ -96,6 +96,7 @@ $m,m'$.
 
 ```@docs
 wigner_eckart
+dot(o′::SpinOrbital, T::Union{TensorComponent,AngularMomentumAlgebra.LinearCombinationTensor}, o::SpinOrbital)
 ```
 
 ```@meta
