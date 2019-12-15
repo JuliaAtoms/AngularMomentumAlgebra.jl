@@ -61,10 +61,7 @@ ranks(a::SpinOrbital, ::Type{SphericalTensor}, b::SpinOrbital) =
     triangle_range(a.orb.ℓ, b.orb.ℓ)
 
 module Dipoles
-import ..TensorComponent, ..SphericalTensor
-const C11 = TensorComponent(SphericalTensor(1), 1)
-const C10 = TensorComponent(SphericalTensor(1), 0)
-const C1n1 = TensorComponent(SphericalTensor(1), -1)
+import ..cartesian_tensor_component, ..SphericalTensor
 
 """
     𝐫̂
@@ -86,9 +83,8 @@ julia> wigner_eckart(0, 0, z, 1, 0)
 ```
 
 """
-const 𝐫̂ = [(-C11 + C1n1)/√2,
-           (im*C11 + im*C1n1)/√2,
-           C10]
+const 𝐫̂ = [cartesian_tensor_component(SphericalTensor(1), c)
+           for c in [:x, :y, :z]]
 export 𝐫̂
 end
 

@@ -14,6 +14,7 @@ include("common.jl")
 include("clebsch_gordan.jl")
 include("linear_combinations.jl")
 include("tensors.jl")
+include("cartesian.jl")
 include("spherical_tensors.jl")
 include("coulomb.jl")
 include("multipole_expansion.jl")
@@ -23,7 +24,7 @@ export # Re-exports from EnergyExpressions.jl
     Conjugate, OrbitalOverlap, EnergyExpression,
     FieldFreeOneBodyHamiltonian, OneBodyHamiltonian, CoulombInteraction, CoulombPotential,
     # Re-exports from LinearAlgebra
-    ⋅, dot
+    ⋅, dot,
     # Own types
     CoulombInteractionMultipole, CoulombPotentialMultipole
 

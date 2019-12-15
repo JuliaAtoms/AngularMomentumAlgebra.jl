@@ -76,6 +76,9 @@ using the rank-1 spherical tensor:
 \end{bmatrix}
 ```
 
+This submodule exists only as a shortcut to [Cartesian tensor
+components](@ref).
+
 ```@meta
 CurrentModule = AngularMomentumAlgebra
 ```
