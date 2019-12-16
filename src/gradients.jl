@@ -5,6 +5,14 @@ Construct a gradient tensor.
 """
 struct Gradient <: Tensor{1,'∇'} end
 
+"""
+    system(::Gradient)
+
+The gradient only acts on the coordinates ``r``, ``\\theta``, and
+``\\phi``.
+"""
+system(::Gradient) = SpatialSubSystem()
+
 @doc raw"""
     RadialGradientMatrixElement(k)
 
@@ -36,7 +44,7 @@ function Base.show(io::IO, me::RadialGradientMatrixElement)
 end
 
 
-function rme(ℓ′::Real,∇::Gradient,ℓ::Real)
+function rme((n′,ℓ′), ::Gradient, (n,ℓ))
     if ℓ′ == ℓ+1
         √(ℓ+1)*RadialGradientMatrixElement(-ℓ)
     elseif ℓ′==ℓ-1
@@ -45,9 +53,5 @@ function rme(ℓ′::Real,∇::Gradient,ℓ::Real)
         0
     end
 end
-rme(a::Orbital,∇::Gradient,b::Orbital) = rme(a.ℓ, ∇, b.ℓ)
-
-jmⱼ(o′::SpinOrbital{<:Orbital}, ∇::Gradient, o::SpinOrbital{<:Orbital}) =
-    o′.orb.ℓ,o′.m[1],o.orb.ℓ,o.m[1],o′.m[2]==o.m[2]
 
 export Gradient

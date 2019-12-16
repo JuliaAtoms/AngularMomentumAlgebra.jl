@@ -8,18 +8,159 @@ abstract type Tensor{k,label} end
 (::Type{T})(k::Int) where {T<:Tensor} = T{k}()
 
 LinearAlgebra.rank(::Tensor{k}) where k = k
+
 couples(a, ::Type{<:Tensor}, b) = true
+
+"""
+    system(::Tensor)
+
+A general tensor acts on the full system, i.e. all coordinates.
+"""
+system(::Tensor) = FullSystem()
 
 # This is only true for SO(3)
 components(::Tensor{k}) where k = -k:k
 
 function Base.show(io::IO, ::Tensor{k,label}) where {k,label}
-    write(io,to_boldface(label))
+    write(io,to_boldface(label)*"̂")
     write(io,"⁽",to_superscript(k),"⁾")
 end
 
-jmⱼ(o′::SpinOrbital{<:RelativisticOrbital}, Tᵏ::Tensor, o::SpinOrbital{<:RelativisticOrbital}) =
-    o′.orb.j,o′.m[1],o.orb.j,o.m[1],true
+complementary_space_factor(::Union{FullSystem,TotalAngularMomentumSubSystem}, _, _, _) = 1
+
+@doc raw"""
+    complementary_space_factor(::SpatialSubSystems, k,
+                               o′::SpinOrbital{<:Orbital},
+                               o::SpinOrbital{<:Orbital})
+
+Tensors acting on the spatial coordinates only, are diagonal in spin
+space:
+
+```math
+\begin{equation}
+\tag{V13.2.3}
+\matrixel{n'\ell'm_\ell';s'm_s'}{\tensor{M}^{(k)}_q(r,\theta,\phi)}{n\ell m_\ell;sm_s} =
+\delta_{ss'}\delta{m_sm_s'}
+\matrixel{n'\ell'm_\ell'}{\tensor{M}^{(k)}_q(r,\theta,\phi)}{n\ell m_\ell}
+\end{equation}
+```
+"""
+function complementary_space_factor(::SpatialSubSystems, k,
+                                    o′::SpinOrbital{<:Orbital},
+                                    o::SpinOrbital{<:Orbital})
+    (s′,mₛ′),(s,mₛ) = quantum_numbers(SpinSubSystem(), o′, o)
+    @δ s,s′ mₛ,mₛ′
+end
+
+@doc raw"""
+    complementary_space_factor(::SpinSubSystem, k,
+                               o′::SpinOrbital{<:Orbital},
+                               o::SpinOrbital{<:Orbital})
+
+Tensors acting on the spin coordinates only, are diagonal in the spatial coordinates:
+
+```math
+\begin{equation}
+\tag{V13.2.4}
+\matrixel{n'\ell'm_\ell';s'm_s'}{\tensor{N}^{(k)}_q(\xi)}{n\ell m_\ell;sm_s} =
+\delta_{\ell\ell'}\delta{m_\ell m_\ell'}
+\matrixel{s'm_s'}{\tensor{N}^{(k)}_q(\xi)}{sm_s}
+\end{equation}
+```
+"""
+function complementary_space_factor(::SpinSubSystem, k,
+                                    o′::SpinOrbital{<:Orbital},
+                                    o::SpinOrbital{<:Orbital})
+    (ℓ′,mℓ′),(ℓ,mℓ) = quantum_numbers(OrbitalAngularMomentumSubSystem(), o′, o)
+    @δ ℓ,ℓ′ mℓ,mℓ′
+end
+
+@doc raw"""
+    complementary_space_factor(::SpatialSubSystems, k,
+                               o′::SpinOrbital{<:RelativisticOrbital},
+                               o::SpinOrbital{<:RelativisticOrbital})
+
+Tensors acting on the spatial coordinates only, are diagonal in spin
+space; in the coupled basis, the following uncoupling formula must be
+employed:
+
+```math
+\begin{equation}
+\tag{V13.2.5}
+\redmatrixel{n'\ell's'J'}{\tensor{M}^{(k)}}{n\ell s J} =
+\delta_{ss'}
+(-)^{J+\ell'+s'+k}
+\angroot{JJ'}
+\wignersixj{\ell&s&J\\J'&k&\ell'}
+\redmatrixel{n'\ell'}{\tensor{M}^{(k)}}{n\ell}
+\end{equation}
+```
+"""
+function complementary_space_factor(::SpatialSubSystems, k,
+                                    o′::SpinOrbital{<:RelativisticOrbital},
+                                    o::SpinOrbital{<:RelativisticOrbital})
+    ((ℓ′,s′,J′),mₛ′),((ℓ,s,J),mₛ) = quantum_numbers(TotalAngularMomentumSubSystem(), o′, o)
+    @δ s,s′
+    powneg1(Int(J+ℓ′+s′+k))*∏(J,J′)*wigner6j(ℓ,  s, J,
+                                             J′, k, ℓ′)
+end
+
+@doc raw"""
+    complementary_space_factor(::SpinSubSystem, k,
+                               o′::SpinOrbital{<:RelativisticOrbital},
+                               o::SpinOrbital{<:RelativisticOrbital})
+
+Tensors acting on the spin coordinates only, are diagonal in the
+spatial coordinates; in the coupled basis, the following uncoupling
+formula must be employed:
+
+```math
+\begin{equation}
+\tag{V13.2.6}
+\redmatrixel{n'\ell's'J'}{\tensor{N}^{(k)}}{n\ell s J} =
+\delta_{\ell\ell'}
+(-)^{J'+\ell+s+k}
+\angroot{JJ'}
+\wignersixj{s&\ell&J\\J'&k&s'}
+\redmatrixel{n's'}{\tensor{N}^{(k)}}{ns}
+\end{equation}
+```
+"""
+function complementary_space_factor(::SpinSubSystem, k,
+                                    o′::SpinOrbital{<:RelativisticOrbital},
+                                    o::SpinOrbital{<:RelativisticOrbital})
+    ((ℓ′,s′,J′),mₛ′),((ℓ,s,J),mₛ) = quantum_numbers(TotalAngularMomentumSubSystem(), o′, o)
+    @δ ℓ,ℓ′
+    powneg1(Int(J′+ℓ+s+k))*∏(J,J′)*wigner6j(s,  ℓ, J,
+                                            J′, k, s′)
+end
+
+total_system(s, _) = s
+total_system(_, ::SpinOrbital{<:RelativisticOrbital}) = TotalAngularMomentumSubSystem()
+
+"""
+    rme_j′j(o′::SpinOrbital, T::Tensor, o::SpinOrbital)
+
+Return the reduced matrix element `⟨o′||T||o⟩` and the two angular
+momenta pertaining to the tensor `T`, along with their projections.
+"""
+function rme_j′j(o′::SpinOrbital, T::Tensor, o::SpinOrbital)
+    o′, T, o
+    s = system(T)
+    f = complementary_space_factor(s, rank(T), o′, o)
+    (γ′,_),(γ,_) = quantum_numbers(s, o′, o)
+    # The j′,m′,j,m appearing in the prefactor of the Wigner–Eckart
+    # theorem are the total angular momenta and their projections for
+    # coupled spin-orbtials and the angular momenta and their
+    # projections of the subsystem acted upon by the tensor T for
+    # uncoupled spin-orbitals.
+    (γ̃′,m′),(γ̃,m) = quantum_numbers(total_system(s, o′), o′, o)
+    j′,j = last(γ̃′),last(γ̃)
+    (iszero(f) ? 0 : f*rme(γ′, T, γ)),(j′,m′),(j,m)
+end
+
+couples(o′::SpinOrbital, T::Tensor, o::SpinOrbital) =
+    !iszero(first(rme_j′j(o′, T, o)))
 
 # * Tensor components
 
@@ -44,8 +185,8 @@ function Base.show(io::IO, Tq::TensorComponent)
     write(io, to_subscript(Tq.q))
 end
 
-jmⱼ(o′::SpinOrbital, Tᵏq::TensorComponent, o::SpinOrbital) =
-    jmⱼ(o′, Tᵏq.tensor, o)
+Base.parent(Tᵏq::TensorComponent) = Tᵏq.tensor
+component(Tᵏq::TensorComponent) = Tᵏq.q
 
 # * Tensor products
 
@@ -128,7 +269,7 @@ have the same rank.
 
 ```jldoctest
 julia> SphericalTensor(4)⋅SphericalTensor(4)
-(𝐂⁽⁴⁾⋅𝐂⁽⁴⁾)
+(𝐂̂⁽⁴⁾⋅𝐂̂⁽⁴⁾)
 ```
 """
 LinearAlgebra.dot(T::Tensor, U::Tensor) =
@@ -146,19 +287,18 @@ function integrate_spinors((a,b), X::TensorScalarProduct, (c,d))
     T,U = X.T,X.U
     k = rank(T)
 
-    ja,ma,jc,mc,Tdiag = jmⱼ(a,T,c)
-    jb,mb,jd,md,Udiag = jmⱼ(b,U,d)
-
-    Tdiag && Udiag || return zero(Float64)
+    Tr,(ja,ma),(jc,mc) = rme_j′j(a,T,c)
+    iszero(Tr) && return 0
+    Ur,(jb,mb),(jd,md) = rme_j′j(b,U,d)
+    iszero(Ur) && return 0
 
     α = Int(ma-mc)
-    (α != md-mb || abs(α) > k) && return zero(Float64)
+    (α != md-mb || abs(α) > k) && return 0
 
     inv(∏(ja,jb)) * powneg1(-α) *
         clebschgordan(jc, mc, k, α, ja, ma) *
         clebschgordan(jd, md, k, -α, jb, mb) *
-        rme(a.orb, X.T, c.orb) *
-        rme(b.orb, X.U, d.orb)
+        Tr*Ur
 end
 
 # * Linear combination of tensors
@@ -172,56 +312,6 @@ const LinearCombinationTensor{T<:Tensor,N<:Number} = LinearCombination{<:TensorC
 
 @linearly_combinable TensorComponent
 
-# * Wigner--Eckart
-
-"""
-    wigner_eckart(j′, m′, T⁽ᵏ⁾q, j, m)
-
-Computes the (spin-angular part of the) matrix element
-`⟨n′j′m′|Tᵏq|njm⟩`, where `T⁽ᵏ⁾q` is the `q`th component of a tensor
-of rank `k`, using the definition of Eq. (13.1.2) in Varshalovich (1988).
-"""
-function wigner_eckart(j′, m′, Tᵏq::TensorComponent, j, m)
-    Tᵏ,q = Tᵏq.tensor, Tᵏq.q
-    k = rank(Tᵏ)
-    powneg1(Int(j′-m′))*wigner3j(j′, k, j,
-                                 -m′, q, m)*rme(j′, Tᵏ, j)
-end
-
-wigner_eckart(j′, m′, lct::LinearCombinationTensor, j, m) =
-    sum(c*wigner_eckart(j′, m′, Tᵏq, j, m) for (Tᵏq,c) in lct)
-
-"""
-    wigner_eckart(o′, T⁽ᵏ⁾q, o)
-
-Computes the (spin-angular part of the) matrix element `⟨o′|Tᵏq|o⟩`,
-where `T⁽ᵏ⁾q` is the `q`th component of a tensor of rank `k`, using
-the definition of Eq. (13.1.2) in Varshalovich (1988).
-"""
-function wigner_eckart(o′::SpinOrbital, Tᵏq::TensorComponent, o::SpinOrbital)
-    Tᵏ = Tᵏq.tensor
-    r = rme(o′.orb, Tᵏ, o.orb)
-    iszero(r) && return 0
-    k,q = rank(Tᵏ), Tᵏq.q
-    j′,m′,j,m,isdiagonal = jmⱼ(o′,Tᵏq,o)
-    isdiagonal || return 0
-    c = powneg1(Int(j′-m′))*wigner3j(j′, k, j,
-                                     -m′, q, m)
-    iszero(c) && return 0
-    c*r
-end
-
-wigner_eckart(o′, lct::LinearCombinationTensor, o) =
-    sum(filter!(!iszero, [c*wigner_eckart(o′, Tᵏq, o) for (Tᵏq,c) in lct]))
-
-"""
-    dot(o′, T, o)
-
-Calculates the matrix element `⟨o′|T|o⟩` using [`wigner_eckart`](@ref).
-"""
-LinearAlgebra.dot(o′::SpinOrbital, T::Union{TensorComponent,LinearCombinationTensor}, o::SpinOrbital) =
-    wigner_eckart(o′, T, o)
-
 export Tensor, TensorComponent,
     TensorProduct, TensorScalarProduct,
-    wigner_eckart
+    system

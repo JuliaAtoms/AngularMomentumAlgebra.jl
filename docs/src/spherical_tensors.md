@@ -19,6 +19,7 @@ Y^k_q.
 
 ```@docs
 SphericalTensor
+system(::SphericalTensor)
 ```
 
 The reduced matrix element of the spherical tensor is given by
@@ -56,7 +57,7 @@ the above formula in the uncoupled basis:
 ```
 
 ```@docs
-rme
+rme(ℓ′::Real,𝐂̂ᵏ::SphericalTensor,ℓ::Real)
 AngularMomentumAlgebra.ranks
 ```
 

@@ -1,4 +1,4 @@
-# Gradients
+# [Gradients](@id gradients)
 
 The gradient is a rank-1 tensor, the reduced matrix element of which
 is given by
@@ -6,7 +6,7 @@ is given by
 ```math
 \begin{equation}
 \tag{V13.2.21}
-\redmatrixel{n'\ell'}{\nabla}{n\ell} =
+\redmatrixel{n'\ell'}{\tensor{\nabla}^{(1)}}{n\ell} =
 \sqrt{\ell+1}
 A_{n'\ell'n\ell}\delta_{\ell',\ell+1} +
 \sqrt{\ell}
@@ -37,6 +37,8 @@ B_{n'\ell'n\ell} &\defd
 ## Example
 
 ```jldoctest
+julia> using AngularMomentumAlgebra, AtomicLevels
+
 julia> orbitals = sos"k[s-d]"
 18-element Array{SpinOrbital{Orbital{Symbol},Tuple{Int64,HalfIntegers.Half{Int64}}},1}:
  ks₀α
@@ -65,7 +67,7 @@ julia> a,b,c = orbitals[[3,9,13]]
  kd₀α
 
 julia> ∂x = cartesian_tensor_component(Gradient(), :x)
-- 0.7071067811865475 𝛁⁽¹⁾₁ + 0.7071067811865475 𝛁⁽¹⁾₋₁
+- 0.707107 𝛁̂⁽¹⁾₁ + 0.707107 𝛁̂⁽¹⁾₋₁
 
 julia> dot(a, ∂x, b)
 0.447214(∂ᵣ + 3/r)
@@ -84,5 +86,6 @@ julia> dot(c, ∂x, a)
 
 ```@docs
 Gradient
+system(::Gradient)
 AngularMomentumAlgebra.RadialGradientMatrixElement
 ```

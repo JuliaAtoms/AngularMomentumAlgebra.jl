@@ -12,6 +12,9 @@ end
 Tensor
 TensorComponent
 AngularMomentumAlgebra.LinearCombinationTensor
+system(::Tensor)
+AngularMomentumAlgebra.complementary_space_factor
+AngularMomentumAlgebra.rme_j′j
 ```
 
 ## Cartesian tensor components

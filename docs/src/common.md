@@ -17,6 +17,7 @@ spin
 LinearCombination
 @linearly_combinable
 clebsch_gordan_condon_shortley
+AngularMomentumAlgebra.@δ
 ```
 
 ```@meta

@@ -11,7 +11,7 @@ p. 14 of Varshalovich (1988).
 
 ```jldoctest
 julia> cartesian_tensor_component(Gradient(), :x)
-- 0.7071067811865475 𝛁⁽¹⁾₁ + 0.7071067811865475 𝛁⁽¹⁾₋₁
+- 0.707107 𝛁̂⁽¹⁾₁ + 0.707107 𝛁̂⁽¹⁾₋₁
 ```
 """
 function cartesian_tensor_component(t::Tensor{1}, c::Symbol)
