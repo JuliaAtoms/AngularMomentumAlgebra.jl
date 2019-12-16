@@ -2,6 +2,7 @@
 #+AUTHOR: Stefanos Carlström
 #+EMAIL: stefanos.carlstrom@gmail.com
 
+[[https://juliaatoms.github.io/AngularMomentumAlgebra.jl/dev/][https://img.shields.io/badge/docs-dev-blue.svg]]
 [[https://travis-ci.org/JuliaAtoms/AngularMomentumAlgebra.jl][https://travis-ci.org/JuliaAtoms/AngularMomentumAlgebra.jl.svg?branch=master]]
 [[https://ci.appveyor.com/project/juliaatoms/angularmomentumalgebra-jl][https://img.shields.io/appveyor/ci/juliaatoms/angularmomentumalgebra-jl.svg?logo=appveyor]]
 [[https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl][https://codecov.io/gh/JuliaAtoms/AngularMomentumAlgebra.jl/branch/master/graph/badge.svg]]
