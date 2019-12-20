@@ -15,14 +15,30 @@ A spherical tensor only acts on the coordinates ``\\theta`` and
 """
 system(::SphericalTensor) = OrbitalAngularMomentumSubSystem()
 
-"""
+@tensor(SphericalTensor{k} where k) do
+    ℓ′ ∈ abs(ℓ - k):2:(ℓ+k)
+
+    raw"""
     rme(ℓ′,𝐂̂ᵏ,ℓ)
 
-Calculate the reduced matrix element `⟨ℓ′||𝐂̂⁽ᵏ⁾||ℓ⟩` of the spherical
-tensor of rank `k`. Condon–Shortley phase convention and using the
-definition of Eq. (13.2.107) in Varshalovich (1988).
+Calculate the reduced matrix element of the spherical tensor of rank
+`k`:
+
+```math
+\begin{aligned}
+\redmatrixel{\ell'}{\tensor{C}^{(k)}}{\ell}
+&=
+\angroot{\ell}
+C_{\ell 0;k,0}^{\ell'0} =
+(-)^{\ell-k}
+\angroot{\ell\ell'}
+\wignerthreej{\ell&k&\ell'\\0&0&0}.
+\end{aligned}
+\tag{V13.2.107}
+```
 """
-rme(ℓ′::Real,𝐂̂ᵏ::SphericalTensor,ℓ::Real) = ∏(ℓ)*clebschgordan(ℓ,0,rank(𝐂̂ᵏ),0,ℓ′,0)
+    ∏(ℓ)*clebschgordan(ℓ,0,rank(k),0,ℓ′,0)
+end
 
 couples(a::SpinOrbital{<:Orbital}, ::Type{SphericalTensor}, b::SpinOrbital{<:Orbital}) =
     a.m[2] == b.m[2]

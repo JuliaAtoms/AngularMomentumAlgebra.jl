@@ -1,14 +1,15 @@
 # Orbitals and quantum systems
 
 When calculating matrix elements of tensor components (using the [The
-Wigner–Eckart theorem](@ref)), it is important to know which part of
-the quantum system the tensor acts on, e.g. [``\tensor{C}``](@ref
-tensors_spherical_tensors) and [``\tensor{\nabla}``](@ref gradients)
-act on the spatial part of a spin-orbital (the coordinates ``r``,
-``\theta``, and ``\phi``, or equivalently, the quantum numbers ``n``,
-``\ell``, ``m_\ell``), whereas [``\tensor{S}``](@ref
-spin_angular_momentum) acts on the spin part (the coordinate ``s``, or
-equivalently, the quantum numbers ``s`` and ``m_s``).
+Wigner–Eckart theorem](@ref wigner_eckart)), it is important to know
+which part of the quantum system the tensor acts on,
+e.g. [``\tensor{C}``](@ref tensors_spherical_tensors) and
+[``\tensor{\nabla}``](@ref gradients) act on the spatial part of a
+spin-orbital (the coordinates ``r``, ``\theta``, and ``\phi``, or
+equivalently, the quantum numbers ``n``, ``\ell``, ``m_\ell``),
+whereas [``\tensor{S}``](@ref spin_angular_momentum) acts on the spin
+part (the coordinate ``s``, or equivalently, the quantum numbers ``s``
+and ``m_s``).
 
 
 ```@docs

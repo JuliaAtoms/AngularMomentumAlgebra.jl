@@ -1,7 +1,7 @@
 @testset "Angular momenta" begin
     @testset "Total angular momentum" begin
         𝐉 = TotalAngularMomentum()
-        for ℓ = 0:2
+        for ℓ = 0:10
             for j = ℓ .+ (-half(1):half(1))
                 for m = -j:j
                     b = SpinOrbital(RelativisticOrbital(:m, ℓ, j), m)

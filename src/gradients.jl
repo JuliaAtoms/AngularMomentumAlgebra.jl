@@ -43,14 +43,22 @@ function Base.show(io::IO, me::RadialGradientMatrixElement)
     end
 end
 
+@tensor(Gradient) do
+    begin
+        n′ ~ n
+        ℓ′ == ℓ ± 1
+    end
 
-function rme((n′,ℓ′), ::Gradient, (n,ℓ))
+    raw"""
+    rme((n′,ℓ′), ::Gradient, (n,ℓ))
+
+Computes the reduced matrix element of `∇` in terms of
+[`RadialGradientMatrixElement`](@ref).
+"""
     if ℓ′ == ℓ+1
         √(ℓ+1)*RadialGradientMatrixElement(-ℓ)
     elseif ℓ′==ℓ-1
         - √(ℓ)*RadialGradientMatrixElement(ℓ+1)
-    else
-        0
     end
 end
 

@@ -19,7 +19,7 @@ function multipole_expand_scalar_product(a, b, ::Type{P}, ::Type{Q}, c, d,
 
     for k in ks
         X = P(k)⋅Q(k)
-        v = integrate_spinors((a,b), X, (c,d))
+        v = dot((a,b), X, (c,d))
         iszero(v) && continue
 
         push!(multipole_terms, k => f*v)

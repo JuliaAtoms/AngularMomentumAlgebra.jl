@@ -11,7 +11,10 @@ coordinates ``\\theta`` and ``\\phi``.
 struct OrbitalAngularMomentum <: AngularMomentum{'L'} end
 system(::OrbitalAngularMomentum) = OrbitalAngularMomentumSubSystem()
 
-@doc raw"""
+@tensor(OrbitalAngularMomentum) do
+    ℓ′ == ℓ
+
+    raw"""
     rme(ℓ′, 𝐋̂, ℓ)
 
 Calculate the reduced matrix element of the orbital angular momentum:
@@ -34,8 +37,6 @@ julia> rme(1, OrbitalAngularMomentum(), 2)
 0
 ```
 """
-function rme(ℓ′, ::OrbitalAngularMomentum, ℓ)
-    @δ ℓ′,ℓ
     √(ℓ*(ℓ+1)*(2ℓ+1))
 end
 
@@ -50,7 +51,10 @@ momentum associated with the coordinate ``s``.
 struct SpinAngularMomentum <: AngularMomentum{'S'} end
 system(::SpinAngularMomentum) = SpinSubSystem()
 
-@doc raw"""
+@tensor(SpinAngularMomentum) do
+    s′ == s
+
+    raw"""
     rme(s′, ::SpinAngularMomentum, s)
 
 Calculate the reduced matrix element of the spin angular momentum:
@@ -74,8 +78,6 @@ julia> rme(half(1), SpinAngularMomentum(), half(3))
 0
 ```
 """
-function rme(s′, ::SpinAngularMomentum, s)
-    @δ s′,s
     √(s*(s+1)*(2s+1))
 end
 
@@ -90,7 +92,14 @@ results from the coupling of the orbital and spin angular momenta.
 struct TotalAngularMomentum <: AngularMomentum{'J'} end
 system(::TotalAngularMomentum) = TotalAngularMomentumSubSystem()
 
-@doc raw"""
+@tensor(TotalAngularMomentum) do
+    begin
+        ℓ′ == ℓ
+        s′ == s
+        J′ == J
+    end
+
+    raw"""
     rme((ℓ′,s′,J′), ::TotalAngularMomentum, (ℓ,s,J))
 
 Calculate the reduced matrix element of the total angular momentum:
@@ -115,10 +124,6 @@ julia> rme((1,half(1),half(3)), TotalAngularMomentum(), (1,half(1),half(1)))
 ```
 
 """
-function rme((ℓ′,s′,J′)::Tuple{<:Number, <:Number, <:Number},
-             ::TotalAngularMomentum,
-             (ℓ,s,J)::Tuple{<:Number, <:Number, <:Number})
-    @δ ℓ′,ℓ s′,s J′,J
     √(J*(J+1)*(2J+1))
 end
 

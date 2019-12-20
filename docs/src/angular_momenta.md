@@ -5,6 +5,7 @@
 ```@docs
 OrbitalAngularMomentum
 rme(ℓ′, ::OrbitalAngularMomentum, ℓ)
+AngularMomentumAlgebra.couplings(tensor::OrbitalAngularMomentum, ℓ)
 ```
 
 ## [Spin angular momentum](@id spin_angular_momentum)
@@ -12,6 +13,7 @@ rme(ℓ′, ::OrbitalAngularMomentum, ℓ)
 ```@docs
 SpinAngularMomentum
 rme(s′, ::SpinAngularMomentum, s)
+AngularMomentumAlgebra.couplings(tensor::SpinAngularMomentum, s)
 ```
 
 ## [Total angular momentum](@id total_angular_momentum)
@@ -19,5 +21,6 @@ rme(s′, ::SpinAngularMomentum, s)
 ```@docs
 TotalAngularMomentum
 rme((ℓ′,s′,J′)::Tuple{<:Number, <:Number, <:Number}, ::TotalAngularMomentum, (ℓ,s,J)::Tuple{<:Number, <:Number, <:Number})
+AngularMomentumAlgebra.couplings(tensor::TotalAngularMomentum, (ℓ,s,J)::Tuple{<:Number, <:Number, <:Number})
 ```
 
