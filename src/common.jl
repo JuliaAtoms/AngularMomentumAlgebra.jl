@@ -66,3 +66,24 @@ macro δ(vars...)
     end
     Expr(:block, code..., :(1))
 end
+
+"""
+    couplings(j₁, m₁, j₂, m₂)
+
+Return all `j`, `m` for which the Clebsch–Gordan coefficient
+`⟨j₁m₁ j₂m₂|jm⟩` is non-zero.
+"""
+function couplings(j₁, m₁, j₂, m₂)
+    for (jᵢ,mᵢ) in ((j₁, m₁), (j₂, m₂))
+        WignerSymbols.ϵ(jᵢ, mᵢ) || throw(DomainError((jᵢ, mᵢ), "invalid combination (jᵢ, mᵢ)"))
+    end
+    m = m₁ + m₂
+    a = max(abs(j₁-j₂),abs(m))
+    b = j₁ + j₂
+    js = if iszero(m₁) && iszero(m₂) && iszero(m)
+        (iseven(a) ? a : a + 1):2:b
+    else
+        a:b
+    end
+    js, m
+end

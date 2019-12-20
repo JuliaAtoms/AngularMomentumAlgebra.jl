@@ -137,7 +137,8 @@ of a tensor operator of rank ``k``, the convention is the following
 \begin{align}
 \matrixel{n' j' m'}{\tensor{T}^{(k)}_q}{n j m}
 &\defd
-(-)^{2k} \frac{\braket{j~m~k~q}{j' m'}}{\angroot{j'}}
+(-)^{2k} \frac{1}{\angroot{j'}}
+C_{jm;kq}^{j'm'}
 \redmatrixel{n' j'}{\tensor{T}^{(k)}}{n j} \nonumber \\
 &=
 (-)^{j'-m'}

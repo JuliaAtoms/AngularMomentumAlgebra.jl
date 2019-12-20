@@ -14,11 +14,13 @@ require(['mathjax'], function(MathJax) {
         TeX: {
             Macros: {
                 defd: "≝",
+                abs: ["|#1|",1],
                 ket: ["|#1\\rangle",1],
                 bra: ["\\langle#1|",1],
                 braket: ["\\langle#1|#2\\rangle",2],
                 matrixel: ["\\langle#1|#2|#3\\rangle",3],
                 redmatrixel: ["\\langle#1||#2||#3\\rangle",3],
+                expect: ["\\langle#1\\rangle",1],
                 vec: ["\\mathbf{#1}",1],
                 mat: ["\\mathsf{#1}",1],
                 conj: ["#1^*",1],

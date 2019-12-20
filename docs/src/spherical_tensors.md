@@ -20,44 +20,8 @@ Y^k_q.
 ```@docs
 SphericalTensor
 system(::SphericalTensor)
-```
-
-The reduced matrix element of the spherical tensor is given by
-
-```math
-\begin{aligned}
-\redmatrixel{\ell'}{\tensor{C}^{(k)}}{\ell}
-&=
-\angroot{\ell}
-C_{\ell 0;k,0}^{\ell'0} =
-(-)^{\ell-k}
-\angroot{\ell\ell'}
-\wignerthreej{\ell&k&\ell'\\0&0&0}.
-\end{aligned}
-\tag{V13.2.107}
-```
-For the reduced matrix element of the same spherical tensor in the
-``\ell s j`` basis, we must use the uncoupling formula together with
-the above formula in the uncoupled basis:
-```math
-\begin{aligned}
-\redmatrixel{\ell' s' j'}{\tensor{C}^{(k)}}{\ell s j}
-&=
-\delta_{ss'}(-)^{j+\ell'+s+k}
-\angroot{jj'}
-\wignersixj{\ell&s&j\\j'&k&\ell'}
-\redmatrixel{\ell'}{\tensor{C}^{(k)}}{\ell}\\
-&=
-(-)^{\ell'+\ell+s+j}
-\angroot{\ell\ell'jj'}
-\wignersixj{\ell&s&j\\j'&k&\ell'}
-\wignerthreej{\ell&k&\ell'\\0&0&0}.
-\end{aligned}
-\tag{V13.\{1.40,2.5\}}
-```
-
-```@docs
 rme(ℓ′::Real,𝐂̂ᵏ::SphericalTensor,ℓ::Real)
+AngularMomentumAlgebra.couplings(tensor::SphericalTensor,ℓ)
 AngularMomentumAlgebra.ranks
 ```
 

@@ -19,11 +19,15 @@ makedocs(
         "Orbitals" => "orbitals.md",
         "Tensors" => [
             "General tensors" => "tensors.md",
-            "Angular momenta" => "angular_momenta.md",
-            "Spherical Tensors" => "spherical_tensors.md",
-            "Gradients" => "gradients.md",
-            "Multipole expansions" => "multipole_expansions.md",
-            "Coulomb interaction" => "coulomb.md"
+            "Tensor DSL" => "tensor_dsl.md",
+            "Various tensors" => [
+                "Angular momenta" => "angular_momenta.md",
+                "Spherical tensors" => "spherical_tensors.md",
+                "Gradients" => "gradients.md",
+                "Multipole expansions" => "multipole_expansions.md",
+                "Coulomb interaction" => "coulomb.md",
+            ],
+            "Tensor matrix elements" => "tensor_matrix_elements.md",
         ],
         "Energy expressions" => "energy_expressions.md",
     ],
