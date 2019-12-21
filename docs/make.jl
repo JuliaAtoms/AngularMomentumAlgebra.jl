@@ -2,6 +2,7 @@ using Documenter
 using AngularMomentumAlgebra
 using AtomicLevels
 using HalfIntegers
+using LinearAlgebra
 
 DocMeta.setdocmeta!(AngularMomentumAlgebra, :DocTestSetup,
                     :(using AngularMomentumAlgebra, AtomicLevels, HalfIntegers, LinearAlgebra); recursive=true)

@@ -25,6 +25,44 @@ cases:
 | **Uncoupled**  | Transform to coupled basis: ``\eqref{eqn:coupling}`` | [Direct evaluation](@ref)              |
 | **Coupled**    | Wigner–Eckart: ``\eqref{eqn:wigner-eckart}``         | Uncoupling: ``\eqref{eqn:uncoupling}`` |
 
+## Interface
+
+There are two interfaces provided for computation of matrix element
+of tensor operators:
+
+- A low-level interface `matrix_element((γj′, m′), 𝐓ᵏq, (γj′, m′))`
+  (and friends), where `γj′`, `m′`, `γj′`, and `m′` are quantum
+  numbers.
+- A high-level interface `dot(a, 𝐓ᵏq, b)`, where `a` and `b` are
+  `SpinOrbital`s from
+  [AtomicLevels.jl](https://github.com/JuliaAtoms/AtomicLevels.jl.git). The
+  high-level interface dispatches as appropriate to the low-level
+  interface, depending on whether `a` and `b` are expressed in the
+  coupled basis or not, and which part of the quantum system `𝐓ᵏq`
+  acts on.
+
+### High-level interface
+
+There are two main functions in the high-level interface:
+- `dot(a, 𝐓ᵏq, b)` for one-body interactions
+- `dot((a,b), 𝐓ᵏq, (c,d))` for two-body interactions (e.g. [Coulomb
+  interaction](@ref)).
+
+#### Coupled orbitals
+
+In the case of coupled orbitals, `RelativisticOrbital`s in the
+nomenclature of AtomicLevels.jl, if the operator acts on the entire
+system (or at least the total angular momentum), the Wigner–Eckart
+theorem ``\eqref{eqn:wigner-eckart}`` can be applied. If however, the
+operators acts on a subsystem, the uncoupling formula
+``\eqref{eqn:uncoupling}`` has to be employed.
+
+```@docs
+LinearAlgebra.dot(a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem}, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(system, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
+```
+
 ## Tensor acts on entire system
 
 ### [The Wigner–Eckart theorem](@id wigner_eckart)
@@ -96,36 +134,14 @@ the same coordinate (of a subsystem) is given by
 \end{equation}
 ```
 
+Apart from the additional factor ``\delta_{n_2'n_2}\delta_{j_2'j_2}``,
+this expression is equivalent to
+``\eqref{eqn:scalar-product-tensor-matrix-element}``.
+
 ##### Different coordinates
 
-The matrix element of a scalar product of two tensors acting on
-different coordinates is given by (in the uncoupled basis)
-
-```math
-\begin{equation}
-\begin{aligned}
-&\matrixel{n_aj_am_a;n_bj_bm_b}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_cj_cm_c;n_dj_dm_d}\\
-=&
-\frac{1}{\angroot{j_aj_b}}
-\sum_\alpha(-)^{-\alpha}
-C_{j_cm_c;k,\alpha}^{j_am_a}
-C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
-&\times
-\redmatrixel{n_aj_a}{\tensor{P}^{(k)}(1)}{n_cj_c}
-\redmatrixel{n_bj_b}{\tensor{Q}^{(k)}(2)}{n_dj_d}
-\end{aligned}
-\tag{V13.1.26}
-\end{equation}
-```
-
-Since the [Clebsch–Gordan coefficients](@ref) can be rewritten using 3j
-symbols and the 3j symbols vanish unless $m_c + \alpha - m_3 = m_d -
-\alpha - m_b = 0$, we have
-
-```math
-\alpha = m_a - m_c = m_d-m_b
-\implies
--\alpha + m_a + m_b = m_b + m_c.
+```@docs
+matrix_element((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
 ```
 
 In the coupled basis, the equivalent formula is
@@ -143,58 +159,6 @@ In the coupled basis, the equivalent formula is
 \end{aligned}
 \tag{V13.1.29}
 \end{equation}
-```
-
-This case occurs in two-body interactions, such as the [Coulomb
-interaction](@ref), where ``a,b`` and ``c,d`` are pairs of orbitals
-and the scalar product tensor is a multipole expansion in [Spherical
-tensors](@ref tensors_spherical_tensors), but also in the case of the
-operator ``\tensor{L}\cdot\tensor{S}`` and coordinates ``1`` and ``2``
-correspond to orbital and spin angular momenta, respectively.
-
-We can verify this using the classical result known from spin–orbit
-splitting:
-
-```math
-\begin{aligned}
-J^2 &= (\tensor{L}+\tensor{S})^2 = L^2 + 2\tensor{L}\cdot\tensor{S} + S^2\\
-\implies
-\expect{\tensor{L}\cdot\tensor{S}} &=
-\frac{1}{2}(\expect{J^2} - \expect{L^2} - \expect{S^2}) =
-\frac{1}{2}[J(J+1) - L(L+1) - S(S+1)]
-\end{aligned}
-```
-
-In the uncoupled basis, ``J`` is not a good quantum number (it is not
-a constant of motion), except for _pure states_, i.e. those with
-maximal ``\abs{m_\ell + m_s}``:
-
-```jldoctest
-julia> using AngularMomentumAlgebra, AtomicLevels, HalfIntegers
-
-julia> a = SpinOrbital(o"2p", 1, half(1))
-2p₁α
-
-julia> 𝐋 = OrbitalAngularMomentum()
-𝐋̂⁽¹⁾
-
-julia> 𝐒 = SpinAngularMomentum()
-𝐒̂⁽¹⁾
-
-julia> X = 𝐋⋅𝐒
-(𝐋̂⁽¹⁾⋅𝐒̂⁽¹⁾)
-
-julia> J = half(3) # Set manually since in uncoupled basis
-3/2
-
-julia> L = a.orb.ℓ
-1
-
-julia> S = half(1)
-1/2
-
-julia> dot(a, X, a), 1/2*(J*(J+1)-L*(L+1)-S*(S+1))
-(0.5, 0.5)
 ```
 
 ### Old stuff

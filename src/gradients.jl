@@ -45,7 +45,8 @@ end
 
 @tensor(Gradient) do
     begin
-        n′ ~ n
+        n′ ~ n # The gradient couples orbitals of different n, but
+               # there is no selection rule.
         ℓ′ == ℓ ± 1
     end
 
