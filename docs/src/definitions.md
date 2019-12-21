@@ -97,7 +97,10 @@ m_1    & m_2    & m_3
     the spherical harmonics as follows
 
     ```math
-    Y_{m}^{\ell}(\theta,\varphi) = \sqrt{\frac{2\ell+1}{4\pi}\frac{(\ell-|m|)!}{(\ell+|m|)!}} P_{\ell}^{|m|}(\cos\theta) \mathrm{e}^{i m \varphi}
+    Y_{m}^{\ell}(\theta,\varphi) =
+    \sqrt{\frac{2\ell+1}{4\pi}\frac{(\ell-|m|)!}{(\ell+|m|)!}}
+    P_{\ell}^{|m|}(\cos\theta)
+    \mathrm{e}^{\im m \varphi}
     \tag{ISO19.17}
     ```
 

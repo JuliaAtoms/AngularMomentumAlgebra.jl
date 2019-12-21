@@ -67,6 +67,8 @@ end
 @doc raw"""
     matrix_element((γj′, m′), X::TensorScalarProduct, (γj, m))
 
+Calculate the matrix element of a scalar product tensor according to:
+
 ```math
 \begin{equation}
 \begin{aligned}
@@ -79,9 +81,22 @@ end
 \redmatrixel{n'j}{\tensor{P}^{(k)}}{n_1j_1}
 \redmatrixel{n_1j_1}{\tensor{Q}^{(k)}}{nj}
 \end{aligned}
+\label{eqn:scalar-product-tensor-matrix-element}
 \tag{V13.1.11}
 \end{equation}
 ```
+
+The permissible values of ``n_1j_1`` in the summation are found using
+[`AngularMomentumAlgebra.couplings`](@ref); it is assumed that the
+summation only consists of a finite amount of terms and that
+
+```math
+\redmatrixel{n'j}{\tensor{P}^{(k)}}{n_1j_1}\neq0
+\iff
+\redmatrixel{n_1j_1}{\tensor{P}^{(k)}}{n'j}\neq0,
+```
+
+i.e. that ``\tensor{P}^{(k)}`` is (skew)symmetric.
 
 # Examples
 
@@ -214,25 +229,15 @@ function matrix_element((γj₁′, m₁′), (γj₂′, m₂′), 𝐓ᵏq, (�
     γj = (γj₁..., γj₂...)
 
     v = 0.0
-    # 𝐓ᵏ = parent(𝐓ᵏq)
-    # k = rank(𝐓ᵏ)
-    # q = component(𝐓ᵏq)
     for j′ ∈ j′s
-        # c′ = clebschgordan(j₁′, m₁′, j₂′, m₂′, j′, m′)/∏(j′)
         c′ = clebschgordan(j₁′, m₁′, j₂′, m₂′, j′, m′)
         for j ∈ js
-            # c = c′*clebschgordan(j₁, m₁, j₂, m₂, j, m)*clebschgordan(j, m, k, q, j′, m′)
-            # r = rme((γj′...,j′), 𝐓ᵏ, (γj...,j))
-            # iszero(r) && continue
-            # v += c*r
             me = matrix_element(((γj′...,j′), m′), 𝐓ᵏq, ((γj...,j), m))
             iszero(me) && continue
             c = c′*clebschgordan(j₁, m₁, j₂, m₂, j, m)
             v += c*me
         end
     end
-
-    # powneg1(2rank(𝐓ᵏ))*v
     v
 end
 
@@ -310,6 +315,221 @@ end
 
 
 # ** Uncoupled basis states
+
+@doc raw"""
+    matrix_element((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+
+The matrix element of a scalar product of two tensors acting on
+different coordinates is given by (in the uncoupled basis)
+
+```math
+\begin{equation}
+\begin{aligned}
+&\matrixel{n_aj_am_a;n_bj_bm_b}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_cj_cm_c;n_dj_dm_d}\\
+=&
+\frac{1}{\angroot{j_aj_b}}
+\sum_\alpha(-)^{-\alpha}
+C_{j_cm_c;k,\alpha}^{j_am_a}
+C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
+&\times
+\redmatrixel{n_aj_a}{\tensor{P}^{(k)}(1)}{n_cj_c}
+\redmatrixel{n_bj_b}{\tensor{Q}^{(k)}(2)}{n_dj_d} \\
+\equiv&
+\sum_\alpha
+(-)^{-\alpha}
+\matrixel{n_aj_am_a}{\tensor{P}^{(k)}_{\alpha}(1)}{n_cj_cm_c}
+\matrixel{n_bj_bm_b}{\tensor{Q}^{(k)}_{-\alpha}(2)}{n_dj_dm_d}
+\end{aligned}
+\tag{V13.1.26}
+\end{equation}
+```
+
+Since the [Clebsch–Gordan coefficients](@ref) can be rewritten using 3j
+symbols and the 3j symbols vanish unless $m_c + \alpha - m_3 = m_d -
+\alpha - m_b = 0$, we have
+
+```math
+\alpha = m_a - m_c = m_d-m_b
+\implies
+-\alpha + m_a + m_b = m_b + m_c.
+```
+
+This case occurs in two-body interactions, such as the [Coulomb
+interaction](@ref), where ``a,b`` and ``c,d`` are pairs of orbitals
+and the scalar product tensor is a term in the multipole expansion in
+terms of [Spherical tensors](@ref tensors_spherical_tensors):
+
+```jldoctest
+julia> 𝐂⁰ = SphericalTensor(0)
+𝐂̂⁽⁰⁾
+
+julia> matrix_element((0, 0), (0, 0), 𝐂⁰⋅𝐂⁰, (0,0), (0, 0)) # ⟨1s₀,1s₀|𝐂⁰⋅𝐂⁰|1s₀,1s₀⟩
+1.0
+
+julia> 𝐂¹ = SphericalTensor(1)
+𝐂̂⁽¹⁾
+
+julia> matrix_element((0, 0), (1, 0), 𝐂¹⋅𝐂¹, (1,0), (2, 0)) # ⟨1s₀,2p₀|𝐂¹⋅𝐂¹|2p₀,3d₀⟩
+0.29814239699997186
+
+julia> matrix_element((0, 0), (1, 1), 𝐂¹⋅𝐂¹, (1,0), (2, 1)) # ⟨1s₀,2p₁|𝐂¹⋅𝐂¹|2p₀,3d₁⟩
+0.25819888974716104
+```
+
+but also in the case of the operator ``\tensor{L}\cdot\tensor{S}`` and
+coordinates ``1`` and ``2`` correspond to orbital and spin angular
+momenta, respectively. We can verify this using the classical result
+known from spin–orbit splitting:
+
+```math
+\begin{aligned}
+J^2 &= (\tensor{L}+\tensor{S})^2 = L^2 + 2\tensor{L}\cdot\tensor{S} + S^2\\
+\implies
+\expect{\tensor{L}\cdot\tensor{S}} &=
+\frac{1}{2}(\expect{J^2} - \expect{L^2} - \expect{S^2}) =
+\frac{1}{2}[J(J+1) - L(L+1) - S(S+1)]
+\end{aligned}
+```
+
+In the uncoupled basis, ``J`` is not a good quantum number (it is not
+a constant of motion), except for _pure states_, i.e. those with
+maximal ``\abs{m_\ell + m_s}``:
+
+```jldoctest
+julia> 𝐋 = OrbitalAngularMomentum()
+𝐋̂⁽¹⁾
+
+julia> 𝐒 = SpinAngularMomentum()
+𝐒̂⁽¹⁾
+
+julia> X = 𝐋⋅𝐒
+(𝐋̂⁽¹⁾⋅𝐒̂⁽¹⁾)
+
+julia> matrix_element((1, 1), (half(1), half(1)),
+                      X, (1,1), (half(1), half(1)))
+0.4999999999999999
+
+julia> 1/2*(half(3)*(half(3)+1)-1*(1+1)-half(1)*(half(1)+1)) # 1/2(J(J+1)-L(L+1)-S(S+1))
+0.5
+```
+"""
+function matrix_element((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+    T,U = X.T,X.U
+    k = rank(T)
+
+    α = Int(m₁′-m₁)
+    (α != m₂-m₂′ || abs(α) > k) && return 0
+
+    powneg1(-α)*
+    matrix_element((γj₁′, m₁′), TensorComponent(T,α), (γj₁, m₁))*
+    matrix_element((γj₂′, m₂′), TensorComponent(U,-α), (γj₂, m₂))
+end
+
+# * Tensor matrix elements in orbital basis
+
+"""
+    matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem},
+                   a::SpinOrbital{<:RelativisticOrbital},
+                   𝐓ᵏq::TensorComponent,
+                   b::SpinOrbital{<:RelativisticOrbital})
+
+The matrix element of a tensor acting on the full system or the total
+angular momentum, evaluated in the basis of coupled spin-orbitals, is
+simply computed using the Wigner–Eckart theorem
+``\\eqref{eqn:wigner-eckart}``.
+"""
+function matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem},
+                        a::SpinOrbital{<:RelativisticOrbital},
+                        𝐓ᵏq::TensorComponent,
+                        b::SpinOrbital{<:RelativisticOrbital})
+    γj′ = a.orb.ℓ,half(1),a.orb.j
+    γj = b.orb.ℓ,half(1),b.orb.j
+    matrix_element((γj′, a.m[1]), 𝐓ᵏq, (γj, b.m[1]))
+end
+
+"""
+    matrix_element(system,
+                   a::SpinOrbital{<:RelativisticOrbital},
+                   𝐓ᵏq::TensorComponent,
+                   b::SpinOrbital{<:RelativisticOrbital})
+
+The matrix element of a tensor acting on `system`, which is a
+subsystem, evaluated in the basis coupled spin-orbitals, needs to be
+computed via the uncoupling formula ``\\eqref{eqn:uncoupling}``.
+"""
+function matrix_element(system,
+                        a::SpinOrbital{<:RelativisticOrbital},
+                        𝐓ᵏq::TensorComponent,
+                        b::SpinOrbital{<:RelativisticOrbital})
+    j′, m′ = a.orb.j, a.m[1]
+    j, m = b.orb.j, b.m[1]
+    γj₁′, γj₁ = first.(quantum_numbers(system, a, b))
+    γj₂′, γj₂ = first.(other_quantum_numbers(system, a, b))
+    matrix_element_via_uncoupling((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
+end
+
+"""
+    dot(a::SpinOrbital{<:RelativisticOrbital},
+        𝐓ᵏq::TensorComponent,
+        b::SpinOrbital{<:RelativisticOrbital})
+
+Compute the matrix element `⟨a|𝐓ᵏq|b⟩` in the basis of coupled
+orbitals, dispatching to the correct low-level function
+`matrix_element`, depending on the value of `system(parent(𝐓ᵏq))`.
+
+# Examples
+
+```jldoctest
+julia> a,b,c = (SpinOrbital(ro"2p", half(3)),
+                SpinOrbital(ro"2p", half(1)),
+                SpinOrbital(ro"2s", half(1)))
+(2p(3/2), 2p(1/2), 2s(1/2))
+
+julia> 𝐉 = TotalAngularMomentum()
+𝐉̂⁽¹⁾
+
+julia> dot(a, cartesian_tensor_component(𝐉, :x), b)
+0.8660254037844386
+
+julia> 1/2*√((half(3)+half(1)+1)*(half(3)-half(1))) # 1/2√((J+M+1)*(J-M))
+0.8660254037844386
+
+julia> dot(a, cartesian_tensor_component(𝐉, :z), a)
+1.5
+
+julia> a.m[1]
+3/2
+
+julia> dot(a, TensorComponent(OrbitalAngularMomentum(), 0), a)
+0.9999999999999999
+
+julia> dot(c, cartesian_tensor_component(Gradient(), :x), a)
+- 0.408248(∂ᵣ + 2/r)
+
+julia> dot(c, cartesian_tensor_component(SphericalTensor(1), :x), a)
+-0.40824829046386296
+```
+
+"""
+LinearAlgebra.dot(a::SpinOrbital{<:RelativisticOrbital},
+                  𝐓ᵏq::TensorComponent,
+                  b::SpinOrbital{<:RelativisticOrbital}) =
+    matrix_element(system(parent(𝐓ᵏq)), a, 𝐓ᵏq, b)
+
+function LinearAlgebra.dot(a::SpinOrbital, T::TensorComponent, b::SpinOrbital)
+    @show a, T, b
+    0
+end
+
+function LinearAlgebra.dot(a::SpinOrbital, T::TensorScalarProduct, b::SpinOrbital)
+    @show a, T, b
+    0
+end
+
+LinearAlgebra.dot(o′, lct::LinearCombinationTensor, o) =
+    sum(filter!(!iszero, [c*dot(o′, Tᵏq, o) for (Tᵏq,c) in lct]))
+
+# * Old stuff
 
 # """
 #     dot(o′, T, o)
@@ -509,13 +729,5 @@ end
 #     sT != sU && return dot((a,a), X, (b,b))
 #     0
 # end
-
-function LinearAlgebra.dot(a::SpinOrbital, T::Union{TensorComponent,TensorScalarProduct}, b::SpinOrbital)
-    @show a, T, b
-    0
-end
-
-LinearAlgebra.dot(o′, lct::LinearCombinationTensor, o) =
-    sum(filter!(!iszero, [c*dot(o′, Tᵏq, o) for (Tᵏq,c) in lct]))
 
 export matrix_element, matrix_element_via_uncoupling
