@@ -1,4 +1,5 @@
 using AngularMomentumAlgebra
+using WignerSymbols
 using LinearAlgebra
 using AtomicLevels
 using HalfIntegers
