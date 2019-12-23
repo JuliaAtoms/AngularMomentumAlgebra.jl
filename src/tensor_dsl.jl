@@ -1,3 +1,20 @@
+"""
+    wrap_show_debug(expr)
+
+Wrap `expr` with a `@show` macro call if `DEBUG_TENSOR_DSL` exists as
+an environment flag, otherwise return `expr` as-is. This is applied at
+compile time, so no overhead is incurred.
+"""
+function wrap_show_debug(expr)
+    if "DEBUG_TENSOR_DSL" in keys(ENV)
+        s = :(@show)
+        push!(s.args, expr)
+        s
+    else
+        expr
+    end
+end
+
 remove_line_numbers(exprs) = filter(n -> !(n isa LineNumberNode), exprs)
 
 generate_signature(f::Function, sym, TensorType::Symbol) =
@@ -161,7 +178,7 @@ Generate a function for computing the reduced matrix element of
 function generate_rme(TensorType, selection_rules, doc, rme)
     γj′,γj = identify_quantum_numbers(selection_rules)
     signature = generate_signature(t -> (γj′, t, γj), :rme, TensorType)
-    body = Expr(:block, :(iszero($(γj′), tensor, $(γj)) && return 0), rme)
+    body = Expr(:block, :(iszero($(γj′), tensor, $(γj)) && return 0), wrap_show_debug(rme))
     fun = Expr(:function, signature, body)
     :(@doc($doc, $fun))
 end
