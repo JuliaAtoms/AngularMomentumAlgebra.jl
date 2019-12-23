@@ -41,7 +41,8 @@ require(['mathjax'], function(MathJax) {
                 diff : ["\\mathrm{d}#1\\,",1],
                 angroot : ["{\\prod}_{#1}", 1],
                 wignerthreej : ["\\begin{pmatrix}#1\\end{pmatrix}", 1],
-                wignersixj : ["\\begin{Bmatrix}#1\\end{Bmatrix}", 1]
+                wignersixj : ["\\begin{Bmatrix}#1\\end{Bmatrix}", 1],
+                Heaviside: "\\Theta"
             }
         }
     });
