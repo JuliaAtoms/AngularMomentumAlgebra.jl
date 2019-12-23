@@ -67,7 +67,7 @@ julia> quantum_numbers(SpinSubSystem(), ro)
 1/2 => missing
 
 julia> quantum_numbers(TotalAngularMomentumSubSystem(), o)
-(2, 1/2, missing) => 1/2
+(2 => 1, 1/2 => -1/2)
 
 julia> quantum_numbers(TotalAngularMomentumSubSystem(), ro)
 (2, 1/2, 5/2) => 1/2

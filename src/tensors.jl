@@ -52,6 +52,8 @@ end
 Base.parent(Tᵏq::TensorComponent) = Tᵏq.tensor
 component(Tᵏq::TensorComponent) = Tᵏq.q
 
+system(Tᵏq::TensorComponent) = system(parent(Tᵏq))
+
 # * Tensor products
 
 @doc raw"""
@@ -84,6 +86,8 @@ function Base.show(io::IO, X::TensorProduct{K}) where K
     show(io, X.U)
     write(io,"}⁽",to_superscript(K),"⁾")
 end
+
+system(X::TensorProduct) = (system(X.T), system(X.U))
 
 # ** Scalar product
 
@@ -141,6 +145,8 @@ julia> SphericalTensor(4)⋅SphericalTensor(4)
 """
 LinearAlgebra.dot(T::Tensor, U::Tensor) =
     TensorScalarProduct(T, U)
+
+system(X::TensorScalarProduct) = (system(X.T), system(X.U))
 
 # * Linear combination of tensors
 

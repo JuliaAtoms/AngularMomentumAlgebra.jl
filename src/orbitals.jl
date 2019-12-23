@@ -155,10 +155,12 @@ const TotalAngularMomentumSubSystem = SubSystem{:total_angular_momentum}
     quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital})
 
 The total angular momentum of an uncoupled spin-orbital is not a good
-quantum number; only its projection is known.
+quantum number; only its projection is known. The system is specified
+by ``\\ell m_\\ell; s m_s``, where ``;`` denotes that the spatial and
+spin subsystems are separable.
 """
 quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.ℓ, half(1), missing) => o.m[1]+o.m[2])
+    quantum_numbers(OrbitalAngularMomentumSubSystem(), o), quantum_numbers(SpinSubSystem(), o)
 
 """
     quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
