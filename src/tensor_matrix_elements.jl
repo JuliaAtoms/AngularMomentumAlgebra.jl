@@ -51,7 +51,9 @@ julia> matrix_element(((1,half(1),half(1)), -half(1)),
 0.7071067811865475
 ```
 """
-function matrix_element((γj′, m′), Tᵏq::TensorComponent, (γj, m))
+function matrix_element((γj′, m′)::Tuple{<:Any, <:Number},
+                        Tᵏq::TensorComponent,
+                        (γj, m)::Tuple{<:Any, <:Number})
     Tᵏ = parent(Tᵏq)
     r = rme(γj′, Tᵏ, γj)
     iszero(r) && return 0
@@ -246,7 +248,7 @@ end
 # ** Uncoupling of coupled basis states
 
 @doc raw"""
-    matrix_element_via_uncoupling((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
+    matrix_element((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
 
 Compute the matrix element of the tensor `𝐓ᵏq` which acts on
 coordinate `1` only in the coupled basis, by employing the uncoupling
@@ -275,8 +277,8 @@ C_{jm;kq}^{j'm'}\\
 julia> 𝐋₀ = TensorComponent(OrbitalAngularMomentum(), 0)
 𝐋̂⁽¹⁾₀
 
-julia> matrix_element_via_uncoupling((1, half(1), half(3), half(3)),
-                                     𝐋₀, (1, half(1), half(3), half(3)))
+julia> matrix_element((1, half(1), half(3), half(3)),
+                      𝐋₀, (1, half(1), half(3), half(3)))
 0.9999999999999999
 
 julia> matrix_element((1, 1), 𝐋₀, (1, 1)) # For comparison
@@ -285,8 +287,8 @@ julia> matrix_element((1, 1), 𝐋₀, (1, 1)) # For comparison
 julia> 𝐒₀ = TensorComponent(SpinAngularMomentum(), 0)
 𝐒̂⁽¹⁾₀
 
-julia> matrix_element_via_uncoupling((half(1), 1, half(3), half(3)),
-                                     𝐒₀, (half(1), 1, half(3), half(3)))
+julia> matrix_element((half(1), 1, half(3), half(3)),
+                      𝐒₀, (half(1), 1, half(3), half(3)))
 0.49999999999999994
 
 julia> matrix_element((half(1),half(1)), 𝐒₀, (half(1),half(1)))
@@ -294,7 +296,9 @@ julia> matrix_element((half(1),half(1)), 𝐒₀, (half(1),half(1)))
 ```
 
 """
-function matrix_element_via_uncoupling((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
+function matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, <:Any, <:Number, <:Number},
+                        𝐓ᵏq::TensorComponent,
+                        (γj₁, γj₂, j, m)::Tuple{<:Any, <:Any, <:Number, <:Number})
     @δ γj₂′,γj₂
 
     𝐓ᵏ = parent(𝐓ᵏq)
@@ -649,7 +653,7 @@ function matrix_element(system,
     j, m = b.orb.j, b.m[1]
     γj₁′, γj₁ = first.(quantum_numbers(system, a, b))
     γj₂′, γj₂ = first.(other_quantum_numbers(system, a, b))
-    matrix_element_via_uncoupling((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
+    matrix_element((γj₁′, γj₂′, j′, m′), 𝐓ᵏq, (γj₁, γj₂, j, m))
 end
 
 """

@@ -40,7 +40,7 @@ quantum_numbers(::FullSystem, o::SpinOrbital{<:Orbital}) =
 The full system of a coupled spin-orbital is ``n\\ell s j m_j``.
 """
 quantum_numbers(::FullSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n, o.orb.ℓ, half(1), o.orb.j) => o.m[1])
+    ((o.orb.n, o.orb.ℓ, half(1), o.orb.j), o.m[1])
 
 other_quantum_numbers(::FullSystem, ::SpinOrbital) = ()
 
@@ -59,7 +59,7 @@ const SpatialSubSystem = SubSystem{:spatial}
 The spatial subsystem of an uncoupled spin-orbital is ``n\\ell m_\\ell``.
 """
 quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.n, o.orb.ℓ) => o.m[1])
+    ((o.orb.n, o.orb.ℓ), o.m[1])
 
 """
     quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital})
@@ -68,13 +68,13 @@ The spatial subsystem of a coupled spin-orbital is just ``n\\ell
 m_\\ell``; ``m_\\ell`` is not a good quantum number.
 """
 quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n, o.orb.ℓ) => missing)
+    ((o.orb.n, o.orb.ℓ), missing)
 
 other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:Orbital}) =
-    (half(1) => o.m[2])
+    (half(1), o.m[2])
 
 other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    (half(1) => missing)
+    (half(1), missing)
 
 # * Orbital angular momentum subsystem
 
@@ -92,7 +92,7 @@ const OrbitalAngularMomentumSubSystem = SubSystem{:orbital_angular_momentum}
 The orbital angular momentum subsystem of an uncoupled spin-orbital is ``\\ell m_\\ell``.
 """
 quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    (o.orb.ℓ => o.m[1])
+    (o.orb.ℓ, o.m[1])
 
 """
     quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
@@ -101,12 +101,12 @@ The orbital angular momentum subsystem of a coupled spin-orbital is
 just ``\\ell``; ``m_\\ell`` is not a good quantum number.
 """
 quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    (o.orb.ℓ => missing)
+    (o.orb.ℓ, missing)
 
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.n,half(1)) => o.m[2])
+    ((o.orb.n,half(1)), o.m[2])
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n,half(1)) => missing)
+    ((o.orb.n,half(1)), missing)
 
 const SpatialSubSystems = Union{SpatialSubSystem,OrbitalAngularMomentumSubSystem}
 
@@ -125,7 +125,7 @@ const SpinSubSystem = SubSystem{:spin}
 The spin subsystem of an uncoupled spin-orbital is ``s m_s``.
 """
 quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:Orbital}) =
-    (half(1) => o.m[2])
+    (half(1), o.m[2])
 
 """
     quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital})
@@ -134,12 +134,12 @@ The spin subsystem of a coupled spin-orbital is just ``s``; ``m_s`` is
 not a good quantum number.
 """
 quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    (half(1) => missing)
+    (half(1), missing)
 
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.n,o.orb.ℓ) => o.m[1])
+    ((o.orb.n,o.orb.ℓ), o.m[1])
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n,o.orb.ℓ) => missing)
+    ((o.orb.n,o.orb.ℓ), missing)
 
 # * Total angular momentum subsystem
 
@@ -169,12 +169,12 @@ The total angular momentum subsystem of a coupled spin-orbital just
 ``\\ell s j m_j``.
 """
 quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.ℓ, half(1), o.orb.j) => o.m[1])
+    ((o.orb.ℓ, half(1), o.orb.j), o.m[1])
 
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    (o.orb.n => missing)
+    (o.orb.n, missing)
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    (o.orb.n => missing)
+    (o.orb.n, missing)
 
 
 export quantum_numbers, SubSystem, FullSystem,
