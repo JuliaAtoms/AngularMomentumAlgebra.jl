@@ -52,8 +52,59 @@ triangle condition between spin-orbitals `a` and `b`.
 ranks(a::SpinOrbital, ::Type{SphericalTensor}, b::SpinOrbital) =
     triangle_range(a.orb.ℓ, b.orb.ℓ)
 
+# * Dipole tensors
+
+"""
+    Dipole()
+
+Construct a dipole tensor
+"""
+struct Dipole <: Tensor{1,'D'} end
+
+"""
+    system(::Dipole)
+
+A dipole tensor only acts on the coordinates ``r``, ``\\theta`` and
+``\\phi``.
+"""
+system(::Dipole) = SpatialSubSystem()
+
+@doc raw"""
+    RadialMatrixElement()
+
+This represents the matrix element of the radial component of the
+dipole operator:
+
+```math
+\expect{r} =
+\int_0^\infty\diff{r}r^2
+\conj{\Psi}_{n'\ell'}(r)
+r
+\Psi_{n\ell}(r)
+```
+"""
+struct RadialMatrixElement <: OneBodyOperator end
+
+Base.show(io::IO, ::RadialMatrixElement) = write(io, "r")
+
+@tensor(Dipole) do
+    begin
+        n′ ~ n # The dipole couples orbitals of different n, but
+               # there is no selection rule.
+        ℓ′ == ℓ ± 1
+    end
+
+    raw"""
+    rme((n′,ℓ′), ::Dipole, (n,ℓ))
+
+Computes the reduced matrix element of `𝐃` in terms of
+[`RadialMatrixElement`](@ref).
+"""
+    rme(ℓ′, SphericalTensor(1), ℓ)*RadialMatrixElement()
+end
+
 module Dipoles
-import ..cartesian_tensor_component, ..SphericalTensor
+import ..cartesian_tensor_component, ..SphericalTensor, ..Dipole
 
 """
     𝐫̂
@@ -70,14 +121,41 @@ julia> using AngularMomentumAlgebra.Dipoles
 julia> z = 𝐫̂[3]
 𝐂̂⁽¹⁾₀
 
-julia> dot(SpinOrbital(o"1s", 0, half(1)), z, SpinOrbital(o"2p", 0, half(1)))
+julia> dot(SpinOrbital(o"2s", 0, half(1)), z, SpinOrbital(o"2p", 0, half(1)))
 0.5773502691896256
 ```
 
 """
 const 𝐫̂ = [cartesian_tensor_component(SphericalTensor(1), c)
            for c in [:x, :y, :z]]
-export 𝐫̂
+
+"""
+    𝐫
+
+The dipole operator; the elements correspond to `[x,y,z]`, i.e. the
+Cartesian tensor components. Can be entered as `\\bfr`.
+
+# Examples
+
+```jldoctest
+julia> using AngularMomentumAlgebra.Dipoles
+
+julia> z = 𝐫[3]
+𝐃̂⁽¹⁾₀
+
+julia> dot(SpinOrbital(o"1s", 0, half(1)), z, SpinOrbital(o"2p", 0, half(1)))
+0.57735r
+
+julia> dot(SpinOrbital(o"2s", 0, half(1)), z, SpinOrbital(o"2p", 0, half(1)))
+0.57735r
+
+julia> dot(SpinOrbital(o"2p", 0, half(1)), z, SpinOrbital(o"3d", 0, half(1)))
+0.516398r
+```
+"""
+const 𝐫 = [cartesian_tensor_component(Dipole(), c)
+           for c in [:x, :y, :z]]
+export 𝐫̂, 𝐫
 end
 
-export SphericalTensor, rme
+export SphericalTensor, Dipole, rme
