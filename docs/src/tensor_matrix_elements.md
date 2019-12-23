@@ -98,7 +98,8 @@ matrix_element(systems::Tuple{<:SubSystem,<:SubSystem}, a::SpinOrbital{<:Orbital
 ### [The Wigner–Eckart theorem](@id wigner_eckart)
 
 ```@docs
-matrix_element((γj′, m′), Tᵏq::TensorComponent, (γj, m))
+matrix_element((γj′, m′)::Tuple{<:Any, <:Number},
+               Tᵏq::TensorComponent, (γj, m)::Tuple{<:Any, <:Number})
 ```
 
 ### Product tensors
@@ -126,7 +127,9 @@ quantum system, in the coupled basis we employ the following
 uncoupling formula:
 
 ```@docs
-matrix_element_via_uncoupling
+matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, <:Any, <:Number, <:Number},
+               𝐓ᵏq::TensorComponent,
+               (γj₁, γj₂, j, m)::Tuple{<:Any, <:Any, <:Number, <:Number})
 ```
 
 ### Direct evaluation
