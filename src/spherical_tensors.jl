@@ -37,7 +37,7 @@ C_{\ell 0;k,0}^{\ell'0} =
 \tag{V13.2.107}
 ```
 """
-    ∏(ℓ)*clebschgordan(ℓ,0,rank(k),0,ℓ′,0)
+    ∏(ℓ)*clebschgordan(ℓ,0,k,0,ℓ′,0)
 end
 
 couples(a::SpinOrbital{<:Orbital}, ::Type{SphericalTensor}, b::SpinOrbital{<:Orbital}) =
