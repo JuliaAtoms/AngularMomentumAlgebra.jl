@@ -8,8 +8,7 @@ Multipole-expand the matrix element `⟨ab|P⋅Q|cd⟩`, where the tensor
 `b` & `d`. The definition is taken from Eq. (13.1.26) of Varshalovich
 (1988).
 """
-function multipole_expand_scalar_product(a, b, ::Type{P}, ::Type{Q}, c, d,
-                                         f::Int=1) where {P<:Tensor,Q<:Tensor}
+function multipole_expand_scalar_product(a, b, P, Q, c, d, f::Int=1)
     multipole_terms = Pair{Int,Float64}[]
 
     couples(a, P, c) && couples(b, Q, d) ||
@@ -39,7 +38,7 @@ function multipole_expand(integral::OrbitalMatrixElement{2,<:Any,<:CoulombIntera
 
     terms = NBodyTerm[]
 
-    for (k,coeff) in multipole_expand_scalar_product(a,b, SphericalTensor, SphericalTensor, c,d)
+    for (k,coeff) in multipole_expand_scalar_product(a, b, CoulombTensor, CoulombTensor, c, d)
         push!(terms, NBodyTerm([radial_integral(integral.a, (k,g), integral.b)], coeff))
     end
 
