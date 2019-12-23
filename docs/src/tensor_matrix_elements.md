@@ -48,7 +48,18 @@ There are two main functions in the high-level interface:
 - `dot((a,b), 𝐓ᵏq, (c,d))` for two-body interactions (e.g. [Coulomb
   interaction](@ref)).
 
-#### Coupled orbitals
+```@docs
+LinearAlgebra.dot(a::SpinOrbital, 𝐓ᵏq::TensorComponent, b::SpinOrbital)
+```
+
+#### Intermediate-level interface
+
+`dot` dispatches to this level, passing the [`system`](@ref) of the
+tensor operator considered as the first argument. At this level, the
+spin-orbitals are translated into quantum numbers, employed by the
+low-level interface.
+
+##### Coupled orbitals
 
 In the case of coupled orbitals, `RelativisticOrbital`s in the
 nomenclature of AtomicLevels.jl, if the operator acts on the entire
@@ -58,9 +69,28 @@ operators acts on a subsystem, the uncoupling formula
 ``\eqref{eqn:uncoupling}`` has to be employed.
 
 ```@docs
-LinearAlgebra.dot(a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
 matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem}, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
 matrix_element(system, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(::Tuple{S,S}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
+matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital}) where {S<:SubSystem}
+matrix_element(systems::Tuple{<:SubSystem,<:SubSystem}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital})
+```
+
+- [x] ``\matrixel{a}{\tensor{L}^2}{b}``, ``\matrixel{a}{\tensor{S}^2}{b}``
+  Scalar product tensors acting on one coordinate only
+- [x] ``\matrixel{a}{\tensor{L}\cdot\tensor{S}}{b}`` Scalar product tensor acting on two
+  different coordinates of the same orbital
+- [ ] ``\matrixel{ab}{\tensor{C}^{(k)}\cdot\tensor{C}^{(k)}}{cd}`` Scalar
+  product tensor acting on (subsystems of) two different orbitals
+
+##### Uncoupled orbitals
+
+```@docs
+matrix_element(system::Union{FullSystem,TotalAngularMomentumSubSystem}, a::SpinOrbital{<:Orbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:Orbital})
+matrix_element(system, a::SpinOrbital{<:Orbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:Orbital})
+matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
+matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital}) where {S<:SubSystem}
+matrix_element(systems::Tuple{<:SubSystem,<:SubSystem}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital})
 ```
 
 ## Tensor acts on entire system
@@ -101,67 +131,14 @@ matrix_element_via_uncoupling
 
 ### Direct evaluation
 
-```math
-\begin{equation}
-\tag{V13.1.39}
-\matrixel{n_1'j_1'm_1';n_2'j_2'm_2'}{\tensor{T}^{(k)}_q(1)}{n_1j_1m_1;n_2j_2m_2}
-=
-\delta_{n_2'n_2}\delta_{j_2'j_2}\delta_{m_2'm_2}
-\matrixel{n_1'j_1'm_1'}{\tensor{T}^{(k)}_q(1)}{n_1j_1m_1}
-\end{equation}
-```
-
-#### Product tensors
-
-##### Same coordinate
-
-The matrix element of a scalar product of two tensors acting on
-the same coordinate (of a subsystem) is given by
-
-```math
-\begin{equation}
-\begin{aligned}
-&\matrixel{n_1'j_1'n_2'j_2'j'm'}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(1)]}{n_1j_1n_2j_2jm}\\
-=&\delta_{n_2'n_2}\delta_{j_2'j_2}\delta_{j_1'j_1}\delta_{j'j}\delta_{m'm}
-\frac{1}{\angroot{j_1}^2}
-(-)^{-j_1}\\
-&\times
-\sum_{JN}(-)^J
-\redmatrixel{n_1'j_1}{\tensor{P}^{(k)}(1)}{NJ}
-\redmatrixel{NJ}{\tensor{Q}^{(k)}(1)}{n_1j_1}.
-\end{aligned}
-\tag{V13.1.43}
-\end{equation}
-```
-
-Apart from the additional factor ``\delta_{n_2'n_2}\delta_{j_2'j_2}``,
-this expression is equivalent to
-``\eqref{eqn:scalar-product-tensor-matrix-element}``.
-
-##### Different coordinates
+### Product tensors
 
 ```@docs
-matrix_element((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+matrix_element2((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+matrix_element2((γj₁′, γj₂′, j′, m′), X::TensorScalarProduct, (γj₁, γj₂, j, m))
 ```
 
-In the coupled basis, the equivalent formula is
-
-```math
-\begin{equation}
-\begin{aligned}
-&\matrixel{n_1'j_1'n_2'j_2'j'm'}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_1j_1n_2j_2jm}\\
-=& \delta_{j'j}\delta_{m'm}
-(-)^{j+j_1+j_2'}
-\wignersixj{j_1'&j_1&k\\j_2&j_2'&j}\\
-&\times
-\redmatrixel{n_1'j_1'}{\tensor{P}^{(k)}(1)}{n_1j_1}
-\redmatrixel{n_2'j_2'}{\tensor{Q}^{(k)}(2)}{n_2j_2}.
-\end{aligned}
-\tag{V13.1.29}
-\end{equation}
-```
-
-### Old stuff
+## Old stuff
 
 ```@docs
 AngularMomentumAlgebra.complementary_space_factor
