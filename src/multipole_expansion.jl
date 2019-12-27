@@ -39,6 +39,7 @@ function multipole_expand(integral::OrbitalMatrixElement{2,<:Any,<:CoulombIntera
     terms = NBodyTerm[]
 
     for (k,coeff) in multipole_expand_scalar_product(a, b, CoulombTensor, CoulombTensor, c, d)
+        # Remember: integral.a == (a,b), integral.b == (c,d) => two-body integral
         push!(terms, NBodyTerm([radial_integral(integral.a, (k,g), integral.b)], coeff))
     end
 
