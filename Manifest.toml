@@ -25,15 +25,15 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[BlockArrays]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "991b73d29f2166fb8acc2ac9e0093a8b9143cc96"
+git-tree-sha1 = "1a6420eb65627efa9b279a46941a19f5b8d5c0bd"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.10.2"
+version = "0.11.0"
 
 [[BlockBandedMatrices]]
 deps = ["ArrayLayouts", "BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LinearAlgebra", "MatrixFactorizations", "Pkg", "Random", "SharedArrays", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "084f081acb27a315f55d49e74be03337fa65da08"
+git-tree-sha1 = "06391dd84a3a3664620c89d01c933375a22c2093"
 uuid = "ffab5731-97b5-5995-9138-79e8c1846df0"
-version = "0.6.0"
+version = "0.7.0"
 
 [[Combinatorics]]
 deps = ["Polynomials"]
@@ -43,9 +43,9 @@ version = "1.0.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "0caaa696071d6e7872ddf30e58ed6ec0b49954c4"
+git-tree-sha1 = "3819f476b6b37ef8ea837070ed831b4ebadfa1e9"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.0.0"
+version = "3.2.0"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
@@ -67,7 +67,7 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[EnergyExpressions]]
 deps = ["AtomicLevels", "Combinatorics", "LinearAlgebra", "SparseArrays", "Test", "UnicodeFun"]
-git-tree-sha1 = "a360290d2cc98beda897775ae54872d4adbd9a1c"
+git-tree-sha1 = "d4cb375a92a871cb1dcd2d74d97434f0b08f3bdd"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaAtoms/EnergyExpressions.jl.git"
 uuid = "f4b57a2e-27c7-11e9-0cb0-edd185b706f6"
