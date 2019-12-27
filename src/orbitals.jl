@@ -12,7 +12,19 @@ A subsystem, i.e. limited to a set of coordinates.
 """
 struct SubSystem{which} <: System end
 
+"""
+    quantum_numbers(system, a, b)
+
+Return the quantum numbers characterizing `system` for the orbitals `a` and `b`.
+"""
 quantum_numbers(system, a, b) = quantum_numbers(system, a), quantum_numbers(system, b)
+
+"""
+    other_quantum_numbers(system, a, b)
+
+Return the quantum numbers characterizing the orthogonal complement to
+`system` for the orbitals `a` and `b`.
+"""
 other_quantum_numbers(system, a, b) = other_quantum_numbers(system, a), other_quantum_numbers(system, b)
 
 # * Full system
@@ -42,7 +54,13 @@ The full system of a coupled spin-orbital is ``n\\ell s j m_j``.
 quantum_numbers(::FullSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((o.orb.n, o.orb.ℓ, half(1), o.orb.j), o.m[1])
 
-other_quantum_numbers(::FullSystem, ::SpinOrbital) = ()
+"""
+    other_quantum_numbers(::FullSystem, ::SpinOrbital)
+
+No quantum numbers characterize the orthogonal complement to
+[`FullSystem`](@ref).
+"""
+other_quantum_numbers(::FullSystem, ::SpinOrbital) = ((),missing)
 
 # * Spatial subsystem
 
@@ -70,9 +88,22 @@ m_\\ell``; ``m_\\ell`` is not a good quantum number.
 quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((o.orb.n, o.orb.ℓ), missing)
 
+"""
+    other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:Orbital})
+
+The orthogonal complement to [`SpatialSubSystem`](@ref) is
+[`SpinSubSystem`](@ref), which is characterized by ``sm_s``.
+"""
 other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:Orbital}) =
     (half(1), o.m[2])
 
+"""
+    other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital})
+
+The orthogonal complement to [`SpatialSubSystem`](@ref) is
+[`SpinSubSystem`](@ref), which is characterized by ``s``; its
+projection is not a good quantum number in the coupled basis.
+"""
 other_quantum_numbers(::SpatialSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     (half(1), missing)
 
@@ -103,8 +134,22 @@ just ``\\ell``; ``m_\\ell`` is not a good quantum number.
 quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     (o.orb.ℓ, missing)
 
+"""
+    other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital})
+
+The orthogonal complement to [`OrbitalAngularMomentumSubSystem`](@ref)
+is characterized by the quantum numbers ``n s m_s``.
+"""
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
     ((o.orb.n,half(1)), o.m[2])
+
+"""
+    other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
+
+The orthogonal complement to [`OrbitalAngularMomentumSubSystem`](@ref)
+is characterized by the quantum numbers ``n s``; the projection of the
+latter is not a good quantum number in the coupled basis.
+"""
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((o.orb.n,half(1)), missing)
 
@@ -136,8 +181,24 @@ not a good quantum number.
 quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     (half(1), missing)
 
+"""
+    other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:Orbital})
+
+The orthogonal complement to [`SpinSubSystem`](@ref) is
+[`SpatialSubSystem`](@ref) which is characterized by the quantum
+numbers ``n \\ell m_\\ell``.
+"""
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:Orbital}) =
     ((o.orb.n,o.orb.ℓ), o.m[1])
+
+"""
+    other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital})
+
+The orthogonal complement to [`SpinSubSystem`](@ref) is
+[`SpatialSubSystem`](@ref) which is characterized by the quantum
+numbers ``n \\ell``; the projection of the latter is not a good
+quantum number in the coupled basis.
+"""
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((o.orb.n,o.orb.ℓ), missing)
 
@@ -171,13 +232,27 @@ The total angular momentum subsystem of a coupled spin-orbital just
 quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((o.orb.ℓ, half(1), o.orb.j), o.m[1])
 
+"""
+    other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital})
+
+The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
+is characterized by the quantum number ``n``.
+"""
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
     (o.orb.n, missing)
+
+"""
+    other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
+
+The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
+is characterized by the quantum number ``n``.
+"""
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     (o.orb.n, missing)
 
 
-export quantum_numbers, SubSystem, FullSystem,
+export quantum_numbers, other_quantum_numbers,
+    SubSystem, FullSystem,
     SpatialSubSystem,
     OrbitalAngularMomentumSubSystem, SpinSubSystem,
     TotalAngularMomentumSubSystem

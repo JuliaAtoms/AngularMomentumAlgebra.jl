@@ -9,7 +9,7 @@ The angular momentum ``\\tensor{L}`` is associated with the spatial
 coordinates ``\\theta`` and ``\\phi``.
 """
 struct OrbitalAngularMomentum <: AngularMomentum{'L'} end
-system(::OrbitalAngularMomentum) = OrbitalAngularMomentumSubSystem()
+system(::Type{OrbitalAngularMomentum}) = OrbitalAngularMomentumSubSystem()
 
 @tensor(OrbitalAngularMomentum) do
     ℓ′ == ℓ
@@ -49,7 +49,7 @@ The spin angular momentum ``\\tensor{S}`` is the intrinsic angular
 momentum associated with the coordinate ``s``.
 """
 struct SpinAngularMomentum <: AngularMomentum{'S'} end
-system(::SpinAngularMomentum) = SpinSubSystem()
+system(::Type{SpinAngularMomentum}) = SpinSubSystem()
 
 @tensor(SpinAngularMomentum) do
     s′ == s
@@ -90,7 +90,7 @@ The total angular momentum ``\\tensor{J} = \\tensor{L} + \\tensor{S}``
 results from the coupling of the orbital and spin angular momenta.
 """
 struct TotalAngularMomentum <: AngularMomentum{'J'} end
-system(::TotalAngularMomentum) = TotalAngularMomentumSubSystem()
+system(::Type{TotalAngularMomentum}) = TotalAngularMomentumSubSystem()
 
 @tensor(TotalAngularMomentum) do
     begin

@@ -86,7 +86,7 @@ julia> dot(c, ∂x, a)
 
 ```@docs
 Gradient
-system(::Gradient)
+system(::Type{Gradient})
 AngularMomentumAlgebra.RadialGradientMatrixElement
 rme((n′,ℓ′)::Tuple{<:Number, <:Number}, ::Gradient, (n,ℓ)::Tuple{<:Number, <:Number})
 AngularMomentumAlgebra.couplings(tensor::Gradient, (n,ℓ)::Tuple{<:Number, <:Number})

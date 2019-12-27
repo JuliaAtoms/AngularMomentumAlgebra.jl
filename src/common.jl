@@ -59,10 +59,7 @@ values for equality and quick-returns `0` at the first inequality.
 """
 macro δ(vars...)
     code = map(vars) do v
-        v.head == :tuple && length(v.args) == 2 ||
-            throw(ArgumentError("Expected tuple of 2 variables to compare"))
-        a,b = v.args
-        :($(esc(a)) == $(esc(b)) || return 0)
+        :(isequal($(esc(v))...) || return 0)
     end
     Expr(:block, code..., :(1))
 end

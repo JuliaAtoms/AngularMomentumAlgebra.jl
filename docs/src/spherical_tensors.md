@@ -19,7 +19,7 @@ Y^k_q.
 
 ```@docs
 SphericalTensor
-system(::SphericalTensor)
+system(::Type{SphericalTensor})
 rme(ℓ′::Real,𝐂̂ᵏ::SphericalTensor,ℓ::Real)
 AngularMomentumAlgebra.couplings(tensor::SphericalTensor,ℓ)
 AngularMomentumAlgebra.ranks
@@ -44,7 +44,7 @@ r
 
 ```@docs
 Dipole
-system(::Dipole)
+system(::Type{Dipole})
 AngularMomentumAlgebra.RadialMatrixElement
 rme((n′,ℓ′), ::Dipole, (n,ℓ))
 AngularMomentumAlgebra.couplings(tensor::Dipole, (n,ℓ)::Tuple{<:Number, <:Number})

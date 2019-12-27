@@ -75,4 +75,5 @@ julia> quantum_numbers(TotalAngularMomentumSubSystem(), ro)
 
 ```@docs
 AngularMomentumAlgebra.quantum_numbers
+AngularMomentumAlgebra.other_quantum_numbers
 ```

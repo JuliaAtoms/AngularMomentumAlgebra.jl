@@ -44,12 +44,12 @@ Construct a Coulomb interaction tensor of rank `k`.
 struct CoulombTensor{k} <: Tensor{k,'K'} end
 
 """
-    system(::CoulombTensor)
+    system(::Type{CoulombTensor})
 
 A Coulomb tensor only acts on the coordinates ``r``, ``\\theta`` and
 ``\\phi``.
 """
-system(::CoulombTensor) = SpatialSubSystem()
+system(::Type{<:CoulombTensor}) = SpatialSubSystem()
 
 @doc raw"""
     RadialCoulombMatrixElement

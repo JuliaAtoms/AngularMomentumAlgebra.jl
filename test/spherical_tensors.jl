@@ -1,4 +1,5 @@
 @testset "Spherical tensors" begin
+    @test system(TensorComponent(SphericalTensor(1), 1)) == OrbitalAngularMomentumSubSystem()
     @testset "Reduced matrix elements" begin
         for k = 0:6
             𝐂ᵏ = SphericalTensor(k)

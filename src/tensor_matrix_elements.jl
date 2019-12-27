@@ -321,7 +321,7 @@ end
 # ** Uncoupled basis states
 
 @doc raw"""
-    matrix_element2((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+    matrix_element2(γjm₁′, γjm₂′, X::TensorScalarProduct, γjm₁, γjm₂)
 
 The matrix element of a scalar product of two tensors acting on
 different coordinates is given by (in the uncoupled basis)
@@ -329,20 +329,20 @@ different coordinates is given by (in the uncoupled basis)
 ```math
 \begin{equation}
 \begin{aligned}
-&\matrixel{n_aj_am_a;n_bj_bm_b}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{n_cj_cm_c;n_dj_dm_d}\\
+&\matrixel{\gamma_1'j_1'm_1';\gamma_2'j_2'm_2'}{[\tensor{P}^{(k)}(1)\cdot\tensor{Q}^{(k)}(2)]}{\gamma_1j_1m_1;\gamma_2j_2m_2}\\
 =&
-\frac{1}{\angroot{j_aj_b}}
+\frac{1}{\angroot{j_1'j_2'}}
 \sum_\alpha(-)^{-\alpha}
-C_{j_cm_c;k,\alpha}^{j_am_a}
-C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
+C_{j_1m_1;k,\alpha}^{j_1'm_1'}
+C_{j_2m_2;k,-\alpha}^{j_2'm_2'}\\
 &\times
-\redmatrixel{n_aj_a}{\tensor{P}^{(k)}(1)}{n_cj_c}
-\redmatrixel{n_bj_b}{\tensor{Q}^{(k)}(2)}{n_dj_d} \\
+\redmatrixel{\gamma_1'j_1'}{\tensor{P}^{(k)}(1)}{\gamma_1j_1}
+\redmatrixel{\gamma_2'j_2'}{\tensor{Q}^{(k)}(2)}{\gamma_2j_2} \\
 \equiv&
 \sum_\alpha
 (-)^{-\alpha}
-\matrixel{n_aj_am_a}{\tensor{P}^{(k)}_{\alpha}(1)}{n_cj_cm_c}
-\matrixel{n_bj_bm_b}{\tensor{Q}^{(k)}_{-\alpha}(2)}{n_dj_dm_d}
+\matrixel{\gamma_1'j_1'm_1'}{\tensor{P}^{(k)}_{\alpha}(1)}{\gamma_1j_1m_1}
+\matrixel{\gamma_2'j_2'm_2'}{\tensor{Q}^{(k)}_{-\alpha}(2)}{\gamma_2j_2m_2}
 \end{aligned}
 \tag{V13.1.26}
 \label{eqn:scalar-product-tensor-matrix-element-diff-coords-uncoupled}
@@ -350,17 +350,15 @@ C_{j_dm_d;k,-\alpha}^{j_bm_b}\\
 ```
 
 Since the [Clebsch–Gordan coefficients](@ref) can be rewritten using 3j
-symbols and the 3j symbols vanish unless $m_c + \alpha - m_3 = m_d -
-\alpha - m_b = 0$, we have
+symbols and the 3j symbols vanish unless $m_1 + \alpha - m_1' = m_2 -
+\alpha - m_2' = 0$, we have
 
 ```math
-\alpha = m_a - m_c = m_d-m_b
-\implies
--\alpha + m_a + m_b = m_b + m_c.
+\alpha = m_1' - m_1 = m_2-m_2'
 ```
 
 This case occurs in two-body interactions, such as the [Coulomb
-interaction](@ref), where ``a,b`` and ``c,d`` are pairs of orbitals
+interaction](@ref), where ``1',1`` and ``2',2`` are pairs of orbitals
 and the scalar product tensor is a term in the multipole expansion in
 terms of [Spherical tensors](@ref tensors_spherical_tensors):
 
@@ -401,13 +399,7 @@ a constant of motion), except for _pure states_, i.e. those with
 maximal ``\abs{m_\ell + m_s}``:
 
 ```jldoctest
-julia> 𝐋 = OrbitalAngularMomentum()
-𝐋̂⁽¹⁾
-
-julia> 𝐒 = SpinAngularMomentum()
-𝐒̂⁽¹⁾
-
-julia> X = 𝐋⋅𝐒
+julia> X = OrbitalAngularMomentum()⋅SpinAngularMomentum()
 (𝐋̂⁽¹⁾⋅𝐒̂⁽¹⁾)
 
 julia> matrix_element2((1, 1), (half(1), half(1)),
@@ -418,16 +410,16 @@ julia> 1/2*(half(3)*(half(3)+1)-1*(1+1)-half(1)*(half(1)+1)) # 1/2(J(J+1)-L(L+1)
 0.5
 ```
 """
-function matrix_element2((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+function matrix_element2(γjm₁′, γjm₂′, X::TensorScalarProduct, γjm₁, γjm₂)
     T,U = X.T,X.U
     k = rank(T)
 
-    α = Int(m₁′-m₁)
-    (α != m₂-m₂′ || abs(α) > k) && return 0
+    α = Int(last(γjm₁′)-last(γjm₁))
+    (α != last(γjm₂)-last(γjm₂′) || abs(α) > k) && return 0
 
     powneg1(-α)*
-    matrix_element((γj₁′, m₁′), TensorComponent(T,α), (γj₁, m₁))*
-    matrix_element((γj₂′, m₂′), TensorComponent(U,-α), (γj₂, m₂))
+    matrix_element(γjm₁′, TensorComponent(T,α), γjm₁)*
+    matrix_element(γjm₂′, TensorComponent(U,-α), γjm₂)
 end
 
 @doc raw"""
@@ -450,6 +442,15 @@ different coordinates is given by (in the coupled basis)
 \tag{V13.1.29}
 \label{eqn:scalar-product-tensor-matrix-element-diff-coords-coupled}
 \end{equation}
+```
+
+```jldoctest
+julia> X = OrbitalAngularMomentum()⋅SpinAngularMomentum()
+(𝐋̂⁽¹⁾⋅𝐒̂⁽¹⁾)
+
+julia> matrix_element2((1, half(1), half(3), half(3)),
+                       X, (1, half(1), half(3), half(3)))
+0.4999999999999999
 ```
 """
 function matrix_element2((γj₁′, γj₂′, j′, m′), X::TensorScalarProduct, (γj₁, γj₂, j, m))
@@ -563,6 +564,10 @@ julia> dot(a, cartesian_tensor_component(𝐉, :z), a), sum(a.m)
 julia> dot(a, TensorComponent(𝐋, 0), a)
 0.9999999999999999
 
+julia> # Same as previous, but with spin down
+       dot(a, TensorComponent(𝐋, 0), SpinOrbital(o"2p", 1, -half(1)))
+0
+
 julia> dot(d, TensorComponent(𝐋, 0), d)
 1.9999999999999998
 
@@ -611,6 +616,42 @@ LinearAlgebra.dot(a::SpinOrbital,
                   𝐓ᵏq::Union{TensorComponent,TensorScalarProduct},
                   b::SpinOrbital) =
                       matrix_element(system(𝐓ᵏq), a, 𝐓ᵏq, b)
+
+"""
+    dot((a,b)::Tuple, X::TensorScalarProduct, (c,d)::Tuple)
+
+Compute the matrix element `⟨a(1)b(2)|𝐓(1)⋅𝐔(2)|c(1)d(2)⟩` in the
+basis of spin-orbitals, dispatching the correct low-level function
+`matrix_element` depending on the value of `system(X)`, where `X` is
+the scalar product tensor.
+
+# Examples
+
+```jldoctest
+julia> 𝐊⁰,𝐊² = CoulombTensor(0),CoulombTensor(2)
+(𝐊̂⁽⁰⁾, 𝐊̂⁽²⁾)
+
+julia> a,b = SpinOrbital(o"1s", 0, half(1)),SpinOrbital(o"3d", 0, half(1))
+(1s₀α, 3d₀α)
+
+julia> dot((a,b), 𝐊⁰⋅𝐊⁰, (a,b))
+1.0
+
+julia> dot((a,b), 𝐊²⋅𝐊², (b,a))
+0.19999999999999998
+
+julia> a,b = SpinOrbital(ro"1s", half(1)),SpinOrbital(ro"3d", half(1))
+(1s(1/2), 3d(1/2))
+
+julia> dot((a,b), 𝐊⁰⋅𝐊⁰, (a,b))
+1.0
+
+julia> dot((a,b), 𝐊²⋅𝐊², (b,a))
+0.12
+```
+"""
+LinearAlgebra.dot((a,b)::Tuple, X::TensorScalarProduct, (c,d)::Tuple) =
+    matrix_element(system(X), (a,b), X, (c,d))
 
 LinearAlgebra.dot(o′, lct::LinearCombinationTensor, o) =
     sum(filter!(!iszero, [c*dot(o′, Tᵏq, o) for (Tᵏq,c) in lct]))
@@ -704,18 +745,18 @@ Apart from the additional factor ``\delta_{n_2'n_2}\delta_{j_2'j_2}``,
 this expression is equivalent to
 ``\eqref{eqn:scalar-product-tensor-matrix-element}``.
 """
-function matrix_element(systems::Tuple{S,S},
+function matrix_element((s,_)::Tuple{S,S},
                         a::SpinOrbital{<:RelativisticOrbital},
                         X::TensorScalarProduct,
                         b::SpinOrbital{<:RelativisticOrbital}) where {S<:SubSystem}
-    γj₁′, γj₁ = first.(quantum_numbers(systems[1], a, b))
-    γj₂′, γj₂ = first.(other_quantum_numbers(systems[1], a, b))
+    γj₁′, γj₁ = first.(quantum_numbers(s, a, b))
+    γj₂′, γj₂ = first.(other_quantum_numbers(s, a, b))
     @δ γj₂′,γj₂ a.orb.j,b.orb.j
     matrix_element((γj₁′, a.m[1]), X, (γj₁, b.m[1]))
 end
 
 """
-    matrix_element(systems::Tuple{<:SubSystem,<:SubSystem},
+    matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
                    a::SpinOrbital{<:RelativisticOrbital},
                    X::TensorScalarProduct,
                    b::SpinOrbital{<:RelativisticOrbital})
@@ -725,13 +766,48 @@ on different subsystems, evaluated in the basis of coupled
 spin-orbitals, is computed using
 ``\\eqref{eqn:scalar-product-tensor-matrix-element-diff-coords-coupled}``.
 """
-function matrix_element(systems::Tuple{<:SubSystem,<:SubSystem},
+function matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
                         a::SpinOrbital{<:RelativisticOrbital},
                         X::TensorScalarProduct,
                         b::SpinOrbital{<:RelativisticOrbital})
-    γj₁′, γj₁ = first.(quantum_numbers(systems[1], a, b))
-    γj₂′, γj₂ = first.(quantum_numbers(systems[2], a, b))
+    γj₁′, γj₁ = first.(quantum_numbers(s₁, a, b))
+    γj₂′, γj₂ = first.(quantum_numbers(s₂, a, b))
     matrix_element2((γj₁′, γj₂′, a.orb.j, a.m[1]), X, (γj₁, γj₂, b.orb.j, b.m[1]))
+end
+
+"""
+    matrix_element((s₁,s₂)::Tuple{<:System,<:System},
+                   (a,b)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                                <:SpinOrbital{<:RelativisticOrbital}},
+                   X::TensorScalarProduct,
+                   (c,d)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                                <:SpinOrbital{<:RelativisticOrbital}})
+
+The matrix element of a tensor scalar product, where the factors act
+on the orbital pairs `a`,`c` and `b`,`d`, respectively, evaluated in
+the basis of coupled spin-orbitals, is computed using
+``\\eqref{eqn:scalar-product-tensor-matrix-element-diff-coords-uncoupled}``
+together with ``\\eqref{eqn:uncoupling}`` applied to each matrix
+element between single orbitals; the individual spin-orbitals couple
+``\\ell`` and ``s`` to form a total ``j``, but they are not further
+coupled to e.g. a term.
+"""
+function matrix_element((s₁,s₂)::Tuple{<:System,<:System},
+                        (a,b)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                                     <:SpinOrbital{<:RelativisticOrbital}},
+                        X::TensorScalarProduct,
+                        (c,d)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                                     <:SpinOrbital{<:RelativisticOrbital}})
+    γjm₁′ = (first(quantum_numbers(s₁, a)), first(other_quantum_numbers(s₁, a)),
+             a.orb.j, a.m[1])
+    γjm₂′ = (first(quantum_numbers(s₂, b)), first(other_quantum_numbers(s₂, b)),
+             b.orb.j, b.m[1])
+    γjm₁ = (first(quantum_numbers(s₁, c)), first(other_quantum_numbers(s₁, c)),
+            c.orb.j, c.m[1])
+    γjm₂ = (first(quantum_numbers(s₂, d)), first(other_quantum_numbers(s₂, d)),
+            d.orb.j, d.m[1])
+
+    matrix_element2(γjm₁′, γjm₂′, X, γjm₁, γjm₂)
 end
 
 # ** Uncoupled orbitals
@@ -815,18 +891,17 @@ spin-orbitals, is just a special case of
 ``\\eqref{eqn:tensor-matrix-element-subsystem-uncoupled}`` combined
 with ``\\eqref{eqn:scalar-product-tensor-matrix-element}``.
 """
-function matrix_element(systems::Tuple{S,S},
+function matrix_element((s,_)::Tuple{S,S},
                         a::SpinOrbital{<:Orbital},
                         X::TensorScalarProduct,
                         b::SpinOrbital{<:Orbital}) where {S<:SubSystem}
-    γjm₂′,γjm₂ = other_quantum_numbers(systems[1], a, b)
-    @δ γjm₂′,γjm₂
-    matrix_element(quantum_numbers(systems[1], a),
-                   X, quantum_numbers(systems[1], b))
+    @δ other_quantum_numbers(s, a, b)
+    matrix_element(quantum_numbers(s, a),
+                   X, quantum_numbers(s, b))
 end
 
 """
-    matrix_element(systems::Tuple{<:SubSystem,<:SubSystem},
+    matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
                    a::SpinOrbital{<:Orbital},
                    X::TensorScalarProduct,
                    b::SpinOrbital{<:Orbital})
@@ -836,196 +911,38 @@ on different subsystems, evaluated in the basis of uncoupled
 spin-orbitals, is computed using
 ``\\eqref{eqn:scalar-product-tensor-matrix-element-diff-coords-uncoupled}``.
 """
-function matrix_element(systems::Tuple{<:SubSystem,<:SubSystem},
+function matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
                         a::SpinOrbital{<:Orbital},
                         X::TensorScalarProduct,
                         b::SpinOrbital{<:Orbital})
-    γjm₁′, γjm₁ = quantum_numbers(systems[1], a, b)
-    γjm₂′, γjm₂ = quantum_numbers(systems[2], a, b)
+    γjm₁′, γjm₁ = quantum_numbers(s₁, a, b)
+    γjm₂′, γjm₂ = quantum_numbers(s₂, a, b)
     matrix_element2(γjm₁′, γjm₂′, X, γjm₁, γjm₂)
 end
 
-# * Old stuff
-
-complementary_space_factor(::Union{FullSystem,TotalAngularMomentumSubSystem}, _, _, _) = 1
-
-@doc raw"""
-    complementary_space_factor(::SpatialSubSystems, k,
-                               o′::SpinOrbital{<:Orbital},
-                               o::SpinOrbital{<:Orbital})
-
-Tensors acting on the spatial coordinates only, are diagonal in spin
-space:
-
-```math
-\begin{equation}
-\tag{V13.2.3}
-\matrixel{n'\ell'm_\ell';s'm_s'}{\tensor{M}^{(k)}_q(r,\theta,\phi)}{n\ell m_\ell;sm_s} =
-\delta_{ss'}\delta_{m_sm_s'}
-\matrixel{n'\ell'm_\ell'}{\tensor{M}^{(k)}_q(r,\theta,\phi)}{n\ell m_\ell}
-\end{equation}
-```
 """
-function complementary_space_factor(::SpatialSubSystems, k,
-                                    o′::SpinOrbital{<:Orbital},
-                                    o::SpinOrbital{<:Orbital})
-    (s′,mₛ′),(s,mₛ) = quantum_numbers(SpinSubSystem(), o′, o)
-    @δ s,s′ mₛ,mₛ′
+    matrix_element((s₁,s₂)::Tuple{<:System,<:System},
+                   (a,b)::Tuple{<:SpinOrbital{<:Orbital},
+                                <:SpinOrbital{<:Orbital}},
+                   X::TensorScalarProduct,
+                   (c,d)::Tuple{<:SpinOrbital{<:Orbital},
+                                <:SpinOrbital{<:Orbital}})
+
+The matrix element of a tensor scalar product, where the factors act
+on the orbital pairs `a`,`c` and `b`,`d`, respectively, evaluated in
+the basis of uncoupled spin-orbitals, is computed using
+``\\eqref{eqn:scalar-product-tensor-matrix-element-diff-coords-uncoupled}``.
+"""
+function matrix_element((s₁,s₂)::Tuple{<:System,<:System},
+                        (a,b)::Tuple{<:SpinOrbital{<:Orbital},
+                                     <:SpinOrbital{<:Orbital}},
+                        X::TensorScalarProduct,
+                        (c,d)::Tuple{<:SpinOrbital{<:Orbital},
+                                     <:SpinOrbital{<:Orbital}})
+    @δ other_quantum_numbers(s₁, a, c) other_quantum_numbers(s₂, b, d)
+    γjm₁′, γjm₁ = quantum_numbers(s₁, a, c)
+    γjm₂′, γjm₂ = quantum_numbers(s₂, b, d)
+    matrix_element2(γjm₁′, γjm₂′, X, γjm₁, γjm₂)
 end
 
-@doc raw"""
-    complementary_space_factor(::SpinSubSystem, k,
-                               o′::SpinOrbital{<:Orbital},
-                               o::SpinOrbital{<:Orbital})
-
-Tensors acting on the spin coordinates only, are diagonal in the spatial coordinates:
-
-```math
-\begin{equation}
-\tag{V13.2.4}
-\matrixel{n'\ell'm_\ell';s'm_s'}{\tensor{N}^{(k)}_q(\xi)}{n\ell m_\ell;sm_s} =
-\delta_{\ell\ell'}\delta_{m_\ell m_\ell'}
-\matrixel{s'm_s'}{\tensor{N}^{(k)}_q(\xi)}{sm_s}
-\end{equation}
-```
-"""
-function complementary_space_factor(::SpinSubSystem, k,
-                                    o′::SpinOrbital{<:Orbital},
-                                    o::SpinOrbital{<:Orbital})
-    (ℓ′,mℓ′),(ℓ,mℓ) = quantum_numbers(OrbitalAngularMomentumSubSystem(), o′, o)
-    @δ ℓ,ℓ′ mℓ,mℓ′
-end
-
-@doc raw"""
-    complementary_space_factor(::SpatialSubSystems, k,
-                               o′::SpinOrbital{<:RelativisticOrbital},
-                               o::SpinOrbital{<:RelativisticOrbital})
-
-Tensors acting on the spatial coordinates only, are diagonal in spin
-space; in the coupled basis, the following uncoupling formula must be
-employed:
-
-```math
-\begin{equation}
-\tag{V13.2.5}
-\redmatrixel{n'\ell's'J'}{\tensor{M}^{(k)}}{n\ell s J} =
-\delta_{ss'}
-(-)^{J+\ell'+s'+k}
-\angroot{JJ'}
-\wignersixj{\ell&s&J\\J'&k&\ell'}
-\redmatrixel{n'\ell'}{\tensor{M}^{(k)}}{n\ell}
-\end{equation}
-```
-"""
-function complementary_space_factor(::SpatialSubSystems, k,
-                                    o′::SpinOrbital{<:RelativisticOrbital},
-                                    o::SpinOrbital{<:RelativisticOrbital})
-    ((ℓ′,s′,J′),mₛ′),((ℓ,s,J),mₛ) = quantum_numbers(TotalAngularMomentumSubSystem(), o′, o)
-    @δ s,s′
-    powneg1(Int(J+ℓ′+s′+k))*∏(J,J′)*wigner6j(ℓ,  s, J,
-                                             J′, k, ℓ′)
-end
-
-@doc raw"""
-    complementary_space_factor(::SpinSubSystem, k,
-                               o′::SpinOrbital{<:RelativisticOrbital},
-                               o::SpinOrbital{<:RelativisticOrbital})
-
-Tensors acting on the spin coordinates only, are diagonal in the
-spatial coordinates; in the coupled basis, the following uncoupling
-formula must be employed:
-
-```math
-\begin{equation}
-\tag{V13.2.6}
-\redmatrixel{n'\ell's'J'}{\tensor{N}^{(k)}}{n\ell s J} =
-\delta_{\ell\ell'}
-(-)^{J'+\ell+s+k}
-\angroot{JJ'}
-\wignersixj{s&\ell&J\\J'&k&s'}
-\redmatrixel{n's'}{\tensor{N}^{(k)}}{ns}
-\end{equation}
-```
-"""
-function complementary_space_factor(::SpinSubSystem, k,
-                                    o′::SpinOrbital{<:RelativisticOrbital},
-                                    o::SpinOrbital{<:RelativisticOrbital})
-    ((ℓ′,s′,J′),mₛ′),((ℓ,s,J),mₛ) = quantum_numbers(TotalAngularMomentumSubSystem(), o′, o)
-    @δ ℓ,ℓ′
-    powneg1(Int(J′+ℓ+s+k))*∏(J,J′)*wigner6j(s,  ℓ, J,
-                                            J′, k, s′)
-end
-
-total_system(s, _) = s
-total_system(_, ::SpinOrbital{<:RelativisticOrbital}) = TotalAngularMomentumSubSystem()
-
-"""
-    rme_j′j(o′::SpinOrbital, T::Tensor, o::SpinOrbital)
-
-Return the reduced matrix element `⟨o′||T||o⟩` and the two angular
-momenta pertaining to the tensor `T`, along with their projections.
-"""
-function rme_j′j(o′::SpinOrbital, T::Tensor, o::SpinOrbital)
-    o′, T, o
-    s = system(T)
-    f = complementary_space_factor(s, rank(T), o′, o)
-    (γ′,_),(γ,_) = quantum_numbers(s, o′, o)
-    # The j′,m′,j,m appearing in the prefactor of the Wigner–Eckart
-    # theorem are the total angular momenta and their projections for
-    # coupled spin-orbitals and the angular momenta and their
-    # projections of the subsystem acted upon by the tensor T for
-    # uncoupled spin-orbitals.
-    (γ̃′,m′),(γ̃,m) = quantum_numbers(total_system(s, o′), o′, o)
-    j′,j = last(γ̃′),last(γ̃)
-    (iszero(f) ? 0 : f*rme(γ′, T, γ)),(j′,m′),(j,m)
-end
-
-couples(o′::SpinOrbital, T::Tensor, o::SpinOrbital) =
-    !iszero(first(rme_j′j(o′, T, o)))
-
-"""
-    dot((a,b), X, (c,d))
-
-Perform the spin-angular integration of the scalar-product tensor
-`X≡(T⁽ᵏ⁾⋅U⁽ᵏ⁾)`, where `T` acts on the coordinate of orbitals `a` &
-`c` and similarly, `U` acts on the coordinate of orbitals `b` &
-`d`, according to Eq. (13.1.26) of Varshalovich (1988).
-
-# Examples
-
-```jldoctest
-julia> a = SpinOrbital(ro"1s", half(1))
-1s(1/2)
-
-julia> b = SpinOrbital(ro"3d", half(1))
-3d(1/2)
-
-julia> 𝐂 = SphericalTensor(2)
-𝐂̂⁽²⁾
-
-julia> X = dot(𝐂,𝐂)
-(𝐂̂⁽²⁾⋅𝐂̂⁽²⁾)
-
-julia> dot((a,b), X, (b,a))
-0.12000000000000001
-```
-"""
-function LinearAlgebra.dot((a,b)::Tuple, X::TensorScalarProduct, (c,d)::Tuple)
-    T,U = X.T,X.U
-    k = rank(T)
-
-    Tr,(ja,ma),(jc,mc) = rme_j′j(a,T,c)
-    iszero(Tr) && return 0
-    Ur,(jb,mb),(jd,md) = rme_j′j(b,U,d)
-    iszero(Ur) && return 0
-
-    α = Int(ma-mc)
-    (α != md-mb || abs(α) > k) && return 0
-
-    inv(∏(ja,jb)) * powneg1(-α) *
-        clebschgordan(jc, mc, k, α, ja, ma) *
-        clebschgordan(jd, md, k, -α, jb, mb) *
-        Tr*Ur
-end
-
-export matrix_element, matrix_element2, matrix_element_via_uncoupling
+export matrix_element, matrix_element2

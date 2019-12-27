@@ -45,12 +45,4 @@ function multipole_expand(integral::OrbitalMatrixElement{2,<:Any,<:CoulombIntera
     NBodyMatrixElement(terms)
 end
 
-# """
-#     multipole_expand(integral::NBodyTermFactor)
-
-# Dummy method that returns `integral` unchanged, used for all
-# `NBodyTermFactor`s that are _not_ to be multipole-expanded.
-# """
-# multipole_expand(integral::NBodyTermFactor) = NBodyMatrixElement([integral])
-
 export multipole_expand_scalar_product, multipole_expand
