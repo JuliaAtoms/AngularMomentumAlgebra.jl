@@ -8,12 +8,12 @@ Construct a spherical tensor of rank `k`.
 struct SphericalTensor{k} <: Tensor{k,'C'} end
 
 """
-    system(::SphericalTensor)
+    system(::Type{SphericalTensor})
 
 A spherical tensor only acts on the coordinates ``\\theta`` and
 ``\\phi``.
 """
-system(::SphericalTensor) = OrbitalAngularMomentumSubSystem()
+system(::Type{<:SphericalTensor}) = OrbitalAngularMomentumSubSystem()
 
 @tensor(SphericalTensor{k} where k) do
     ℓ′ ∈ abs(ℓ - k):2:(ℓ+k)
@@ -40,9 +40,6 @@ C_{\ell 0;k,0}^{\ell'0} =
     ∏(ℓ)*clebschgordan(ℓ,0,k,0,ℓ′,0)
 end
 
-couples(a::SpinOrbital{<:Orbital}, ::Type{SphericalTensor}, b::SpinOrbital{<:Orbital}) =
-    a.m[2] == b.m[2]
-
 """
     ranks(a, ::Type{SphericalTensor}, b)
 
@@ -62,12 +59,12 @@ Construct a dipole tensor
 struct Dipole <: Tensor{1,'D'} end
 
 """
-    system(::Dipole)
+    system(::Type{Dipole})
 
 A dipole tensor only acts on the coordinates ``r``, ``\\theta`` and
 ``\\phi``.
 """
-system(::Dipole) = SpatialSubSystem()
+system(::Type{Dipole}) = SpatialSubSystem()
 
 @doc raw"""
     RadialMatrixElement()

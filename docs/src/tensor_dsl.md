@@ -3,7 +3,7 @@
 When specifying a new tensor type, a few functions need to be
 provided:
 
-- `AngularMomentumAlgebra.system(::TensorType)` which returns the
+- `AngularMomentumAlgebra.system(::Type{TensorType})` which returns the
   [`AngularMomentumAlgebra.System`](@ref) the tensor acts on,
 - `Base.iszero` which indicates whether a reduced matrix element of
   the tensor vanishes without actually computing it,

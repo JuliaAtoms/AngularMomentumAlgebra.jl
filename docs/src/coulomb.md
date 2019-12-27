@@ -80,7 +80,7 @@ is the Heaviside function, we can rewrite the Coulomb interaction as
 CoulombInteractionMultipole
 CoulombPotentialMultipole
 CoulombTensor
-system(::CoulombTensor)
+system(::Type{CoulombTensor})
 AngularMomentumAlgebra.RadialCoulombMatrixElement
 rme((n′,ℓ′), ::CoulombTensor, (n,ℓ))
 AngularMomentumAlgebra.couplings(tensor::CoulombTensor, (n,ℓ)::Tuple{<:Number, <:Number})

@@ -22,7 +22,7 @@ cases:
 
 | Basis \ Tensor | Acts on entire system                                | Acts on subsystems                     |
 |----------------|------------------------------------------------------|----------------------------------------|
-| **Uncoupled**  | Transform to coupled basis: ``\eqref{eqn:coupling}`` | [Direct evaluation](@ref)              |
+| **Uncoupled**  | Transform to coupled basis: ``\eqref{eqn:coupling}`` | [Evaluation in subspace](@ref)         |
 | **Coupled**    | Wigner–Eckart: ``\eqref{eqn:wigner-eckart}``         | Uncoupling: ``\eqref{eqn:uncoupling}`` |
 
 ## Interface
@@ -50,6 +50,7 @@ There are two main functions in the high-level interface:
 
 ```@docs
 LinearAlgebra.dot(a::SpinOrbital, 𝐓ᵏq::TensorComponent, b::SpinOrbital)
+LinearAlgebra.dot((a,b)::Tuple, X::TensorScalarProduct, (c,d)::Tuple)
 ```
 
 #### Intermediate-level interface
@@ -69,28 +70,63 @@ operators acts on a subsystem, the uncoupling formula
 ``\eqref{eqn:uncoupling}`` has to be employed.
 
 ```@docs
-matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem}, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
-matrix_element(system, a::SpinOrbital{<:RelativisticOrbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:RelativisticOrbital})
-matrix_element(::Tuple{S,S}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
-matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital}) where {S<:SubSystem}
-matrix_element(systems::Tuple{<:SubSystem,<:SubSystem}, a::SpinOrbital{<:RelativisticOrbital}, X::TensorScalarProduct, b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(::Union{FullSystem,TotalAngularMomentumSubSystem},
+               a::SpinOrbital{<:RelativisticOrbital},
+               𝐓ᵏq::TensorComponent,
+               b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(system,
+               a::SpinOrbital{<:RelativisticOrbital},
+               𝐓ᵏq::TensorComponent,
+               b::SpinOrbital{<:RelativisticOrbital})
+matrix_element(::Tuple{S,S},
+               a::SpinOrbital{<:RelativisticOrbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:RelativisticOrbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
+matrix_element(systems::Tuple{S,S},
+               a::SpinOrbital{<:RelativisticOrbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:RelativisticOrbital}) where {S<:SubSystem}
+matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
+               a::SpinOrbital{<:RelativisticOrbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:RelativisticOrbital})
+matrix_element((s₁,s₂)::Tuple{<:AngularMomentumAlgebra.System,<:AngularMomentumAlgebra.System},
+               (a,b)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                            <:SpinOrbital{<:RelativisticOrbital}},
+               X::TensorScalarProduct,
+               (c,d)::Tuple{<:SpinOrbital{<:RelativisticOrbital},
+                            <:SpinOrbital{<:RelativisticOrbital}})
 ```
-
-- [x] ``\matrixel{a}{\tensor{L}^2}{b}``, ``\matrixel{a}{\tensor{S}^2}{b}``
-  Scalar product tensors acting on one coordinate only
-- [x] ``\matrixel{a}{\tensor{L}\cdot\tensor{S}}{b}`` Scalar product tensor acting on two
-  different coordinates of the same orbital
-- [ ] ``\matrixel{ab}{\tensor{C}^{(k)}\cdot\tensor{C}^{(k)}}{cd}`` Scalar
-  product tensor acting on (subsystems of) two different orbitals
 
 ##### Uncoupled orbitals
 
 ```@docs
-matrix_element(system::Union{FullSystem,TotalAngularMomentumSubSystem}, a::SpinOrbital{<:Orbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:Orbital})
-matrix_element(system, a::SpinOrbital{<:Orbital}, 𝐓ᵏq::TensorComponent, b::SpinOrbital{<:Orbital})
-matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
-matrix_element(systems::Tuple{S,S}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital}) where {S<:SubSystem}
-matrix_element(systems::Tuple{<:SubSystem,<:SubSystem}, a::SpinOrbital{<:Orbital}, X::TensorScalarProduct, b::SpinOrbital{<:Orbital})
+matrix_element(system::Union{FullSystem,TotalAngularMomentumSubSystem},
+               a::SpinOrbital{<:Orbital},
+               𝐓ᵏq::TensorComponent,
+               b::SpinOrbital{<:Orbital})
+matrix_element(system,
+               a::SpinOrbital{<:Orbital},
+               𝐓ᵏq::TensorComponent,
+               b::SpinOrbital{<:Orbital})
+matrix_element(systems::Tuple{S,S},
+               a::SpinOrbital{<:Orbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:Orbital}) where {S<:Union{FullSystem,TotalAngularMomentumSubSystem}}
+matrix_element(systems::Tuple{S,S},
+               a::SpinOrbital{<:Orbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:Orbital}) where {S<:SubSystem}
+matrix_element((s₁,s₂)::Tuple{<:SubSystem,<:SubSystem},
+               a::SpinOrbital{<:Orbital},
+               X::TensorScalarProduct,
+               b::SpinOrbital{<:Orbital})
+matrix_element((s₁,s₂)::Tuple{<:AngularMomentumAlgebra.System,<:AngularMomentumAlgebra.System},
+               (a,b)::Tuple{<:SpinOrbital{<:Orbital},
+                            <:SpinOrbital{<:Orbital}},
+               X::TensorScalarProduct,
+               (c,d)::Tuple{<:SpinOrbital{<:Orbital},
+                            <:SpinOrbital{<:Orbital}})
 ```
 
 ## Tensor acts on entire system
@@ -132,29 +168,18 @@ matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, <:Any, <:Number,
                (γj₁, γj₂, j, m)::Tuple{<:Any, <:Any, <:Number, <:Number})
 ```
 
-### Direct evaluation
+### Evaluation in subspace
+
+In the uncoupled basis, the matrix element of a tensor operator acting
+only on a subsystem is simply given by the appropriate
+[`matrix_element`](@ref) applied to the quantum numbers characterizing
+the subspace, with the extra diagonality constraint for the
+[`other_quantum_numbers`](@ref) enforced using
+[`AngularMomentumAlgebra.@δ`](@ref).
 
 ### Product tensors
 
 ```@docs
-matrix_element2((γj₁′, m₁′), (γj₂′, m₂′), X::TensorScalarProduct, (γj₁, m₁), (γj₂, m₂))
+matrix_element2(γjm₁′, γjm₂′, X::TensorScalarProduct, γjm₁, γjm₂)
 matrix_element2((γj₁′, γj₂′, j′, m′), X::TensorScalarProduct, (γj₁, γj₂, j, m))
-```
-
-## Old stuff
-
-```@docs
-AngularMomentumAlgebra.complementary_space_factor
-AngularMomentumAlgebra.rme_j′j
-```
-
-The matrix element of a scalar product of two tensors depends on
-whether the scalar product is an irreducible tensor or not.
-
-
-## Reference
-
-```@docs
-dot(a, X::TensorScalarProduct, b)
-dot((a,b)::Tuple, X::TensorScalarProduct, (c,d)::Tuple)
 ```

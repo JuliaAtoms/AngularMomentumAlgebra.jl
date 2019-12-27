@@ -12,7 +12,7 @@ end
 Tensor
 TensorComponent
 AngularMomentumAlgebra.LinearCombinationTensor
-system(::Tensor)
+system(::Type{<:Tensor})
 ```
 
 ## Cartesian tensor components

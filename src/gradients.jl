@@ -6,12 +6,12 @@ Construct a gradient tensor.
 struct Gradient <: Tensor{1,'∇'} end
 
 """
-    system(::Gradient)
+    system(::Type{Gradient})
 
 The gradient only acts on the coordinates ``r``, ``\\theta``, and
 ``\\phi``.
 """
-system(::Gradient) = SpatialSubSystem()
+system(::Type{Gradient}) = SpatialSubSystem()
 
 @doc raw"""
     RadialGradientMatrixElement(k)

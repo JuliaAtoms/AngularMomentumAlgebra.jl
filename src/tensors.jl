@@ -9,14 +9,18 @@ abstract type Tensor{k,label} end
 
 LinearAlgebra.rank(::Tensor{k}) where k = k
 
-couples(a, ::Type{<:Tensor}, b) = true
-
 """
     system(::Tensor)
 
 A general tensor acts on the full system, i.e. all coordinates.
 """
-system(::Tensor) = FullSystem()
+system(::Type{<:Tensor}) = FullSystem()
+
+couples(a::SpinOrbital{<:Orbital}, ::Type{T}, b::SpinOrbital{<:Orbital}) where {T<:Tensor} =
+    isequal(other_quantum_numbers(system(T), a, b)...)
+
+couples(a::SpinOrbital{<:RelativisticOrbital}, ::Type{T}, b::SpinOrbital{<:RelativisticOrbital}) where {T<:Tensor} =
+    isequal(first.(other_quantum_numbers(system(T), a, b))...)
 
 # This is only true for SO(3)
 components(::Tensor{k}) where k = -k:k
@@ -52,7 +56,7 @@ end
 Base.parent(Tᵏq::TensorComponent) = Tᵏq.tensor
 component(Tᵏq::TensorComponent) = Tᵏq.q
 
-system(Tᵏq::TensorComponent) = system(parent(Tᵏq))
+system(::TensorComponent{T}) where T = system(T)
 
 # * Tensor products
 
@@ -87,7 +91,7 @@ function Base.show(io::IO, X::TensorProduct{K}) where K
     write(io,"}⁽",to_superscript(K),"⁾")
 end
 
-system(X::TensorProduct) = (system(X.T), system(X.U))
+system(::TensorProduct{<:Any,A,B}) where {A,B} = (system(A), system(B))
 
 # ** Scalar product
 
@@ -146,7 +150,7 @@ julia> SphericalTensor(4)⋅SphericalTensor(4)
 LinearAlgebra.dot(T::Tensor, U::Tensor) =
     TensorScalarProduct(T, U)
 
-system(X::TensorScalarProduct) = (system(X.T), system(X.U))
+system(::TensorScalarProduct{A,B}) where {A,B} = (system(A), system(B))
 
 # * Linear combination of tensors
 
