@@ -63,4 +63,11 @@ Computes the reduced matrix element of `∇` in terms of
     end
 end
 
+module LinearMomenta
+import ..cartesian_tensor_component, ..Gradient
+const 𝐩 = [-im*cartesian_tensor_component(Gradient(), c)
+           for c in [:x, :y, :z]]
+export 𝐩
+end
+
 export Gradient
