@@ -5,10 +5,10 @@ is given by
 
 ```math
 \begin{equation}
-\tag{V13.2.21}
+\tag{V13.2.22}
 \redmatrixel{n'\ell'}{\tensor{\nabla}^{(1)}}{n\ell} =
 \sqrt{\ell+1}
-A_{n'\ell'n\ell}\delta_{\ell',\ell+1} +
+A_{n'\ell'n\ell}\delta_{\ell',\ell+1} -
 \sqrt{\ell}
 B_{n'\ell'n\ell}\delta_{\ell',\ell-1},
 \end{equation}
@@ -18,7 +18,7 @@ where
 
 ```math
 \begin{equation}
-\tag{V13.2.22}
+\tag{V13.2.23}
 \begin{aligned}
 A_{n'\ell'n\ell} &\defd
 \int_0^\infty\diff{r}r^2

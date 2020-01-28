@@ -21,7 +21,7 @@ gradient operator:
 
 ```math
 \begin{equation}
-\tag{V13.2.24}
+\tag{V13.2.23}
 \int_0^\infty\diff{r}r^2
 \conj{\Psi}_{n'\ell'}(r)
 \left(\partial_r+\frac{k}{r}\right)
