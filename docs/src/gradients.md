@@ -5,6 +5,7 @@ is given by
 
 ```math
 \begin{equation}
+\label{eqn:gradient-rme}
 \tag{V13.2.22}
 \redmatrixel{n'\ell'}{\tensor{\nabla}^{(1)}}{n\ell} =
 \sqrt{\ell+1}
@@ -18,7 +19,6 @@ where
 
 ```math
 \begin{equation}
-\tag{V13.2.23}
 \begin{aligned}
 A_{n'\ell'n\ell} &\defd
 \int_0^\infty\diff{r}r^2
@@ -31,8 +31,113 @@ B_{n'\ell'n\ell} &\defd
 \left(\partial_r+\frac{\ell+1}{r}\right)
 \Psi_{n\ell}(r).
 \end{aligned}
+\tag{V13.2.23}
+\label{eqn:gradient-rme-terms}
 \end{equation}
 ```
+
+!!! note
+    When working in spherical coordinates, it is common to use the
+    _reduced wavefunction_, since that simplifies the Laplacian and
+    enforces vanishing Dirichlet boundary conditions at ``r=0``:
+
+    ```math
+    \Phi(\vec{r}) \defd r\Psi(\vec{r}).
+    ```
+
+    This must be taken into account when computing matrix elements of
+    differential operators with respect to the partial waves of the
+    reduced wavefunction:
+
+    ```math
+    \nabla \Psi = \nabla \frac{\Phi}{r} =
+    \left(\nabla\frac{1}{r}\right)\Phi + \frac{1}{r}(\nabla\Phi) =
+    -\frac{\tensor{n}_1}{r^2}\Phi + \frac{1}{r}\nabla\Phi =
+    \frac{1}{r}\left(\nabla - \frac{\tensor{n}_1}{r}\right)\Phi,
+    ```
+
+    which means that if ``\ket{n'\ell'}`` and ``\ket{n\ell}`` are
+    partial waves of ``\Phi``, instead of
+    ``\eqref{eqn:gradient-rme}``, we need to use
+
+    ```math
+    \begin{equation}
+    \tag{\ref{eqn:gradient-rme}*}
+    \redmatrixel{n'\ell'}{\tensor{\nabla}^{(1)}-\frac{\tensor{n}_1}{r}}{n\ell}
+    =
+    \sqrt{\ell+1}
+    \tilde{A}_{n'\ell'n\ell}\delta_{\ell',\ell+1} -
+    \sqrt{\ell}
+    \tilde{B}_{n'\ell'n\ell}\delta_{\ell',\ell-1},
+    \end{equation}
+    ```
+
+    where
+
+    ```math
+    \begin{equation}
+    \begin{aligned}
+    \tilde{A}_{n'\ell'n\ell}\delta_{\ell',\ell+1}
+    &\defd
+    \int_0^\infty\diff{r}r^2
+    \conj{\Psi}_{n'\ell'}(r)
+    \left(\partial_r-\frac{\ell+1}{r}\right)
+    \Psi_{n\ell}(r),\\
+    \tilde{B}_{n'\ell'n\ell}\delta_{\ell',\ell-1}
+    &\defd
+    \int_0^\infty\diff{r}r^2
+    \conj{\Psi}_{n'\ell'}(r)
+    \left(\partial_r+\frac{\ell}{r}\right)
+    \Psi_{n\ell}(r),
+    \end{aligned}
+    \tag{\ref{eqn:gradient-rme-terms}*}
+    \end{equation}
+    ```
+
+    since
+
+    ```math
+    \begin{equation}
+    \tag{V13.2.11}
+    \redmatrixel{\ell'}{\tensor{n}_1}{\ell} =
+    \angroot{\ell}
+    C_{\ell 0;10}^{\ell'0}
+    \end{equation}
+    ```
+
+    (cf [Spherical tensors](@ref tensors_spherical_tensors)
+    since ``\tensor{n}_1\equiv\tensor{C}^{(1)}``) and
+
+    ```math
+    \begin{equation}
+    \tag{V8.5.33,34}
+    C_{\ell 0;10}^{\ell'0} =
+    % (\ell+1)
+    % \sqrt{\frac{(2\ell)!2!}{(2\ell+2)!}}
+    % \delta_{\ell',\ell+1}
+    % - \ell
+    % \sqrt{\frac{2!(2\ell-1)!}{(2\ell+1)!}}
+    % \delta_{\ell',\ell-1}
+    \sqrt{\frac{(\ell+1)}{(2\ell+1)}}
+    \delta_{\ell',\ell+1}
+    - \sqrt{\frac{\ell}{(2\ell+1)}}
+    \delta_{\ell',\ell-1}
+    \end{equation}
+    ```
+
+    ```math
+    \begin{equation}
+    \tag{V13.2.11*}
+    \implies\redmatrixel{\ell'}{\tensor{n}_1}{\ell} =
+    \sqrt{\ell+1}
+    \delta_{\ell',\ell+1} -
+    \sqrt{\ell}
+    \delta_{\ell',\ell-1},
+    \end{equation}
+    ```
+
+    i.e. ``r^{-1}`` is subtracted from the centrifugal terms of ``A``
+    and ``B`` in ``\eqref{eqn:gradient-rme-terms}``.
 
 ## Example
 
