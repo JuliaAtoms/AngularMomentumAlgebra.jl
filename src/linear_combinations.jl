@@ -13,8 +13,11 @@ end
 Base.length(lc::LinearCombination) = length(lc.Ts)
 Base.eltype(lc::LinearCombination{T,N}) where {T,N} = (T,N)
 
+Base.getindex(lc::LinearCombination, i) =
+    (lc.Ts[i],lc.coeffs[i])
+
 Base.iterate(lc::LinearCombination, i=1) =
-    i > length(lc) ? nothing : ((lc.Ts[i],lc.coeffs[i]), i+=1)
+    i > length(lc) ? nothing : (lc[i], i+=1)
 
 function Base.show(io::IO, lc::LinearCombination)
     n = length(lc)

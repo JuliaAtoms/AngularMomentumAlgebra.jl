@@ -139,6 +139,9 @@ B_{n'\ell'n\ell} &\defd
     i.e. ``r^{-1}`` is subtracted from the centrifugal terms of ``A``
     and ``B`` in ``\eqref{eqn:gradient-rme-terms}``.
 
+    For convenience, the [`ReducedGradient`](@ref) tensor is provided,
+    to simplify working with reduced wavefunctions.
+
 ## Example
 
 ```jldoctest
@@ -189,10 +192,37 @@ julia> dot(c, ∂x, a)
 
 ## Reference
 
+### Gradient
+
 ```@docs
 Gradient
 system(::Type{Gradient})
 AngularMomentumAlgebra.RadialGradientMatrixElement
 rme((n′,ℓ′)::Tuple{<:Number, <:Number}, ::Gradient, (n,ℓ)::Tuple{<:Number, <:Number})
 AngularMomentumAlgebra.couplings(tensor::Gradient, (n,ℓ)::Tuple{<:Number, <:Number})
+```
+
+### Reduced gradient
+
+```@docs
+ReducedGradient
+system(::Type{ReducedGradient})
+rme((n′,ℓ′)::Tuple{<:Number, <:Number}, ::ReducedGradient, (n,ℓ)::Tuple{<:Number, <:Number})
+AngularMomentumAlgebra.couplings(tensor::ReducedGradient, (n,ℓ)::Tuple{<:Number, <:Number})
+```
+
+#### `AngularMomentumAlgebra.LinearMomenta`
+
+```@meta
+CurrentModule = AngularMomentumAlgebra
+```
+
+```@docs
+LinearMomenta.𝐩
+LinearMomenta.𝐩̃
+```
+
+```@meta
+CurrentModule = nothing
+DocTestSetup = nothing
 ```

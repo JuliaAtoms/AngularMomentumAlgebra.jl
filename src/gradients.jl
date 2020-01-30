@@ -13,6 +13,21 @@ The gradient only acts on the coordinates ``r``, ``\\theta``, and
 """
 system(::Type{Gradient}) = SpatialSubSystem()
 
+"""
+    ReducedGradient()
+
+Construct a gradient tensor acting on reduced wavefunctions.
+"""
+struct ReducedGradient <: Tensor{1,'∂'} end
+
+"""
+    system(::Type{ReducedGradient})
+
+The reduced gradient only acts on the coordinates ``r``, ``\\theta``,
+and ``\\phi``.
+"""
+system(::Type{ReducedGradient}) = SpatialSubSystem()
+
 @doc raw"""
     RadialGradientMatrixElement(k)
 
@@ -63,11 +78,50 @@ Computes the reduced matrix element of `∇` in terms of
     end
 end
 
-module LinearMomenta
-import ..cartesian_tensor_component, ..Gradient
-const 𝐩 = [-im*cartesian_tensor_component(Gradient(), c)
-           for c in [:x, :y, :z]]
-export 𝐩
+@tensor(ReducedGradient) do
+    begin
+        n′ ~ n # The gradient couples orbitals of different n, but
+               # there is no selection rule.
+        ℓ′ == ℓ ± 1
+    end
+
+    raw"""
+    rme((n′,ℓ′), ::ReducedGradient, (n,ℓ))
+
+Computes the reduced matrix element of `∂` in terms of
+[`RadialGradientMatrixElement`](@ref).
+"""
+    if ℓ′ == ℓ+1
+        √(ℓ+1)*RadialGradientMatrixElement(-(ℓ+1))
+    elseif ℓ′==ℓ-1
+        - √(ℓ)*RadialGradientMatrixElement(ℓ)
+    end
 end
 
-export Gradient
+module LinearMomenta
+import ..cartesian_tensor_component, ..Gradient, ..ReducedGradient
+
+@doc raw"""
+    𝐩
+
+The linear momentum operator ``\vec{p}=-\im\nabla``; the elements
+correspond to `[px,py,pz]`, i.e. the Cartesian tensor components. Can
+be entered as `\bfp`.
+"""
+const 𝐩 = [-im*cartesian_tensor_component(Gradient(), c)
+           for c in [:x, :y, :z]]
+
+@doc raw"""
+    𝐩̃
+
+The linear momentum operator ``\vec{p}=-\im\nabla``, but _evaluated in
+the basis of reduced wavefunctions_; the elements correspond to
+`[px,py,pz]`, i.e. the Cartesian tensor components. Can be entered as
+`\bfp\tilde`.
+"""
+const 𝐩̃ = [-im*cartesian_tensor_component(ReducedGradient(), c)
+           for c in [:x, :y, :z]]
+export 𝐩, 𝐩̃
+end
+
+export Gradient, ReducedGradient
