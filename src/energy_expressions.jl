@@ -48,9 +48,10 @@ integrated over the spin-angular coordinates using
 [`integrate_spinor`](@ref).
 """
 function Base.Matrix(a::VSC, op::QuantumOperator, b::VSC,
-                     overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}}
-    E = Matrix(SlaterDeterminant.(a), op, SlaterDeterminant.(b), overlaps)
-    transform(integrate_spinor, E)
+                     overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[];
+                     kwargs...) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}}
+    E = Matrix(SlaterDeterminant.(a), op, SlaterDeterminant.(b), overlaps; kwargs...)
+    transform(integrate_spinor, E; kwargs...)
 end
 
 """
@@ -66,5 +67,6 @@ integrated over the spin-angular coordinates using
 [`integrate_spinor`](@ref).
 """
 Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
-            overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}} =
-                Matrix(spin_cfgs, op, spin_cfgs, overlaps)
+            overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[];
+            kwargs...) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}} =
+                Matrix(spin_cfgs, op, spin_cfgs, overlaps; kwargs...)
