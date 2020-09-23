@@ -29,14 +29,17 @@ function Base.show(io::IO, lc::LinearCombination)
     end
 end
 
-Base.:(+)(A::LC, B::LC) where {LC<:LinearCombination} =
+Base.:(+)(A::LinearCombination, B::LinearCombination) =
     LinearCombination(vcat(A.Ts, B.Ts), vcat(A.coeffs, B.coeffs))
 
-Base.:(-)(A::LC, B::LC) where {LC<:LinearCombination} =
+Base.:(-)(A::LinearCombination, B::LinearCombination) =
     LinearCombination(vcat(A.Ts, B.Ts), vcat(A.coeffs, -1 * B.coeffs))
 
-Base.:(+)(A::LC, B::T) where {T,N,LC<:LinearCombination{T,N}} =
+Base.:(+)(A::LC, B::T) where {T,N,LC<:LinearCombination{<:T,N}} =
     LinearCombination(vcat(A.Ts, B), vcat(A.coeffs, one(N)))
+
+Base.:(+)(A::T, B::LC) where {T,N,LC<:LinearCombination{<:T,N}} =
+    LinearCombination(vcat(A, B.Ts), vcat(one(N), B.coeffs))
 
 Base.:(-)(A::LC) where {LC<:LinearCombination} =
     LinearCombination(A.Ts, -1 * A.coeffs)
@@ -67,8 +70,8 @@ julia> 4*(:x) - 5*(:y)
 """
 macro linearly_combinable(TT)
     quote
-        Base.:(+)(A::T, B::T) where {T<:$(esc(TT))} =
-            LinearCombination(T[A,B], [1,1])
+        Base.:(+)(A::T, B::U) where {T<:$(esc(TT)),U<:$(esc(TT))} =
+            LinearCombination(promote_type(T,U)[A,B], [1,1])
 
         Base.:(-)(A::$(esc(TT))) =
             LinearCombination($(esc(TT))[A], [-1])
