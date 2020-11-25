@@ -8,10 +8,17 @@ Represents a general linear combination of objects of type `T`.
 struct LinearCombination{T,N<:Number}
     Ts::Vector{T}
     coeffs::Vector{N}
+    function LinearCombination(Ts::Vector{T}, coeffs::Vector{N}) where {T,N}
+        sel = .!iszero.(coeffs)
+        new{T,N}(Ts[sel], coeffs[sel])
+    end
 end
 
 Base.length(lc::LinearCombination) = length(lc.Ts)
 Base.eltype(lc::LinearCombination{T,N}) where {T,N} = (T,N)
+
+Base.zero(::LinearCombination{T,N}) where {T,N} =
+    LinearCombination(Vector{T}(), Vector{N}())
 
 Base.getindex(lc::LinearCombination, i) =
     (lc.Ts[i],lc.coeffs[i])
