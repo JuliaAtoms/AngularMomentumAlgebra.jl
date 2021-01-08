@@ -64,6 +64,11 @@ function matrix_element((γj′, m′)::Tuple{<:Any, <:Number},
     c*r
 end
 
+matrix_element(γj′m′::Tuple{<:Any, <:Number},
+               lct::LinearCombinationTensor,
+               γjm::Tuple{<:Any, <:Number}) =
+    sum(filter!(!iszero, [c*matrix_element(γj′m′, Tᵏq, γjm) for (Tᵏq,c) in lct]))
+
 # ** Product tensors
 
 @doc raw"""
