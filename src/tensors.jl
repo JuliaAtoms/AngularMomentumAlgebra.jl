@@ -58,6 +58,8 @@ component(Tᵏq::TensorComponent) = Tᵏq.q
 
 system(::TensorComponent{T}) where T = system(T)
 
+Base.hash(Tq::TensorComponent, h::UInt) = hash(Tq.tensor, hash(Tq.q, h))
+
 # * Tensor products
 
 @doc raw"""

@@ -17,6 +17,12 @@ end
 Base.length(lc::LinearCombination) = length(lc.Ts)
 Base.eltype(lc::LinearCombination{T,N}) where {T,N} = (T,N)
 
+Base.:(==)(a::LinearCombination, b::LinearCombination) =
+    a.Ts == b.Ts && a.coeffs == b.coeffs
+
+Base.hash(lc::LinearCombination, h::UInt) =
+    hash(lc.Ts, hash(lc.coeffs, h))
+
 Base.zero(::LinearCombination{T,N}) where {T,N} =
     LinearCombination(Vector{T}(), Vector{N}())
 
