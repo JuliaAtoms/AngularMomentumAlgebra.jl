@@ -35,26 +35,6 @@ Dummy method that returns `integral` unchanged, used for all
 integrate_spinor(integral::NBodyTermFactor) = NBodyMatrixElement([integral])
 
 """
-    Matrix(a::Vector{<:Configuration{<:SpinOrbital}},
-           op::QuantumOperator,
-           b::Vector{<:Configuration{<:SpinOrbital}}[, overlaps])
-
-Generate the energy-expression associated with the quantum operator
-`op`, in the basis of the spin-configurations `a` and `b`, with an
-optional set of orbital `overlaps`, specifying any desired
-non-orthogonalities. The energy expression is generated in a
-basis-agnostic way by EnergyExpressions.jl and each term is then
-integrated over the spin-angular coordinates using
-[`integrate_spinor`](@ref).
-"""
-function Base.Matrix(a::VSC, op::QuantumOperator, b::VSC,
-                     overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[];
-                     kwargs...) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}}
-    E = Matrix(SlaterDeterminant.(a), op, SlaterDeterminant.(b), overlaps; kwargs...)
-    transform(integrate_spinor, E; kwargs...)
-end
-
-"""
     Matrix(op::QuantumOperator,
            spin_cfgs::Vector{<:Configuration{<:SpinOrbital}}[, overlaps])
 
@@ -66,7 +46,10 @@ basis-agnostic way by EnergyExpressions.jl and each term is then
 integrated over the spin-angular coordinates using
 [`integrate_spinor`](@ref).
 """
-Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
-            overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[];
-            kwargs...) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}} =
-                Matrix(spin_cfgs, op, spin_cfgs, overlaps; kwargs...)
+function Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
+                     overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[];
+                     kwargs...) where {VSC<:AbstractVector{<:Configuration{<:SpinOrbital}}}
+    bcs = BitConfigurations(spin_cfgs, overlaps)
+    E = Matrix(bcs, op; kwargs...)
+    transform(integrate_spinor, E; kwargs...)
+end
