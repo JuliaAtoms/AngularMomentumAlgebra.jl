@@ -1,6 +1,4 @@
-Base.Matrix(::QuantumOperator, csfs::Vector{<:CSF},
-            overlaps::Vector{<:OrbitalOverlap}=OrbitalOverlap[]) =
-    throw(ArgumentError("Derivation of energy expression for atomic CSFs not yet implemented"))
+# * Integration of spinors
 
 """
     integrate_spinor(me)
@@ -34,6 +32,10 @@ Dummy method that returns `integral` unchanged, used for all
 """
 integrate_spinor(integral::NBodyTermFactor) = NBodyMatrixElement([integral])
 
+# * Energy Expressions
+
+# ** Spin-configurations
+
 """
     Matrix(op::QuantumOperator,
            spin_cfgs::Vector{<:Configuration{<:SpinOrbital}}[, overlaps])
@@ -52,4 +54,65 @@ function Base.Matrix(op::QuantumOperator, spin_cfgs::VSC,
     bcs = BitConfigurations(spin_cfgs, overlaps)
     E = Matrix(bcs, op; kwargs...)
     transform(integrate_spinor, E; kwargs...)
+end
+
+# ** Average-of-configuration
+
+function NBodyMatrixElement(a::Configuration{O}, op::OneBodyOperator, b::Configuration{O}, overlap) where {O<:Union{Orbital,RelativisticOrbital}}
+    a == b || return 0
+    overlap == I || @error "We don't know what to do about non-orthogonal orbitals" overlap
+    terms = NBodyTerm[]
+    for (o,w,_) in b
+        me = integrate_spinor(OrbitalMatrixElement([o], op, [o]))
+        nbme = convert(NBodyMatrixElement, w*me)
+        append!(terms, nbme.terms)
+    end
+    NBodyMatrixElement(terms)
+end
+
+function NBodyMatrixElement(ac::Configuration{O}, op::CoulombInteraction, bc::Configuration{O}, overlap) where {O<:Union{Orbital,RelativisticOrbital}}
+    ac == bc || return 0
+    overlap == I || @error "We don't know what to do about non-orthogonal orbitals" overlap
+    # Eq. (2-2) of
+    #
+    # - Froese Fischer, C. (1977). The Hartree–Fock Method for Atoms : A
+    #   Numerical Approach. New York: Wiley.
+    #
+    # and Eq. (2.40) of
+    #
+    # - Froese Fischer, C., Brage, T., & Jönsson, P. (1997). Computational
+    #   Atomic Structure : An MCHF Approach. Bristol, UK Philadelphia, Penn:
+    #   Institute of Physics Publ.
+
+    terms = NBodyTerm[]
+    add!(v) = append!(terms, convert(NBodyMatrixElement, v).terms)
+    for (a,w,_) in bc
+        w == 1 && continue
+        μ = w*(w-1)/2
+        ℓa = a.ℓ
+        for k = 0:2ℓa
+            me = radial_integral([a,a], (k, op), [a,a])
+            f = k == 0 ? 1 : (-(2ℓa+1)/(4ℓa+1))*wigner3j(ℓa, k, ℓa,
+                                                         0,  0, 0)^2
+            add!(μ*f*me)
+        end
+    end
+    m = length(bc)
+    for i=2:m
+        (a,wa,_) = bc[i]
+        ℓa = a.ℓ
+        for j = 1:i-1
+            (b,wb,_) = bc[j]
+            ℓb = b.ℓ
+            μ = wa*wb
+            add!(μ*radial_integral([a,b], (0, op), [a,b]))
+            for k = abs(ℓa-ℓb):(ℓa+ℓb)
+                me = radial_integral([a,b], (k, op), [b,a])
+                g = -1/2*wigner3j(ℓa, k, ℓb,
+                                  0,  0, 0)^2
+                add!(μ*g*me)
+            end
+        end
+    end
+    NBodyMatrixElement(terms)
 end
