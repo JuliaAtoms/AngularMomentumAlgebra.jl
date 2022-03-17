@@ -239,7 +239,7 @@ The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
 is characterized by the quantum number ``n``.
 """
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    (o.orb.n, missing)
+    ((), missing)
 
 """
     other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
@@ -248,7 +248,7 @@ The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
 is characterized by the quantum number ``n``.
 """
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    (o.orb.n, missing)
+    ((), missing)
 
 
 export quantum_numbers, other_quantum_numbers,

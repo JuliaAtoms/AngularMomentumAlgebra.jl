@@ -322,6 +322,14 @@ function matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, <:Any, 
     powneg1(Int(j+j₁′+j₂-k))*∏(j)*c*w6j*r
 end
 
+function matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, Tuple{}, <:Number, <:Number},
+                        𝐓ᵏq::TensorComponent,
+                        (γj₁, γj₂, j, m)::Tuple{<:Any, Tuple{}, <:Number, <:Number})
+    last(γj₁′) == j′ && last(γj₁) == j ||
+        throw(ArgumentError("Angular momentum mismatch"))
+    matrix_element((γj₁′, m′), 𝐓ᵏq, (γj₁, m))
+end
+
 
 # ** Uncoupled basis states
 
