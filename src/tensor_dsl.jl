@@ -16,6 +16,7 @@ function wrap_show_debug(expr)
 end
 
 remove_line_numbers(exprs) = filter(n -> !(n isa LineNumberNode), exprs)
+remove_line_numbers(expr::Expr) = Expr(expr.head, remove_line_numbers(expr.args))
 
 generate_signature(f::Function, sym, TensorType::Symbol) =
     Expr(:call, sym, f(Expr(:(::), :tensor, TensorType))...)

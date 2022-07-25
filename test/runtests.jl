@@ -7,6 +7,7 @@ using Test
 
 include("common.jl")
 include("linear_combinations.jl")
+include("tensor_dsl.jl")
 include("wigner_eckart.jl")
 include("multipole_expansions.jl")
 include("angular_momenta.jl")
