@@ -5,6 +5,7 @@ using AtomicLevels
 using HalfIntegers
 using Test
 
+include("common.jl")
 include("linear_combinations.jl")
 include("wigner_eckart.jl")
 include("multipole_expansions.jl")
