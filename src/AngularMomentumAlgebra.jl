@@ -11,7 +11,6 @@ using HalfIntegers
 using UnicodeFun
 
 include("common.jl")
-include("clebsch_gordan.jl")
 include("linear_combinations.jl")
 include("orbitals.jl")
 include("tensors.jl")

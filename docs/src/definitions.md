@@ -128,7 +128,7 @@ m_1&m_2&-m_3
 \tag{V8.1.12}
 ```
 
-They can be calculated with the [`clebsch_gordan_condon_shortley`](@ref) function.
+They can be calculated with the [`clebsch_gordan`](@ref) function.
 
 ## Wigner–Eckart theorem
 
