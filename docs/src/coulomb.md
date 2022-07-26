@@ -81,7 +81,6 @@ CoulombInteractionMultipole
 CoulombPotentialMultipole
 CoulombTensor
 system(::Type{CoulombTensor})
-AngularMomentumAlgebra.RadialCoulombMatrixElement
 rme((n′,ℓ′), ::CoulombTensor, (n,ℓ))
 AngularMomentumAlgebra.couplings(tensor::CoulombTensor, (n,ℓ)::Tuple{<:Number, <:Number})
 ```
