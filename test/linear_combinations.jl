@@ -54,6 +54,7 @@ end
 
     @test z′′.Ts == [x,y]
     @test z′′.coeffs == [8, -10]
+    @test z′′ == z*2
     
     @test all((z′′/2).coeffs .== z.coeffs)
 
