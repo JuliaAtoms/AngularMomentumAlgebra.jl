@@ -10,8 +10,11 @@ import AngularMomentumAlgebra: triangle_range, ∏, powneg1,
         @test triangle_range(0,2) == [2]
         @test triangle_range(2,2) == [0,2,4]
 
-        @test triangle_range(half(1),half(1)) == [1]
-        @test triangle_range(half(1),half(3)) == [2]
+        if VERSION ≥ v"1.7"
+            # iseven(::Real) was introduced in 1.7
+            @test triangle_range(half(1),half(1)) == [1]
+            @test triangle_range(half(1),half(3)) == [2]
+        end
     end
 
     @testset "Angular roots" begin
