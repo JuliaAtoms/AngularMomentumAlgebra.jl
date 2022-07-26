@@ -24,6 +24,7 @@ end
     @test g + w == LinearCombination([g,x,y], [1,1,1])
     @test w - g == LinearCombination([x,y,g], [1,1,-1])
     @test g - w == LinearCombination([g,x,y], [1,-1,-1])
+    @test w + g ≈ (1+1e-9)*LinearCombination([x,y,g], [1,1,1])
 
     @test iszero(LinearCombination(MySym[], Int[]))
     @test iszero(zero(w))

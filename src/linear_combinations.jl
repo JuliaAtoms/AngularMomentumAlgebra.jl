@@ -20,6 +20,9 @@ Base.eltype(lc::LinearCombination{T,N}) where {T,N} = (T,N)
 Base.:(==)(a::LinearCombination, b::LinearCombination) =
     a.Ts == b.Ts && a.coeffs == b.coeffs
 
+Base.isapprox(a::LinearCombination, b::LinearCombination, args...) =
+    a.Ts == b.Ts && isapprox(a.coeffs, b.coeffs, args...)
+
 Base.hash(lc::LinearCombination, h::UInt) =
     hash(lc.Ts, hash(lc.coeffs, h))
 
