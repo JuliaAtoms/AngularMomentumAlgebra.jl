@@ -144,7 +144,7 @@ function matrix_element((γj′, m′), X::TensorScalarProduct, (γj, m))
 
     # We assume that iszero(⟨n′j′||𝐓̂⁽ᵏ⁾||n₁j₁⟩) ⇔
     # iszero(⟨n₁j₁||𝐓̂⁽ᵏ⁾||n′j′⟩).
-    Tγj₁ = couplings(T, γj)
+    Tγj₁ = couplings(T, γj′)
     Uγj₁ = couplings(U, γj)
     γj₁s = map(((Tγj₁, Uγj₁),) -> ∩(Tγj₁, Uγj₁), zip(Tγj₁, Uγj₁))
     for γj₁ ∈ Iterators.product(γj₁s...)
