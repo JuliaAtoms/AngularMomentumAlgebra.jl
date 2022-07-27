@@ -8,6 +8,7 @@ using Test
 include("common.jl")
 include("linear_combinations.jl")
 include("orbitals.jl")
+include("tensors.jl")
 include("tensor_dsl.jl")
 include("tensor_matrix_elements.jl")
 include("wigner_eckart.jl")
