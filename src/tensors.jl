@@ -260,6 +260,159 @@ EnergyExpressions.isdependent(o::OrbitalRadialOverlap, orb::O) where O = o.b == 
 Base.show(io::IO, o::OrbitalRadialOverlap) =
     write(io, "⟨$(o.a)|$(o.b)⟩ᵣ")
 
+# * Tensor operators
+
+"""
+    TensorOperator{N}(T)
+
+Create an `NBodyOperator` out of a tensor component (either a
+[`TensorComponent`](@ref) or a [`TensorScalarProduct`](@ref), which
+implicitly only has one component, `0`).
+
+# Example
+
+```julia-repl
+julia> 𝐉 = TotalAngularMomentum()
+𝐉̂⁽¹⁾
+
+julia> 𝐉₀ = TensorComponent(𝐉, 0)
+𝐉̂⁽¹⁾₀
+
+julia> A = TensorOperator{1}(𝐉₀)
+[𝐉̂⁽¹⁾₀]
+
+julia> cfgs = scs"1s2"
+1-element Vector{SpinConfiguration{SpinOrbital{Orbital{Int64}, Tuple{Int64, HalfIntegers.Half{Int64}}}}}:
+ 1s₀α 1s₀β
+
+julia> Matrix(A, cfgs)
+1×1 SparseArrays.SparseMatrixCSC{NBodyMatrixElement, Int64} with 1 stored entry:
+ 0.5⟨1s₀α|1s₀α⟩ - 0.5⟨1s₀β|1s₀β⟩
+```
+"""
+struct TensorOperator{N,Tt} <: NBodyOperator{N}
+    T::Tt
+    TensorOperator{N}(T::Tt) where {N,Tt} =
+        new{N,Tt}(T)
+end
+
+Base.hash(t::TensorOperator{N}, h::UInt) where N = hash(N, hash(t.T, h))
+
+spin_ang_coeff(me::OrbitalMatrixElement{1,<:SpinOrbital,<:TensorOperator{1},<:SpinOrbital}) =
+    dot(me.a[1], me.o.T, me.b[1])
+
+spin_ang_coeff(me::OrbitalMatrixElement{<:Any,<:SpinOrbital,<:TensorOperator,<:SpinOrbital}) =
+    dot(Tuple(me.a), me.o.T, Tuple(me.b))
+
+Base.iszero(me::OrbitalMatrixElement{<:Any,<:SpinOrbital,<:TensorOperator,<:SpinOrbital}) =
+    iszero(spin_ang_coeff(me))
+
+function integrate_spinor(me::OrbitalMatrixElement{N,<:SpinOrbital,<:TensorOperator{N},<:SpinOrbital}) where N
+    coeff = spin_ang_coeff(me)
+    NBodyMatrixElement([NBodyTerm([OrbitalRadialOverlap(me.a[i], me.b[i]) for i = 1:N], coeff)])
+end
+
+function Base.show(io::IO, to::TensorOperator)
+    write(io, "[")
+    show(io, to.T)
+    write(io, "]")
+end
+
+function Base.show(io::IO, to::TensorOperator{1,<:TensorScalarProduct})
+    T = to.T.T
+    U = to.T.U
+    write(io, "[")
+    show(io, T)
+    if T ≠ U
+        write(io, "⋅")
+        show(io, U)
+    end
+    write(io, "]")
+    T == U && write(io, "²")
+end
+
+function Base.show(io::IO, to::TensorOperator{2,<:TensorScalarProduct})
+    T = to.T.T
+    U = to.T.U
+    write(io, "[")
+    show(io, T)
+    write(io, "(1)⋅")
+    show(io, U)
+    write(io, "(2)]")
+end
+
+@doc raw"""
+    many_electron_scalar_product(𝐓::Tensor{k}, 𝐔::Tensor{k}=𝐓) where k
+
+Create the total tensor acting on a many-electron state according to
+
+```math
+\begin{equation}
+\begin{aligned}
+(\tensor{T}^{(k)} \cdot
+\tensor{U}^{(k)})
+&=
+\sum_{i,j}
+[\tensor{t}^{(k)}(i)
+ \cdot
+\tensor{u}^{(k)}(j)] \\
+&\equiv
+\sum_i
+[\tensor{t}^{(k)}(i)
+ \cdot
+\tensor{u}^{(k)}(i)] +
+\sum_{i\ne j}
+2[\tensor{t}^{(k)}(i)
+ \cdot
+\tensor{u}^{(k)}(j)],
+\end{aligned}
+\tag{H11-32*}
+\end{equation}
+```
+where ``\tensor{t}^{(k)}(i)`` and ``\tensor{u}^{(k)}(j)`` act only on
+electron ``i`` and ``j``, respectively [cf. John E. Harriman:
+_Theoretical Foundations of Electron Spin Resonance_ (1978); note that
+Harriman uses another normalization of the ladder operators compared
+to ours: [Eq. (V3.1.1)](@ref angular_momenta), which explains why his
+Eq. (H11-32) is missing a factor of ``2``].
+
+# Examples
+
+```julia-repl
+julia> 𝐉 = TotalAngularMomentum()
+𝐉̂⁽¹⁾
+
+julia> A = many_electron_scalar_product(𝐉)
+[𝐉̂⁽¹⁾]² + 2.0[𝐉̂⁽¹⁾(1)⋅𝐉̂⁽¹⁾(2)]
+
+julia> 𝐋 = OrbitalAngularMomentum()
+𝐋̂⁽¹⁾
+
+julia> 𝐒 = SpinAngularMomentum()
+𝐒̂⁽¹⁾
+
+julia> B = many_electron_scalar_product(𝐋, 𝐒)
+[𝐋̂⁽¹⁾⋅𝐒̂⁽¹⁾] + 2.0[𝐋̂⁽¹⁾(1)⋅𝐒̂⁽¹⁾(2)]
+
+julia> cfgs = rscs"1s2"
+1-element Vector{SpinConfiguration{SpinOrbital{RelativisticOrbital{Int64}, Tuple{HalfIntegers.Half{Int64}}}}}:
+ 1s(-1/2) 1s(1/2)
+
+julia> Matrix(A, cfgs)
+1×1 SparseArrays.SparseMatrixCSC{NBodyMatrixElement, Int64} with 1 stored entry:
+ 0.75⟨1s(-1/2)|1s(-1/2)⟩ + 0.75⟨1s(1/2)|1s(1/2)⟩ - ⟨1s(-1/2)|1s(1/2)⟩⟨1s(1/2)|1s(-1/2)⟩ - 0.5⟨1s(-1/2)|1s(-1/2)⟩⟨1s(1/2)|1s(1/2)⟩
+
+julia> Matrix(B, cfgs)
+1×1 SparseArrays.SparseMatrixCSC{NBodyMatrixElement, Int64} with 0 stored entries:
+ ⋅
+```
+"""
+function many_electron_scalar_product(𝐓::Tensor{k}, 𝐔::Tensor{k}=𝐓) where k
+    𝐗 = 𝐓⋅𝐔
+    TensorOperator{1}(𝐗) + 2TensorOperator{2}(𝐗)
+end
+
 export Tensor, TensorComponent,
     TensorProduct, TensorScalarProduct,
-    system
+    system,
+    TensorOperator, many_electron_scalar_product

@@ -14,6 +14,8 @@ TensorComponent
 AngularMomentumAlgebra.LinearCombinationTensor
 system(::Type{<:Tensor})
 AngularMomentumAlgebra.OrbitalRadialOverlap
+TensorOperator
+many_electron_scalar_product
 ```
 
 ## Cartesian tensor components
