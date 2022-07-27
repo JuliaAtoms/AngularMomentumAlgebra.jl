@@ -90,40 +90,43 @@
             ℓ′ == ℓ ± 1
         end
 
+        lnn = LineNumberNode(123, :here)
+
         @testset "generate_iszero" begin
-            f = generate_iszero(:OrbitalAngularMomentum, sr)
+            f = generate_iszero(:OrbitalAngularMomentum, sr, lnn)
             @test function_definition_name(f) == :(Base.iszero)
             @test f.args[1].args == [:(Base.iszero), :ℓ′, :(tensor::OrbitalAngularMomentum), :ℓ]
-            @test f.args[2].args == [:(ℓ′ == ℓ || return true), false]
+            @test f.args[2].args == [lnn, :(ℓ′ == ℓ || return true), false]
 
-            g = generate_iszero(:Dipole, bsr)
+            g = generate_iszero(:Dipole, bsr, lnn)
             @test function_definition_name(g) == :(Base.iszero)
             @test g.args[1].args == [:(Base.iszero), :((n′, ℓ′)), :(tensor::Dipole), :((n,ℓ))]
+            @test g.args[2].args[1] == lnn
             @test remove_line_numbers(g.args[2]).args[1] == [:((ℓ′ == ℓ - 1 || ℓ′ == ℓ + 1) || return true), false]
         end
 
         @testset "generate_rme" begin
-            f = generate_rme(:OrbitalAngularMomentum, sr, "The Docs", :(sin(a)))
+            f = generate_rme(:OrbitalAngularMomentum, sr, "The Docs", :(sin(a)), lnn)
             args = remove_line_numbers(f.args)
             @test first(args) == Symbol("@doc")
             @test args[2] == "The Docs"
             ff = args[3]
             @test function_definition_name(ff) == :rme
             @test ff.args[1].args == [:rme, :ℓ′, :(tensor::OrbitalAngularMomentum), :ℓ]
-            @test ff.args[2].args == [:(iszero(ℓ′, tensor, ℓ) && return 0), :(sin(a))]
+            @test ff.args[2].args == [:(iszero(ℓ′, tensor, ℓ) && return 0), lnn, :(sin(a))]
 
-            g = generate_rme(:Dipole, bsr, "The Docs", :(sin(a)))
+            g = generate_rme(:Dipole, bsr, "The Docs", :(sin(a)), lnn)
             args = remove_line_numbers(g.args)
             @test first(args) == Symbol("@doc")
             @test args[2] == "The Docs"
             gg = args[3]
             @test function_definition_name(gg) == :rme
             @test gg.args[1].args == [:rme, :(n′,ℓ′), :(tensor::Dipole), :(n,ℓ)]
-            @test gg.args[2].args == [:(iszero((n′, ℓ′), tensor, (n, ℓ)) && return 0), :(sin(a))]
+            @test gg.args[2].args == [:(iszero((n′, ℓ′), tensor, (n, ℓ)) && return 0), lnn, :(sin(a))]
         end
 
         @testset "generate_couplings" begin
-            f = generate_couplings(:OrbitalAngularMomentum, sr)
+            f = generate_couplings(:OrbitalAngularMomentum, sr, lnn)
             args = remove_line_numbers(f.args)
             @test first(args) == Symbol("@doc")
             @test occursin("couplings", args[2])
@@ -131,9 +134,9 @@
             ff = args[3]
             @test function_definition_name(ff) == :couplings
             @test ff.args[1].args == [:couplings, :(tensor::OrbitalAngularMomentum), :ℓ]
-            @test ff.args[2].args == [:(ℓ′ = [ℓ]), :ℓ′]
+            @test ff.args[2].args == [lnn, :(ℓ′ = [ℓ]), :ℓ′]
 
-            g = generate_couplings(:Dipole, bsr)
+            g = generate_couplings(:Dipole, bsr, lnn)
             args = remove_line_numbers(g.args)
             @test first(args) == Symbol("@doc")
             @test occursin("couplings", args[2])
@@ -141,14 +144,15 @@
             gg = args[3]
             @test function_definition_name(gg) == :couplings
             @test gg.args[1].args == [:couplings, :(tensor::Dipole), :(n,ℓ)]
-            @test function_name(gg.args[2].args[1]) == :error
+            @test gg.args[2].args[1] == lnn
+            @test function_name(gg.args[2].args[2]) == :error
 
             # Does not end in prime
-            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ == 1))
+            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ == 1), lnn)
             # Does not know how to handle a constant
-            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ′ == 1))
+            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ′ == 1), lnn)
             # Unequalities not supported
-            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ′ < 4))
+            @test_throws ArgumentError generate_couplings(:MyTensor, :(ℓ′ < 4), lnn)
         end
     end
 
@@ -230,7 +234,7 @@
 
             @test fc.head == :block
             @test function_definition_name(first(fc.args)) == :couplings
-            @test function_name(fc.args[1].args[2].args[1]) == :error
+            @test function_name(fc.args[1].args[2].args[2]) == :error
             @test first(fc.args[2].args) == Base.Docs.doc!
         end
     end

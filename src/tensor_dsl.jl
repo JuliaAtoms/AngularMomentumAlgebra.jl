@@ -152,16 +152,18 @@ function push_selection_rules!(f, args, selection_rules)
 end
 
 """
-    generate_iszero(TensorType, selection_rules)
+    generate_iszero(TensorType, selection_rules, selection_rules_linenum)
 
 Generate a function for testing if the matrix element of `TensorType`
-vanishes, given a set a quantum number deduced from `selection_rules`.
+vanishes, given a set a quantum number deduced from `selection_rules`,
+given at line number `selection_rules_linenum`.
 """
-function generate_iszero(TensorType, selection_rules)
+function generate_iszero(TensorType, selection_rules, selection_rules_linenum)
     γj′,γj = identify_quantum_numbers(selection_rules)
 
     signature = generate_signature(t -> (γj′, t, γj), :(Base.iszero), TensorType)
     body = Expr(:block)
+    push!(body.args, selection_rules_linenum)
     push_selection_rules!(parse_selection_rule, body.args, selection_rules)
     push!(body.args, false)
     # TODO: Should auto-generate docstring for generated iszero
@@ -170,29 +172,31 @@ function generate_iszero(TensorType, selection_rules)
 end
 
 """
-    generate_rme(TensorType, selection_rules, doc, rme)
+    generate_rme(TensorType, selection_rules, doc, rme, rme_linenum)
 
 Generate a function for computing the reduced matrix element of
 `TensorType`, given a set a quantum number deduced from
-`selection_rules`, along with the docstring and the definition `rme`.
+`selection_rules`, along with the docstring and the definition `rme`,
+given at line number `rme_linenum`.
 """
-function generate_rme(TensorType, selection_rules, doc, rme)
+function generate_rme(TensorType, selection_rules, doc, rme, rme_linenum)
     γj′,γj = identify_quantum_numbers(selection_rules)
     signature = generate_signature(t -> (γj′, t, γj), :rme, TensorType)
-    body = Expr(:block, :(iszero($(γj′), tensor, $(γj)) && return 0), wrap_show_debug(rme))
+    body = Expr(:block, :(iszero($(γj′), tensor, $(γj)) && return 0),
+                rme_linenum, wrap_show_debug(rme))
     fun = Expr(:function, signature, body)
     :(@doc($doc, $fun))
 end
 
 """
-    generate_copulings(TensorType, selection_rules)
+    generate_copulings(TensorType, selection_rules, selection_rules_linenum)
 
 Generate a function that given the quantum numbers `γj` generates
 lists of all permissible `γj′` for which the reduced matrix element
 `⟨γj′||::TensorType||γj⟩` does not vanish. This is deduced from the
-`selection_rules`.
+`selection_rules`, given at line number `selection_rules_linenum`.
 """
-function generate_couplings(TensorType, selection_rules)
+function generate_couplings(TensorType, selection_rules, selection_rules_linenum)
     indeterminates = filter(r -> r.head == :call && first(r.args) == :(~),
                             remove_line_numbers(selection_rules.head == :call ?
                                                 [selection_rules] :
@@ -200,6 +204,7 @@ function generate_couplings(TensorType, selection_rules)
     γj′,γj = identify_quantum_numbers(selection_rules)
     signature = generate_signature(t -> (t, γj), :couplings, TensorType)
     body = Expr(:block)
+    push!(body.args, selection_rules_linenum)
     if !isempty(indeterminates)
         push!(body.args, Expr(:call, :error, "Cannot generate all couplings for "*
                               string(TensorType)*
@@ -245,10 +250,14 @@ for `TensorType`, given a set of selection rules and an expression for
 the reduced matrix element.
 """
 macro tensor(exprs, TensorType)
-    args = remove_line_numbers(exprs.args[2].args)
-    selection_rules = args[1]
-    iszero = generate_iszero(TensorType, selection_rules)
-    rme = generate_rme(TensorType, selection_rules, args[2], args[3])
-    couplings = generate_couplings(TensorType, selection_rules)
-    esc(Expr(:block, iszero, rme, couplings))
+    args = exprs.args[2].args
+    length(args) == 6 ||
+        throw(ArgumentError("Malformed @tensor call, see documentation"))
+    (selection_rules_linenum, selection_rules,
+     rme_doc_linenum, rme_doc,
+     rme_linenum, rme) = args
+    fun_iszero = generate_iszero(TensorType, selection_rules, selection_rules_linenum)
+    fun_rme = generate_rme(TensorType, selection_rules, rme_doc, rme, rme_linenum)
+    fun_couplings = generate_couplings(TensorType, selection_rules, selection_rules_linenum)
+    esc(Expr(:block, fun_iszero, fun_rme, fun_couplings))
 end
