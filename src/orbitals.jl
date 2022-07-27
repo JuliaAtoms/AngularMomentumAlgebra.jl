@@ -236,7 +236,9 @@ quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOr
     other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital})
 
 The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
-is characterized by the quantum number ``n``.
+is characterized by the principal quantum number ``n``; however, this
+does not affect the matrix elements of ``𝐉``, so it is silently
+ignored.
 """
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
     ((), missing)
@@ -245,7 +247,9 @@ other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}
     other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
 
 The orthogonal complement to [`TotalAngularMomentumSubSystem`](@ref)
-is characterized by the quantum number ``n``.
+is characterized by the principal quantum number ``n``; however, this
+does not affect the matrix elements of ``𝐉``, so it is silently
+ignored.
 """
 other_quantum_numbers(::TotalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
     ((), missing)

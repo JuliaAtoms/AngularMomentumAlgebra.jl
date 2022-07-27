@@ -15,6 +15,7 @@ LinearAlgebra.rank(::Tensor{k}) where k = k
 A general tensor acts on the full system, i.e. all coordinates.
 """
 system(::Type{<:Tensor}) = FullSystem()
+system(::T) where {T<:Tensor} = system(T)
 
 couples(a::SpinOrbital{<:Orbital}, ::Type{T}, b::SpinOrbital{<:Orbital}) where {T<:Tensor} =
     isequal(other_quantum_numbers(system(T), a, b)...)
@@ -58,6 +59,8 @@ component(Tᵏq::TensorComponent) = Tᵏq.q
 
 system(::TensorComponent{T}) where T = system(T)
 
+Base.:(==)(a::TensorComponent, b::TensorComponent) =
+    a.tensor == b.tensor && a.q == b.q
 Base.hash(Tq::TensorComponent, h::UInt) = hash(Tq.tensor, hash(Tq.q, h))
 
 # * Tensor products

@@ -20,11 +20,16 @@ Base.eltype(lc::LinearCombination{T,N}) where {T,N} = (T,N)
 Base.:(==)(a::LinearCombination, b::LinearCombination) =
     a.Ts == b.Ts && a.coeffs == b.coeffs
 
+Base.isapprox(a::LinearCombination, b::LinearCombination, args...) =
+    a.Ts == b.Ts && isapprox(a.coeffs, b.coeffs, args...)
+
 Base.hash(lc::LinearCombination, h::UInt) =
     hash(lc.Ts, hash(lc.coeffs, h))
 
 Base.zero(::LinearCombination{T,N}) where {T,N} =
     LinearCombination(Vector{T}(), Vector{N}())
+
+Base.iszero(lc::LinearCombination) = isempty(lc.Ts)
 
 Base.getindex(lc::LinearCombination, i) =
     (lc.Ts[i],lc.coeffs[i])
@@ -36,7 +41,6 @@ function Base.show(io::IO, lc::LinearCombination)
     n = length(lc)
     for (i,(t,c)) in enumerate(lc)
         showcoeff(io, c, i > 1)
-        write(io, " ")
         show(io, t)
         i < n && write(io, " ")
     end
@@ -53,6 +57,12 @@ Base.:(+)(A::LC, B::T) where {T,N,LC<:LinearCombination{<:T,N}} =
 
 Base.:(+)(A::T, B::LC) where {T,N,LC<:LinearCombination{<:T,N}} =
     LinearCombination(vcat(A, B.Ts), vcat(one(N), B.coeffs))
+
+Base.:(-)(A::LC, B::T) where {T,N,LC<:LinearCombination{<:T,N}} =
+    A + (-1)*B
+
+Base.:(-)(A::T, B::LC) where {T,N,LC<:LinearCombination{<:T,N}} =
+    A + (-1)*B
 
 Base.:(-)(A::LC) where {LC<:LinearCombination} =
     LinearCombination(A.Ts, -1 * A.coeffs)

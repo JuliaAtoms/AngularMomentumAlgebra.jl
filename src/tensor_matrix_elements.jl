@@ -144,7 +144,7 @@ function matrix_element((γj′, m′), X::TensorScalarProduct, (γj, m))
 
     # We assume that iszero(⟨n′j′||𝐓̂⁽ᵏ⁾||n₁j₁⟩) ⇔
     # iszero(⟨n₁j₁||𝐓̂⁽ᵏ⁾||n′j′⟩).
-    Tγj₁ = couplings(T, γj)
+    Tγj₁ = couplings(T, γj′)
     Uγj₁ = couplings(U, γj)
     γj₁s = map(((Tγj₁, Uγj₁),) -> ∩(Tγj₁, Uγj₁), zip(Tγj₁, Uγj₁))
     for γj₁ ∈ Iterators.product(γj₁s...)
@@ -322,6 +322,27 @@ function matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, <:Any, 
     powneg1(Int(j+j₁′+j₂-k))*∏(j)*c*w6j*r
 end
 
+@doc raw"""
+    matrix_element((γj₁′, ::Tuple{}, j′, m′), 𝐓ᵏq, (γj₁, ::Tuple{}, j, m))
+
+Compute the matrix element of the tensor `𝐓ᵏq` which acts on
+coordinate `1`, in the special case that the second coordinate is
+immaterial for the tensor `𝐓ᵏ` (an example is the principal quantum
+number ``n``, which does not affect the matrix elements of `𝐉`).
+
+# Examples
+
+```jldoctest
+julia> 𝐉₀ = TensorComponent(TotalAngularMomentum(), 0)
+𝐉̂⁽¹⁾₀
+
+julia> a = ((0, half(1), half(1)), (), half(1), half(1))
+((0, 1/2, 1/2), (), 1/2, 1/2)
+
+julia> matrix_element(a, 𝐉₀, a)
+0.49999999999999994
+```
+"""
 function matrix_element((γj₁′, γj₂′, j′, m′)::Tuple{<:Any, Tuple{}, <:Number, <:Number},
                         𝐓ᵏq::TensorComponent,
                         (γj₁, γj₂, j, m)::Tuple{<:Any, Tuple{}, <:Number, <:Number})

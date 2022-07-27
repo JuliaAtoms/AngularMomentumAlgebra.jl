@@ -16,7 +16,6 @@ jmⱼ
 spin
 LinearCombination
 @linearly_combinable
-clebsch_gordan_condon_shortley
 @δ
 couplings(j₁, m₁, j₂, m₂)
 ```

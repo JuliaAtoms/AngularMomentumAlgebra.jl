@@ -31,7 +31,7 @@ function Base.show(io::IO, me::OrbitalMatrixElement{2,A,<:CoulombInteractionMult
 end
 
 Base.show(io::IO, me::CoulombPotentialMultipole{A,B}) where {A,B}=
-write(io, "r⁻¹×Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
+    write(io, "r⁻¹×Y",to_superscript(me.o.k),"($(me.a[1]),$(me.b[1]))")
 
 radial_integral(a, (k,g)::Tuple{<:Integer,<:CoulombInteraction}, b) =
     OrbitalMatrixElement(a, CoulombInteractionMultipole(k,g), b)
@@ -51,32 +51,6 @@ A Coulomb tensor only acts on the coordinates ``r``, ``\\theta`` and
 """
 system(::Type{<:CoulombTensor}) = SpatialSubSystem()
 
-@doc raw"""
-    RadialCoulombMatrixElement
-
-This represents the matrix element of the radial component of the
-Coulomb tensor operator:
-
-```math
-\tensor{K}^{(k)}(i) \defd
-\left\{[1-\Heaviside(r_j-r_i)]r_i^k +
-\frac{\Heaviside(r_j-r_i)}{r_i^{k+1}}\right\}
-\tensor{C}^{(k)}(i),
-\quad
-i = 1,2,
-\quad
-j = 3-i,
-```
-"""
-struct RadialCoulombMatrixElement{k} <: OneBodyOperator end
-
-RadialCoulombMatrixElement(k) = RadialCoulombMatrixElement{k}()
-
-function Base.:(*)(a::RadialCoulombMatrixElement{k₁}, b::RadialCoulombMatrixElement{k₂}) where {k₁,k₂}
-    @assert k₁ == k₂
-    CoulombInteractionMultipole(k₁)
-end
-
 @tensor(CoulombTensor{k} where k) do
     begin
         n′ ~ n # The Coulomb interaction couples orbitals of different
@@ -87,10 +61,9 @@ end
     raw"""
     rme((n′,ℓ′), ::CoulombTensor{k}, (n,ℓ))
 
-Computes the reduced matrix element of `𝐊` in terms of
-[`RadialCoulombMatrixElement`](@ref).
+Computes the reduced matrix element of `𝐊`.
 """
-    rme(ℓ′, SphericalTensor(k), ℓ) # *RadialCoulombMatrixElement(k)
+    rme(ℓ′, SphericalTensor(k), ℓ)
 end
 
 """

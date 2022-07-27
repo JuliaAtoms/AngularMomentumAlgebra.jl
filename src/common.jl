@@ -1,7 +1,7 @@
 """
     triangle_range(a,b)
 
-Find all (even) `k` such that `|a-b| ≤ k ≤ a + b`. This is useful when
+Find all `k` such that `|a-b| ≤ k ≤ a + b`. This is useful when
 expanding matrix elements of tensors between angular momenta `a` and
 `b` in multipoles `k`; `triangle_range` can then be used to decided
 which multipole terms are required.
@@ -56,6 +56,26 @@ spin(o::SpinOrbital{<:Orbital}) = o.m[2]
 
 Kronecker ``\\delta_{ab}\\delta_{cd}...`` that tests each pair of
 values for equality and quick-returns `0` at the first inequality.
+Thus intended usage is within a function body, and not as part of
+an expression.
+
+# Example
+
+```julia-repl
+julia> import AngularMomentumAlgebra: @δ
+
+julia> function my_function(a,b)
+           @δ a,b # Quick-returns unless a and b are equal
+           sin(a)
+       end
+my_function (generic function with 1 method)
+
+julia> my_function(1,1)
+0.8414709848078965
+
+julia> my_function(1,0)
+0
+```
 """
 macro δ(vars...)
     code = map(vars) do v
