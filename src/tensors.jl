@@ -168,6 +168,98 @@ const LinearCombinationTensor{T<:Tensor,N<:Number} = LinearCombination{<:TensorC
 
 @linearly_combinable TensorComponent
 
+# * OrbitalRadialOverlap
+
+@doc raw"""
+    OrbitalRadialOverlap(a,b)
+
+Represents the radial overlap between the orbitals `a` and `b` in a
+N-body matrix element expansion. This is different from
+`EnergyExpressions.OrbitalOverlap`, which represents integration over
+_all_ coordinates. An `OrbitalRadialOverlap` might result when
+integrating over the spin–angular degrees of freedom of a matrix
+element. As an example, with spin-orbitals on the form
+```math
+\phi_{n\ell m_\ell s m_s}(\spatialspin) =
+\frac{P_{n\ell m_\ell s m_s}(r)}{r}
+Y^\ell_m(\theta,\phi)
+\chi_{m_s}(s),
+\quad
+\spatialspin = \{\vec{r},s\},
+```
+in the spin-restricted case, we have
+```math
+\int\diff{r}
+\conj{P_{\textrm{1s}_0\alpha}}(r)
+P_{\textrm{1s}_0\beta}(r) = 1
+```
+(provided ``P`` is normalized) whereas integration over all
+coordinates (spatial and spin)
+```math
+\int\diff{\spatialspin}
+\conj{\phi_{\textrm{1s}_0\alpha}}(\spatialspin)
+\phi_{\textrm{1s}_0\beta}(\spatialspin) = 0
+```
+by symmetry.
+
+# Examples
+
+```jldoctest
+julia> AngularMomentumAlgebra.OrbitalRadialOverlap(so"1s₀α", so"1s₀β")
+⟨1s₀α|1s₀β⟩ᵣ
+```
+"""
+struct OrbitalRadialOverlap{A,B} <: NBodyTermFactor
+    a::A
+    b::B
+end
+
+# By default, we assume that all orbital radial overlaps are non-zero,
+# i.e. the orbitals are non-orthogonal.
+Base.iszero(::OrbitalRadialOverlap) = false
+
+Base.:(==)(a::OrbitalRadialOverlap, b::OrbitalRadialOverlap) =
+    a.a == b.a && a.b == b.b
+
+Base.hash(o::OrbitalRadialOverlap, h::UInt) =
+    hash(hash(hash(o.a), hash(o.b)), h)
+
+Base.adjoint(o::OrbitalRadialOverlap{A,B}) where {A,B} = OrbitalRadialOverlap{B,A}(o.b, o.a)
+
+radial_integral(oo::OrbitalOverlap) = OrbitalRadialOverlap(oo.a, oo.b)
+
+"""
+    numbodies(::OrbitalRadialOverlap)
+
+Returns the number of bodies coupled by the zero-body operator in the
+orbital overlap, i.e. `0`.
+"""
+EnergyExpressions.numbodies(::OrbitalRadialOverlap) = 0
+
+"""
+    isdependent(o::OrbitalRadialOverlap, orbital)
+
+Returns `true` if the [`OrbitalRadialOverlap`](@ref) `o` depends on `orbital`.
+
+# Examples
+
+```jldoctest
+julia> isdependent(OrbitalRadialOverlap(:a,:b), :a)
+false
+
+julia> isdependent(OrbitalRadialOverlap(:a,:b), Conjugate(:a))
+true
+
+julia> isdependent(OrbitalRadialOverlap(:a,:b), :b)
+true
+```
+"""
+EnergyExpressions.isdependent(o::OrbitalRadialOverlap, corb::Conjugate{O}) where O = o.a == corb.orbital
+EnergyExpressions.isdependent(o::OrbitalRadialOverlap, orb::O) where O = o.b == orb
+
+Base.show(io::IO, o::OrbitalRadialOverlap) =
+    write(io, "⟨$(o.a)|$(o.b)⟩ᵣ")
+
 export Tensor, TensorComponent,
     TensorProduct, TensorScalarProduct,
     system

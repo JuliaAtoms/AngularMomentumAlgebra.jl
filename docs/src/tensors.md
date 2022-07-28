@@ -13,6 +13,7 @@ Tensor
 TensorComponent
 AngularMomentumAlgebra.LinearCombinationTensor
 system(::Type{<:Tensor})
+AngularMomentumAlgebra.OrbitalRadialOverlap
 ```
 
 ## Cartesian tensor components

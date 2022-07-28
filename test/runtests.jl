@@ -1,4 +1,5 @@
 using AngularMomentumAlgebra
+using EnergyExpressions
 using WignerSymbols
 using LinearAlgebra
 using AtomicLevels

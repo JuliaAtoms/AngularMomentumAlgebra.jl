@@ -1,5 +1,6 @@
 @testset "Tensors" begin
-    import AngularMomentumAlgebra: components, component
+    import AngularMomentumAlgebra: components, component,
+    OrbitalRadialOverlap
     @test system(Tensor) == FullSystem()
 
     𝐂⁵ = SphericalTensor(5)
@@ -37,4 +38,21 @@
     @test rank(CJ) == 0
     @test system(CJ) == (OrbitalAngularMomentumSubSystem(), TotalAngularMomentumSubSystem())
     @test string(CJ) == "(𝐂̂⁽¹⁾⋅𝐉̂⁽¹⁾)"
+
+    @testset "OrbitalRadialOverlap" begin
+        oro = OrbitalRadialOverlap(so"1s₀α", so"1s₀β")
+        @test radial_integral(OrbitalOverlap(so"1s₀α", so"1s₀β")) == oro
+        @test !iszero(oro)
+        @test oro == OrbitalRadialOverlap(so"1s₀α", so"1s₀β")
+        @test oro' == OrbitalRadialOverlap(so"1s₀β", so"1s₀α")
+        @test hash(oro') == hash(OrbitalRadialOverlap(so"1s₀β", so"1s₀α"))
+        @test numbodies(oro) == 0
+
+        @test isdependent(oro, conj(so"1s₀α"))
+        @test !isdependent(oro, conj(so"1s₀β"))
+        @test !isdependent(oro, so"1s₀α")
+        @test isdependent(oro, so"1s₀β")
+
+        @test string(oro) == "⟨1s₀α|1s₀β⟩ᵣ"
+    end
 end
