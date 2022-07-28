@@ -82,6 +82,7 @@ MathJax.Hub.Config({
         "{\\operator{J}_{#1}}",
         1
       ],
+      "spatialspin": "\\varsigma",
       "operator": [
         "\\mathfrak{#1}",
         1
