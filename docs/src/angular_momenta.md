@@ -1,4 +1,21 @@
-# Angular Momenta
+# [Angular Momenta](@id angular_momenta)
+
+An irreducible tensor ``\tensor{T}^{(J)}_M`` obeys the following
+commutation relations with the angular momentum ``\tensor{J}``:
+```math
+\begin{equation}
+\begin{aligned}
+{}[J_{\pm},\tensor{T}^{(J)}_M]
+&=
+\sqrt{\frac{J(J+1)-M(M\pm1)}{2}}\tensor{T}^{(J)}_{M\pm1}, \\
+[J_0,\tensor{T}^{(J)}_M]
+&=
+M\tensor{T}^{(J)}_M.
+\end{aligned}
+\label{eqn:ladder-operators}
+\tag{V3.1.1}
+\end{equation}
+```
 
 ## [Orbital angular momentum](@id orbital_angular_momentum)
 
