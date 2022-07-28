@@ -128,7 +128,9 @@ m_1&m_2&-m_3
 \tag{V8.1.12}
 ```
 
-They can be calculated with the [`clebsch_gordan`](@ref) function.
+They can be calculated with the
+[`WignerSymbols.clebschgordan`](https://github.com/Jutho/WignerSymbols.jl)
+function.
 
 ## Wigner–Eckart theorem
 
