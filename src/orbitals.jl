@@ -138,20 +138,24 @@ quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Relativistic
     other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital})
 
 The orthogonal complement to [`OrbitalAngularMomentumSubSystem`](@ref)
-is characterized by the quantum numbers ``n s m_s``.
+is characterized by the quantum numbers ``n s m_s``; however, ``n``
+does not affect the matrix elements of ``𝐋``, so it is silently
+ignored.
 """
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.n,half(1)), o.m[2])
+    ((half(1),), o.m[2])
 
 """
     other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital})
 
 The orthogonal complement to [`OrbitalAngularMomentumSubSystem`](@ref)
-is characterized by the quantum numbers ``n s``; the projection of the
-latter is not a good quantum number in the coupled basis.
+is characterized by the quantum numbers ``n s``; however, ``n`` does
+not affect the matrix elements of ``𝐋``, so it is silently
+ignored. Additoinally, the projection of ``s`` is not a good quantum
+number in the coupled basis.
 """
 other_quantum_numbers(::OrbitalAngularMomentumSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n,half(1)), missing)
+    ((half(1),), missing)
 
 const SpatialSubSystems = Union{SpatialSubSystem,OrbitalAngularMomentumSubSystem}
 
@@ -186,21 +190,24 @@ quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
 
 The orthogonal complement to [`SpinSubSystem`](@ref) is
 [`SpatialSubSystem`](@ref) which is characterized by the quantum
-numbers ``n \\ell m_\\ell``.
+numbers ``n \\ell m_\\ell``; however, ``n`` does not affect the matrix
+elements of ``𝐒``, so it is silently ignored.
 """
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:Orbital}) =
-    ((o.orb.n,o.orb.ℓ), o.m[1])
+    ((o.orb.ℓ,), o.m[1])
 
 """
     other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital})
 
 The orthogonal complement to [`SpinSubSystem`](@ref) is
 [`SpatialSubSystem`](@ref) which is characterized by the quantum
-numbers ``n \\ell``; the projection of the latter is not a good
-quantum number in the coupled basis.
+numbers ``n \\ell``; however, ``n`` does not affect the matrix
+elements of ``𝐒``, so it is silently ignored. Additionally, the
+projection of ``\\ell`` is not a good quantum number in the coupled
+basis.
 """
 other_quantum_numbers(::SpinSubSystem, o::SpinOrbital{<:RelativisticOrbital}) =
-    ((o.orb.n,o.orb.ℓ), missing)
+    ((o.orb.ℓ,), missing)
 
 # * Total angular momentum subsystem
 
