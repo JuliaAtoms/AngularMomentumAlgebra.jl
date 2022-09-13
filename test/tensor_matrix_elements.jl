@@ -10,8 +10,7 @@
     @testset "Wigner–Eckart for orbitals" begin
         @test dot(so"3d₁α", TensorComponent(OrbitalAngularMomentum(), 1), so"3d₀α") ≈ -√3
         @test dot(so"2s₀α", TensorComponent(SphericalTensor(1), 0), so"2p₀α") ≈ 1/√3
-        # The spherical tensor only couples the angular dimension, not r
-        @test iszero(dot(so"1s₀α", TensorComponent(SphericalTensor(1), 0), so"2p₀α"))
+        @test dot(so"1s₀α", TensorComponent(SphericalTensor(1), 0), so"2p₀α") ≈ 1/√3
         @test dot(rso"2p-(-1/2)", TensorComponent(TotalAngularMomentum(), -1), rso"2p-(1/2)") ≈ 1/√2
         @test dot(rso"2p(-1/2)", TensorComponent(TotalAngularMomentum(), -1), rso"2p(1/2)") ≈ √2
 

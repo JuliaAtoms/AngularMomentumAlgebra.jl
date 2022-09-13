@@ -1,7 +1,7 @@
 @testset "Tensors" begin
     import AngularMomentumAlgebra: components, component,
-    OrbitalRadialOverlap, radial_integral
-    import EnergyExpressions: NBodyTerm, NBodyMatrixElement
+    OrbitalRadialOverlap, radial_integral, integrate_spinor
+    import EnergyExpressions: NBodyTerm, NBodyMatrixElement, OrbitalMatrixElement
     @test system(Tensor) == FullSystem()
 
     𝐂⁵ = SphericalTensor(5)

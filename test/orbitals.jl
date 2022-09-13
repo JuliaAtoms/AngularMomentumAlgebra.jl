@@ -40,11 +40,11 @@
         @test quantum_numbers(S, so"3d₂β") == (2,2)
         @test compare(quantum_numbers(S, rso"1s(1/2)"), (0, missing))
 
-        @test other_quantum_numbers(S, so"1s₀α") == ((1,1/2),1/2)
-        @test other_quantum_numbers(S, so"1s₀β") == ((1,1/2),-1/2)
-        @test other_quantum_numbers(S, so"2p₋₁α") == ((2,1/2),1/2)
-        @test other_quantum_numbers(S, so"3d₂β") == ((3,1/2),-1/2)
-        @test compare(other_quantum_numbers(S, rso"1s(1/2)"), ((1,1/2),missing))
+        @test other_quantum_numbers(S, so"1s₀α") == ((1/2,),1/2)
+        @test other_quantum_numbers(S, so"1s₀β") == ((1/2,),-1/2)
+        @test other_quantum_numbers(S, so"2p₋₁α") == ((1/2,),1/2)
+        @test other_quantum_numbers(S, so"3d₂β") == ((1/2,),-1/2)
+        @test compare(other_quantum_numbers(S, rso"1s(1/2)"), ((1/2,),missing))
     end
 
     @testset "SpinSubSystem" begin
@@ -53,11 +53,11 @@
         @test quantum_numbers(S, so"1s₀β") == (1/2, -1/2)
         @test compare(quantum_numbers(S, rso"1s(1/2)"), (1/2,missing))
 
-        @test other_quantum_numbers(S, so"1s₀α") == ((1,0),0)
-        @test other_quantum_numbers(S, so"1s₀β") == ((1,0),0)
-        @test other_quantum_numbers(S, so"2p₋₁α") == ((2,1),-1)
-        @test other_quantum_numbers(S, so"3d₂β") == ((3,2),2)
-        @test compare(other_quantum_numbers(S, rso"1s(1/2)"), ((1,0),missing))
+        @test other_quantum_numbers(S, so"1s₀α") == ((0,),0)
+        @test other_quantum_numbers(S, so"1s₀β") == ((0,),0)
+        @test other_quantum_numbers(S, so"2p₋₁α") == ((1,),-1)
+        @test other_quantum_numbers(S, so"3d₂β") == ((2,),2)
+        @test compare(other_quantum_numbers(S, rso"1s(1/2)"), ((0,),missing))
     end
 
     @testset "TotalAngularMomentumSubSystem" begin
