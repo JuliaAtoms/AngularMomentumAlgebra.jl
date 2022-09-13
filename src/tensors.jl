@@ -309,6 +309,7 @@ Base.iszero(me::OrbitalMatrixElement{<:Any,<:SpinOrbital,<:TensorOperator,<:Spin
 
 function integrate_spinor(me::OrbitalMatrixElement{N,<:SpinOrbital,<:TensorOperator{N},<:SpinOrbital}) where N
     coeff = spin_ang_coeff(me)
+    iszero(coeff) && return zero(NBodyMatrixElement)
     NBodyMatrixElement([NBodyTerm([OrbitalRadialOverlap(me.a[i], me.b[i]) for i = 1:N], coeff)])
 end
 
