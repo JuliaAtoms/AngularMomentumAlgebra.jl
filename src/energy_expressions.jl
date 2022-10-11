@@ -23,6 +23,8 @@ coordinates (see [`multipole_expand`](@ref)).
 integrate_spinor(me::OrbitalMatrixElement{2,<:Any,<:CoulombInteraction,<:Any}) =
     multipole_expand(me)
 
+integrate_spinor(me::OrbitalMatrixElement{0, <:Any, IdentityOperator{0}, <:Any}) =
+    one(NBodyMatrixElement)
 
 """
     integrate_spinor(integral::NBodyTermFactor)

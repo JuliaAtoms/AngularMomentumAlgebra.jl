@@ -26,6 +26,18 @@
                 end
             end
         end
+
+        @testset "Zero-body identity operator" begin
+            I₀ = IdentityOperator{0}()
+
+            me = ome([], I₀, [])
+            @test isone(integrate_spinor(me))
+
+            cfgs = [sc"1s₀α kp₀α"]
+            oo = ov(so"kp₀α", so"kp₀α")
+            E = Matrix(I₀, cfgs, [oo])
+            @test E == NBodyMatrixElement[nbt(oo)][:,:]
+        end
     end
 
     @testset "Multi-configurational" begin
