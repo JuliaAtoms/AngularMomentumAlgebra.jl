@@ -45,7 +45,7 @@ r
 ```@docs
 Dipole
 system(::Type{Dipole})
-AngularMomentumAlgebra.RadialMatrixElement
+AngularMomentumAlgebra.RadialOperator
 rme((n′,ℓ′), ::Dipole, (n,ℓ))
 AngularMomentumAlgebra.couplings(tensor::Dipole, (n,ℓ)::Tuple{<:Number, <:Number})
 ```

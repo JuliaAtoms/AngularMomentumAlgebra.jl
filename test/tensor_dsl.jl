@@ -212,12 +212,12 @@
                    rme((n′,ℓ′), ::Gradient, (n,ℓ))
 
                Computes the reduced matrix element of `∇` in terms of
-               [`RadialGradientMatrixElement`](@ref).
+               [`RadialGradientOperator`](@ref).
                """
                     if ℓ′ == ℓ+1
-                        √(ℓ+1)*RadialGradientMatrixElement(-ℓ)
+                        √(ℓ+1)*RadialGradientOperator(-ℓ)
                     elseif ℓ′==ℓ-1
-                        - √(ℓ)*RadialGradientMatrixElement(ℓ+1)
+                        - √(ℓ)*RadialGradientOperator(ℓ+1)
                     end
                 end
             end
