@@ -31,6 +31,91 @@ function Base.show(io::IO, ::Tensor{k,label}) where {k,label}
     write(io,"⁽",to_superscript(k),"⁾")
 end
 
+# * Radial integrals
+
+@doc raw"""
+    OrbitalRadialMatrixElement(a,b)
+
+Represents the radial overlap between the orbitals `a` and `b` in a
+N-body matrix element expansion. This is different from
+`EnergyExpressions.OrbitalMatrixElement`, which represents integration
+over _all_ coordinates. An `OrbitalRadialMatrixElement` might result when
+integrating over the spin–angular degrees of freedom of a matrix
+element.
+
+# Examples
+
+```jldoctest
+julia> AngularMomentumAlgebra.OrbitalRadialMatrixElement(so"1s₀α", RadialOperator(), so"2p₀α")
+⟨1s₀α|r|2p₀α⟩ᵣ
+```
+"""
+struct OrbitalRadialMatrixElement{A,O,B} <: NBodyTermFactor
+    a::A
+    o::O
+    b::B
+end
+
+# By default, we assume that all orbital radial matrix elements are
+# non-zero.
+Base.iszero(::OrbitalRadialMatrixElement) = false
+
+Base.:(==)(a::OrbitalRadialMatrixElement, b::OrbitalRadialMatrixElement) =
+    a.a == b.a && a.o == b.o && a.b == b.b
+
+Base.hash(me::OrbitalRadialMatrixElement, h::UInt) =
+    hash(hash(hash(me.a), hash(me.o, hash(me.b))), h)
+
+Base.adjoint(me::OrbitalRadialMatrixElement) = OrbitalRadialMatrixElement(me.b, me.o, me.a)
+
+"""
+    numbodies(::OrbitalRadialMatrixElement)
+
+Returns the number of bodies coupled by the operator in the
+radial matrix element.
+"""
+EnergyExpressions.numbodies(me::OrbitalRadialMatrixElement) = length(me.a)
+
+"""
+    isdependent(o::OrbitalRadialMatrixElement, orbital)
+
+Returns `true` if the [`OrbitalRadialMatrixElement`](@ref) `o` depends on `orbital`.
+
+# Examples
+
+```jldoctest
+julia> isdependent(OrbitalRadialMatrixElement(:a,I,:b), :a)
+false
+
+julia> isdependent(OrbitalRadialMatrixElement(:a,I,:b), Conjugate(:a))
+true
+
+julia> isdependent(OrbitalRadialMatrixElement(:a,I,:b), :b)
+true
+```
+"""
+EnergyExpressions.isdependent(me::OrbitalRadialMatrixElement, corb::Conjugate{O}) where O = corb.orbital ∈ me.a
+EnergyExpressions.isdependent(me::OrbitalRadialMatrixElement, orb::O) where O = orb ∈ me.b
+
+function Base.show(io::IO, me::OrbitalRadialMatrixElement)
+    write(io, "⟨", join(string.(me.a), " "))
+    write(io, "|")
+    show(io, me.o)
+    write(io, "|")
+    write(io, join(string.(me.b), " "), "⟩ᵣ")
+end
+
+function radial_integral(a, op, b)
+    na = length(a)
+    nb = length(b)
+    na == nb ||
+        throw(DimensionMismatch("Trying to form radial integral from $(na) and $(nb) orbitals"))
+    OrbitalRadialMatrixElement(a, op, b)
+end
+
+radial_integral(a, op::EnergyExpressions.LinearCombinationOperator, b) =
+    sum(c*radial_integral(a, o, b) for (o,c) in op.operators)
+
 # * Tensor components
 
 """
@@ -228,6 +313,11 @@ Base.adjoint(o::OrbitalRadialOverlap{A,B}) where {A,B} = OrbitalRadialOverlap{B,
 
 radial_integral(oo::OrbitalOverlap) = OrbitalRadialOverlap(oo.a, oo.b)
 
+function radial_integral(a, n::Number, b)
+    @assert length(a) == length(b)
+    NBodyTerm([OrbitalRadialOverlap(aa, bb) for (aa,bb) in zip(a,b)], n)
+end
+
 """
     numbodies(::OrbitalRadialOverlap)
 
@@ -310,7 +400,7 @@ Base.iszero(me::OrbitalMatrixElement{<:Any,<:SpinOrbital,<:TensorOperator,<:Spin
 function integrate_spinor(me::OrbitalMatrixElement{N,<:SpinOrbital,<:TensorOperator{N},<:SpinOrbital}) where N
     coeff = spin_ang_coeff(me)
     iszero(coeff) && return zero(NBodyMatrixElement)
-    NBodyMatrixElement([NBodyTerm([OrbitalRadialOverlap(me.a[i], me.b[i]) for i = 1:N], coeff)])
+    NBodyMatrixElement(radial_integral(me.a, coeff, me.b))
 end
 
 function Base.show(io::IO, to::TensorOperator)
