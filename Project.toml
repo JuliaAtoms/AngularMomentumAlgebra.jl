@@ -1,7 +1,7 @@
 name = "AngularMomentumAlgebra"
 uuid = "0bb1b1ac-0216-11e9-361b-bb110c659ce1"
 authors = ["Stefanos Carlström <stefanos.carlstrom@gmail.com>"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 AtomicLevels = "10933b4c-d60f-11e8-1fc6-bd9035a249a1"
