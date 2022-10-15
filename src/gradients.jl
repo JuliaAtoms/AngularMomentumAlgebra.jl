@@ -29,7 +29,7 @@ and ``\\phi``.
 system(::Type{ReducedGradient}) = SpatialSubSystem()
 
 @doc raw"""
-    RadialGradientMatrixElement(k)
+    RadialGradientOperator(k)
 
 This represents the matrix element of the radial component of the
 gradient operator:
@@ -44,11 +44,11 @@ gradient operator:
 \end{equation}
 ```
 """
-struct RadialGradientMatrixElement <: OneBodyOperator
+struct RadialGradientOperator <: OneBodyOperator
     k::Int
 end
 
-function Base.show(io::IO, me::RadialGradientMatrixElement)
+function Base.show(io::IO, me::RadialGradientOperator)
     if iszero(me.k)
         write(io, "∂ᵣ")
     else
@@ -57,6 +57,8 @@ function Base.show(io::IO, me::RadialGradientMatrixElement)
         write(io, " $(abs(me.k))/r)")
     end
 end
+
+LinearAlgebra.adjoint(∂ᵣ::RadialGradientOperator) = -RadialGradientOperator(-∂ᵣ.k)
 
 @tensor(Gradient) do
     begin
@@ -69,12 +71,12 @@ end
     rme((n′,ℓ′), ::Gradient, (n,ℓ))
 
 Computes the reduced matrix element of `∇` in terms of
-[`RadialGradientMatrixElement`](@ref).
+[`RadialGradientOperator`](@ref).
 """
     if ℓ′ == ℓ+1
-        √(ℓ+1)*RadialGradientMatrixElement(-ℓ)
+        √(ℓ+1)*RadialGradientOperator(-ℓ)
     elseif ℓ′==ℓ-1
-        - √(ℓ)*RadialGradientMatrixElement(ℓ+1)
+        - √(ℓ)*RadialGradientOperator(ℓ+1)
     end
 end
 
@@ -89,12 +91,12 @@ end
     rme((n′,ℓ′), ::ReducedGradient, (n,ℓ))
 
 Computes the reduced matrix element of `∂` in terms of
-[`RadialGradientMatrixElement`](@ref).
+[`RadialGradientOperator`](@ref).
 """
     if ℓ′ == ℓ+1
-        √(ℓ+1)*RadialGradientMatrixElement(-(ℓ+1))
+        √(ℓ+1)*RadialGradientOperator(-(ℓ+1))
     elseif ℓ′==ℓ-1
-        - √(ℓ)*RadialGradientMatrixElement(ℓ)
+        - √(ℓ)*RadialGradientOperator(ℓ)
     end
 end
 

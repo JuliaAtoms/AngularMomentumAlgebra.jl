@@ -67,7 +67,7 @@ A dipole tensor only acts on the coordinates ``r``, ``\\theta`` and
 system(::Type{Dipole}) = SpatialSubSystem()
 
 @doc raw"""
-    RadialMatrixElement()
+    RadialOperator()
 
 This represents the matrix element of the radial component of the
 dipole operator:
@@ -80,9 +80,11 @@ r
 \Psi_{n\ell}(r)
 ```
 """
-struct RadialMatrixElement <: OneBodyOperator end
+struct RadialOperator <: OneBodyOperator end
 
-Base.show(io::IO, ::RadialMatrixElement) = write(io, "r")
+Base.show(io::IO, ::RadialOperator) = write(io, "r")
+
+LinearAlgebra.adjoint(r::RadialOperator) = r
 
 @tensor(Dipole) do
     begin
@@ -95,9 +97,9 @@ Base.show(io::IO, ::RadialMatrixElement) = write(io, "r")
     rme((n′,ℓ′), ::Dipole, (n,ℓ))
 
 Computes the reduced matrix element of `𝐃` in terms of
-[`RadialMatrixElement`](@ref).
+[`RadialOperator`](@ref).
 """
-    rme(ℓ′, SphericalTensor(1), ℓ)*RadialMatrixElement()
+    rme(ℓ′, SphericalTensor(1), ℓ)*RadialOperator()
 end
 
 module Dipoles

@@ -1,5 +1,5 @@
 @testset "Spherical tensors" begin
-    import AngularMomentumAlgebra: ranks, RadialMatrixElement
+    import AngularMomentumAlgebra: ranks, RadialOperator
 
     approx_comp(a, b) = a ≈ b
     function approx_comp(a::EnergyExpressions.LinearCombinationOperator,
@@ -88,7 +88,7 @@
         D₋₁ = TensorComponent(𝐃, -1)
         @test system(𝐃) == SpatialSubSystem()
 
-        r = RadialMatrixElement()
+        r = RadialOperator()
         @test string(r) == "r"
 
         @test iszero(dot(so"1s₀α", D₀, so"3d₀α"))

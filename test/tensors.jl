@@ -1,6 +1,7 @@
 @testset "Tensors" begin
     import AngularMomentumAlgebra: components, component,
-    OrbitalRadialOverlap, radial_integral, integrate_spinor
+    RadialOperator, RadialGradientOperator,
+    OrbitalRadialOverlap, OrbitalRadialMatrixElement, radial_integral, integrate_spinor
     import EnergyExpressions: NBodyTerm, NBodyMatrixElement, OrbitalMatrixElement
     @test system(Tensor) == FullSystem()
 
@@ -66,9 +67,11 @@
 
         Tz = T -> TensorOperator{1}(TensorComponent(T, 0))
         oro = (args...) -> NBodyMatrixElement([NBodyTerm([OrbitalRadialOverlap(a, b) for (a,b) in args], 1)])
+        orm = (a,o,b) -> NBodyMatrixElement([NBodyTerm([radial_integral(a, o, b)], 1)])
 
         a = so"1s₀α"
         b = so"1s₀β"
+        c = so"2p₀β"
         a′ = so"ks₀α"
         b′ = so"ls₀β"
         ra = rso"1s(1/2)"
@@ -129,6 +132,46 @@
             ref = c*NBodyMatrixElement[oro((a′,a),(b′,b)) 0
                                        0 oro((b′,b),(a′,a))]
             @test all(int_omes .≈ ref)
+        end
+
+        @testset "OrbitalRadialMatrixElement" begin
+            cfgs = [sc"1s₀α 1s₀β", sc"1s₀α 2p₀β"]
+
+            r̂ = RadialOperator()
+            ∂̂ᵣ = k -> RadialGradientOperator(k)
+
+            @test radial_integral([b],r̂,[c]) == OrbitalRadialMatrixElement([b],r̂,[c])
+            @test radial_integral([b],2.0,[c]) == 2oro((b,c))
+
+            @test string(orm([b],r̂,[c])) == "⟨1s₀β|r|2p₀β⟩ᵣ"
+
+            val = Matrix(Tz(Dipole()), cfgs)
+            ref = 1/√3*NBodyMatrixElement[0 orm([b],r̂,[c])
+                                          orm([c],r̂,[b]) 0]
+            @test all(val .≈ ref)
+
+            val = Matrix(Tz(Gradient()), cfgs)
+            ref = 1/√3*NBodyMatrixElement[0 orm([b],∂̂ᵣ(2),[c])
+                                          orm([c],∂̂ᵣ(0),[b]) 0]
+            @test all(val .≈ ref)
+
+            val = Matrix(Tz(SphericalTensor(1)), cfgs)
+            ref = 1/√3*NBodyMatrixElement[0 oro((b,c))
+                                          oro((c,b)) 0]
+            @test all(val .≈ ref)
+
+            @test adjoint(orm([a], r̂, [b])) == orm([b], r̂, [a])
+            @test adjoint(adjoint(orm([a], r̂, [b]))) == orm([a], r̂, [b])
+
+            @test adjoint(orm([a], ∂̂ᵣ(2), [b])) == -orm([b], ∂̂ᵣ(-2), [a])
+            @test adjoint(adjoint(orm([a], ∂̂ᵣ(2), [b]))) == orm([a], ∂̂ᵣ(2), [b])
+
+            me = orm([a], r̂, [b]).terms[1].factors[1]
+            @test numbodies(me) == 1
+            @test !isdependent(me, a)
+            @test isdependent(me, conj(a))
+            @test isdependent(me, b)
+            @test !isdependent(me, conj(b))
         end
     end
 end
