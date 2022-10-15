@@ -29,7 +29,7 @@ and ``\\phi``.
 system(::Type{ReducedGradient}) = SpatialSubSystem()
 
 @doc raw"""
-    RadialGradientMatrixElement(k)
+    RadialGradientOperator(k)
 
 This represents the matrix element of the radial component of the
 gradient operator:
@@ -57,6 +57,8 @@ function Base.show(io::IO, me::RadialGradientOperator)
         write(io, " $(abs(me.k))/r)")
     end
 end
+
+LinearAlgebra.adjoint(∂ᵣ::RadialGradientOperator) = -RadialGradientOperator(-∂ᵣ.k)
 
 @tensor(Gradient) do
     begin

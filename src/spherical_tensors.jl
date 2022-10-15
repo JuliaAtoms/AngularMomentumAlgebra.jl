@@ -84,6 +84,8 @@ struct RadialOperator <: OneBodyOperator end
 
 Base.show(io::IO, ::RadialOperator) = write(io, "r")
 
+LinearAlgebra.adjoint(r::RadialOperator) = r
+
 @tensor(Dipole) do
     begin
         n′ ~ n # The dipole couples orbitals of different n, but

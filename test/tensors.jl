@@ -159,6 +159,19 @@
             ref = 1/√3*NBodyMatrixElement[0 oro((b,c))
                                           oro((c,b)) 0]
             @test all(val .≈ ref)
+
+            @test adjoint(orm([a], r̂, [b])) == orm([b], r̂, [a])
+            @test adjoint(adjoint(orm([a], r̂, [b]))) == orm([a], r̂, [b])
+
+            @test adjoint(orm([a], ∂̂ᵣ(2), [b])) == -orm([b], ∂̂ᵣ(-2), [a])
+            @test adjoint(adjoint(orm([a], ∂̂ᵣ(2), [b]))) == orm([a], ∂̂ᵣ(2), [b])
+
+            me = orm([a], r̂, [b]).terms[1].factors[1]
+            @test numbodies(me) == 1
+            @test !isdependent(me, a)
+            @test isdependent(me, conj(a))
+            @test isdependent(me, b)
+            @test !isdependent(me, conj(b))
         end
     end
 end

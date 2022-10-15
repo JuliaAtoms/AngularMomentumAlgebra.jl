@@ -66,7 +66,7 @@ Base.:(==)(a::OrbitalRadialMatrixElement, b::OrbitalRadialMatrixElement) =
 Base.hash(me::OrbitalRadialMatrixElement, h::UInt) =
     hash(hash(hash(me.a), hash(me.o, hash(me.b))), h)
 
-Base.adjoint(me::OrbitalRadialMatrixElement) = OrbitalRadialMatrixElement(me.b, me.o, me.a)
+Base.adjoint(me::OrbitalRadialMatrixElement) = radial_integral(me.b, adjoint(me.o), me.a)
 
 """
     numbodies(::OrbitalRadialMatrixElement)
