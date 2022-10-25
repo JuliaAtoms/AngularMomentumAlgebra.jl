@@ -350,6 +350,24 @@ EnergyExpressions.isdependent(o::OrbitalRadialOverlap, orb::O) where O = o.b == 
 Base.show(io::IO, o::OrbitalRadialOverlap) =
     write(io, "⟨$(o.a)|$(o.b)⟩ᵣ")
 
+"""
+    diff(ab::OrbitalRadialOverlap, o::O)
+
+Vary the orbital radial overlap ⟨a|b⟩ᵣ with respect to |o⟩.
+"""
+Base.diff(ab::OrbitalRadialOverlap, o::O) where O =
+    o == ab.b ? NBodyEquation(Conjugate(ab.a),
+                              IdentityOperator{1}()) : 0
+
+"""
+    diff(ab::OrbitalRadialOverlap, o::Conjugate{O})
+
+Vary the orbital radial overlap ⟨a|b⟩ᵣ with respect to ⟨o|.
+"""
+Base.diff(ab::OrbitalRadialOverlap, o::Conjugate{O}) where O =
+    conj(o) == ab.a ? NBodyEquation(ab.b,
+                                    IdentityOperator{1}()) : 0
+
 # * Tensor operators
 
 """

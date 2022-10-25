@@ -2,7 +2,7 @@
     import AngularMomentumAlgebra: components, component,
     RadialOperator, RadialGradientOperator,
     OrbitalRadialOverlap, OrbitalRadialMatrixElement, radial_integral, integrate_spinor
-    import EnergyExpressions: NBodyTerm, NBodyMatrixElement, OrbitalMatrixElement
+    import EnergyExpressions: NBodyTerm, NBodyMatrixElement, OrbitalMatrixElement, NBodyEquation
     @test system(Tensor) == FullSystem()
 
     𝐂⁵ = SphericalTensor(5)
@@ -59,6 +59,14 @@
         @test isdependent(oro, so"1s₀β")
 
         @test string(oro) == "⟨1s₀α|1s₀β⟩ᵣ"
+
+        eq(orb, op, args...) = NBodyEquation(orb, op, args...)
+        I₁ = IdentityOperator{1}()
+
+        @test diff(oro, conj(so"1s₀α")) == eq(so"1s₀β", I₁)
+        @test iszero(diff(oro, conj(so"1s₀β")))
+        @test iszero(diff(oro, so"1s₀α"))
+        @test diff(oro, so"1s₀β") == eq(conj(so"1s₀α"), I₁)
     end
 
     @testset "TensorOperator" begin
