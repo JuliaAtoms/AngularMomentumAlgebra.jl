@@ -12,6 +12,35 @@ spin-angular integral of unity.
 """
 integrate_spinor(me) = me
 
+function spin_angular_overlap(a::SpinOrbital{<:Orbital}, b::SpinOrbital{<:Orbital})
+    @δ a.orb.ℓ, b.orb.ℓ
+    @δ a.m, b.m
+    1
+end
+
+function spin_angular_overlap(a::SpinOrbital{<:RelativisticOrbital}, b::SpinOrbital{<:RelativisticOrbital})
+    @δ a.orb.ℓ, b.orb.ℓ
+    @δ a.orb.j, b.orb.j
+    @δ a.m, b.m
+    1
+end
+
+function spin_angular_overlap(a::SpinOrbital{<:Orbital}, b::SpinOrbital{<:RelativisticOrbital})
+    @δ a.orb.ℓ, b.orb.ℓ
+    clebschgordan(a.orb.ℓ, a.m[1], half(1), a.m[2], b.orb.j, b.m[1])
+end
+
+function spin_angular_overlap(a::SpinOrbital{<:RelativisticOrbital}, b::SpinOrbital{<:Orbital})
+    @δ a.orb.ℓ, b.orb.ℓ
+    conj(clebschgordan(b.orb.ℓ, b.m[1], half(1), b.m[2], a.orb.j, a.m[1]))
+end
+
+function integrate_spinor(ob::OrbitalOverlap{<:SpinOrbital,<:SpinOrbital})
+    f = spin_angular_overlap(ob.a, ob.b)
+    iszero(f) && return 0
+    f*OrbitalRadialOverlap(ob.a, ob.b)
+end
+
 """
     integrate_spinor(me::OrbitalMatrixElement{2,<:Any,<:CoulombInteraction,<:Any})
 
